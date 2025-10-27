@@ -4,7 +4,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectDB {
-	public static void main(String[] args) {
+	
+	public static void connect() {
 		String url = "jdbc:sqlserver://localhost:1433;databaseName=QUANLYQUANCOFFEEJCD;encrypt=true;trustServerCertificate=true";
         String user = "sa";
         String password = "sapassword";
@@ -13,6 +14,9 @@ public class ConnectDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+	}
+	public static void main(String[] args) {
+		connect();
     }
 
 }

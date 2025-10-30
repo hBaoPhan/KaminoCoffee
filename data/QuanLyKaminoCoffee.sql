@@ -50,7 +50,7 @@ GO
 CREATE TABLE Ban (
     maBan VARCHAR(20) PRIMARY KEY,
     soGhe INT CHECK (soGhe >= 0),
-    trangThai BIT DEFAULT 0  -- 0: Tr?ng, 1: Ðang s? d?ng/Ðã d?t
+    trangThai NVARCHAR(10) CHECK (trangThai IN ('Trong', 'DaDuocDat','DangDuocSuDung')) NOT NULL,
    
 );
 GO
@@ -97,7 +97,19 @@ CREATE TABLE HoaDon (
         ON UPDATE CASCADE
 );
 GO
-
+CREATE TABLE DonDatBan (
+    maDonDatBan VARCHAR(20) PRIMARY KEY,
+    maKH VARCHAR(20),
+    maBan VARCHAR(20),
+    thoiGian Date,
+    FOREIGN KEY (maKH) REFERENCES KhachHang(maKH)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    FOREIGN KEY (maBan) REFERENCES Ban(maBan)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+  
+);
 -- ========================================================
 -- B?NG CHI TI?T HÓA ÐON
 -- ========================================================
@@ -174,3 +186,5 @@ INSERT INTO HoaDon VALUES
 --('HD004', 'SP004', 3, 30000);
 
 */
+use master
+drop database QUANLYKAMINOCOFFEE

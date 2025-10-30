@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public class ConnectDB {
 	
 	public static void connect() {
-		String url = "jdbc:sqlserver://localhost:1433;databaseName=QUANLYQUANCOFFEEJCD;encrypt=true;trustServerCertificate=true";
+		String url = "jdbc:sqlserver://localhost:1433;databaseName=QUANLYKAMINOCOFFEE;encrypt=true;trustServerCertificate=true";
         String user = "sa";
         String password = "sapassword";
         try (Connection conn = DriverManager.getConnection(url, user, password)) {

@@ -186,5 +186,3 @@ INSERT INTO HoaDon VALUES
 --('HD004', 'SP004', 3, 30000);
 
 */
-use master
-drop database QUANLYKAMINOCOFFEE

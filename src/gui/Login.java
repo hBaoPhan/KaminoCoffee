@@ -37,12 +37,16 @@ public class Login extends JFrame implements ActionListener {
 //		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		JPanel pnlMain = new JPanel();
+		pnlMain.setBackground(Color.WHITE);
+		pnlMain.setOpaque(true);
 		add(pnlMain, BorderLayout.CENTER);
 
 		ImageIcon LogoIcon = new ImageIcon("images/logo.png");
 		Image scaledImage = LogoIcon.getImage().getScaledInstance(205, 205, Image.SCALE_SMOOTH);
 		ImageIcon resizedIcon = new ImageIcon(scaledImage);
 		JLabel lblLogo = new JLabel(resizedIcon);
+		lblLogo.setBackground(Color.WHITE);
+		lblLogo.setOpaque(true);
 
 		add(lblLogo, BorderLayout.NORTH);
 
@@ -56,10 +60,12 @@ public class Login extends JFrame implements ActionListener {
 		lblPassword.setPreferredSize(lblUserName.getPreferredSize());
 
 		txtUserName = new JTextField(20);
-		txtUserName.setBorder(BorderFactory.createLineBorder(Color.white, 5, true));
+		txtUserName.setBorder(BorderFactory.createLineBorder(Color.decode("#F7F4EC"), 5, true));
+		txtUserName.setBackground(Color.decode("#F7F4EC"));
 
 		txtPassword = new JPasswordField(20);
-		txtPassword.setBorder(BorderFactory.createLineBorder(Color.white, 5, true));
+		txtPassword.setBorder(BorderFactory.createLineBorder(Color.decode("#F7F4EC"), 5, true));
+		txtPassword.setBackground(Color.decode("#F7F4EC"));
 
 		btnLogin = new JButton("Đăng nhập");
 		btnLogin.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///

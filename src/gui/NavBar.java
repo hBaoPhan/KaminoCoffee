@@ -31,9 +31,10 @@ public class NavBar extends JFrame implements MouseListener {
 
 	private Color defaultColor = new Color(230, 230, 230);
 	private Color hoverColor = new Color(200, 200, 255); // màu nền khi hover
-	private Color textHoverColor = Color.BLUE; // màu chữ khi hover
+	private Color textHoverColor = Color.decode("#e07b39"); // màu chữ khi hover
 	private Color textDefaultColor = Color.BLACK;
 	private Font customFont = new Font("Time New Romans", Font.BOLD, 20);
+	private JButton btnDangXuat;
 
 	public NavBar() {
 		setTitle("Main Frame");
@@ -64,7 +65,11 @@ public class NavBar extends JFrame implements MouseListener {
 		sidebar.add(Box.createVerticalStrut(10));
 		sidebar.add(lblTenTaiKhoan);
 		sidebar.add(lblChucVu);
-
+		sidebar.add(Box.createVerticalStrut(10));
+		btnDangXuat=new JButton("Đăng xuất");
+		btnDangXuat.setBackground(Color.RED);
+		btnDangXuat.setForeground(Color.WHITE);
+		sidebar.add(btnDangXuat);
 		sidebar.add(Box.createVerticalStrut(20));
 
 		String[] tabs = { "Trang chủ", "Bàn", "Thực đơn", "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };

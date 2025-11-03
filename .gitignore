@@ -1,0 +1,34 @@
+# Thư mục build và biên dịch
+/bin/
+/build/
+/out/
+/target/
+
+# File biên dịch
+*.class
+
+# IDE: IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Maven
+/logs/
+*.log
+target/
+
+# Gradle
+.gradle/
+build/
+
+# VS Code
+.vscode/
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Tệp tạm
+*.tmp
+*.swp
+

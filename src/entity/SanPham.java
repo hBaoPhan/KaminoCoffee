@@ -2,12 +2,15 @@ package entity;
 
 import java.util.Objects;
 
+import enums.LoaiSanPham;
+
 public class SanPham {
 	private String maSanPham;
 	private String tenSanPham;
 	private double gia;
-	private String loaiSanPham;
-	public SanPham(String maSanPham, String tenSanPham, double gia, String loaiSanPham) {
+	private LoaiSanPham loaiSanPham;
+	
+	public SanPham(String maSanPham, String tenSanPham, double gia, LoaiSanPham loaiSanPham) {
 		super();
 		this.maSanPham = maSanPham;
 		this.tenSanPham = tenSanPham;
@@ -26,12 +29,7 @@ public class SanPham {
 	public void setGia(double gia) {
 		this.gia = gia;
 	}
-	public String getLoaiSanPham() {
-		return loaiSanPham;
-	}
-	public void setLoaiSanPham(String loaiSanPham) {
-		this.loaiSanPham = loaiSanPham;
-	}
+	
 	public String getMaSanPham() {
 		return maSanPham;
 	}

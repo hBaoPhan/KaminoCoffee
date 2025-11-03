@@ -48,15 +48,26 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	private JTable tableMonAn;
 	private JLabel lblThanhTien;
 	private JTextField txtTimKiemDoUong;
-	Border lineBorder = BorderFactory.createLineBorder(Color.decode("#e07b39"), 5);
-	Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+	
 	private JButton btnLuu;
 	private JToggleButton tggleDangSuDung;
 	private JButton btnThanhToan;
 	private JButton btnTimKiemDoUong;
 	private JComboBox<String> cboFilterDoUong;
+	
 	private ImageIcon resizedIcon;
 	private Font lblFont = new Font("Time New Roman", Font.BOLD, 20);
+	Border lineBorder = BorderFactory.createLineBorder(Color.decode("#e07b39"), 5);
+	Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+	private JLabel lblTenBan_DatBan;
+	private JTextField txtTenKH_DatBan;
+	private JLabel lblSDT_DatBan;
+	private JTextField txtSDT_DatBan;
+	private JLabel lblThoiGian_DatBan;
+	private JTextField txtThoiGian_DatBan;
+	private JButton btnDatBan;
+	private DefaultTableModel modelDatBan;
+	private JTable tableDatBan;
 	public BanPanel() {
 		
 		// Tạo panel chính cho tab đầu tiên
@@ -103,16 +114,18 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		
 		BoxThongTin_Center.setBorder(new CompoundBorder(lineBorder, emptyBorder));
 		
-		Box[] boxArray = new Box[15];
+		
+		
+		Box[] boxArrayThongTinBan = new Box[15];
 		for (int i = 0; i < 15; i++) {
-			BoxThongTin_Center.add(boxArray[i] = Box.createHorizontalBox());
-			boxArray[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+			BoxThongTin_Center.add(boxArrayThongTinBan[i] = Box.createHorizontalBox());
+			boxArrayThongTinBan[i].setAlignmentX(Component.LEFT_ALIGNMENT);
 			BoxThongTin_Center.add(Box.createVerticalStrut(10));
 		}
 
 		// Tiêu đề bàn
 		lblTenBan = new JLabel("Bàn 1");
-		boxArray[0].add(lblTenBan);
+		boxArrayThongTinBan[0].add(lblTenBan);
 		lblTenBan.setFont(lblFont);
 
 		JLabel lblTenKH;
@@ -124,41 +137,41 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		lblTenKH.setPreferredSize(new Dimension(100, 25));
 		lblTenKH.setMaximumSize(lblTenKH.getPreferredSize());
 
-		boxArray[1].add(lblTenKH);
+		boxArrayThongTinBan[1].add(lblTenKH);
 
-		boxArray[2].add(txtTenKH = new JTextField());
+		boxArrayThongTinBan[2].add(txtTenKH = new JTextField());
 
-		boxArray[3].add(lblSDTKH = new JLabel("Số điện thoại:"));
+		boxArrayThongTinBan[3].add(lblSDTKH = new JLabel("Số điện thoại:"));
 		lblSDTKH.setPreferredSize(new Dimension(100, 25));
 		lblSDTKH.setMaximumSize(lblSDTKH.getPreferredSize());
 
-		boxArray[4].add(txtSDT = new JTextField());
+		boxArrayThongTinBan[4].add(txtSDT = new JTextField());
 
 //      pnlThongTin_Center.add(new JLabel("Thời gian đặt:"));
 //      pnlThongTin_Center.add(Box.createVerticalStrut(5));
 //      pnlThongTin_Center.add(txtThoiGian=new JTextField("10:00"));
 //      pnlThongTin_Center.add(Box.createVerticalStrut(10));
 
-		boxArray[5].add(lblThoiGianVao = new JLabel("Thời gian vào:"));
+		boxArrayThongTinBan[5].add(lblThoiGianVao = new JLabel("Thời gian vào:"));
 		lblThoiGianVao.setPreferredSize(new Dimension(100, 25));
 		lblThoiGianVao.setMaximumSize(lblThoiGianVao.getPreferredSize());
 
-		boxArray[6].add(new JTextField());
+		boxArrayThongTinBan[6].add(new JTextField());
 
-		boxArray[7].add(lblThoiGianRa = new JLabel("Thời gian ra:"));
+		boxArrayThongTinBan[7].add(lblThoiGianRa = new JLabel("Thời gian ra:"));
 		lblThoiGianRa.setPreferredSize(new Dimension(100, 25));
 		lblThoiGianRa.setMaximumSize(lblThoiGianRa.getPreferredSize());
 	
 
-		boxArray[8].add(new JTextField());
+		boxArrayThongTinBan[8].add(new JTextField());
 
-		boxArray[9].add(new JLabel("Danh sách món:"));
+		boxArrayThongTinBan[9].add(new JLabel("Danh sách món:"));
 
 		String header[] = { "Tên món", "Số lượng", "Đơn giá", "Thành tiền" };
 		modelMonAn = new DefaultTableModel(header, 0);
 		tableMonAn = new JTable(modelMonAn);
 		JScrollPane scrDanhSachMon = new JScrollPane(tableMonAn);
-		boxArray[10].add(scrDanhSachMon);
+		boxArrayThongTinBan[10].add(scrDanhSachMon);
 		//      Tong Tien
 		JLabel lblTongTien = new JLabel("Tổng tiền: ");
 		lblTongTien.setPreferredSize(new Dimension(100, 25));
@@ -171,7 +184,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		tongTienBox.add(lblTongTien);
 		tongTienBox.add(Box.createHorizontalStrut(740));
 		tongTienBox.add(lblThanhTien);
-		boxArray[11].add(tongTienBox);
+		boxArrayThongTinBan[11].add(tongTienBox);
 		
 		tggleDangSuDung=new JToggleButton("Đang sử dụng");
 		tggleDangSuDung.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
@@ -191,15 +204,15 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		buttonBox.add(tggleDangSuDung);
 		buttonBox.add(Box.createHorizontalStrut(30));
 		buttonBox.add(btnLuu);
-		boxArray[12].add(buttonBox);
+		boxArrayThongTinBan[12].add(buttonBox);
 		btnThanhToan=new JButton("Thanh Toán");
 		btnThanhToan.setBorder(BorderFactory.createLineBorder(Color.decode("#00A651"), 5, true)); /////// Màu cam///
 		btnThanhToan.setForeground(Color.WHITE);
 		btnThanhToan.setPreferredSize(new Dimension(850, 50));
 		btnThanhToan.setMaximumSize(btnThanhToan.getPreferredSize());
 		btnThanhToan.setBackground(Color.decode("#00A651"));
-		boxArray[13].add(Box.createVerticalStrut(15));
-		boxArray[14].add(btnThanhToan);
+		boxArrayThongTinBan[13].add(Box.createVerticalStrut(15));
+		boxArrayThongTinBan[14].add(btnThanhToan);
 		
 		
 		
@@ -210,11 +223,11 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		BoxThucDon_Right.setOpaque(true);
 		BoxThucDon_Right.setBorder(new CompoundBorder(lineBorder, emptyBorder));
 		
-		Box[] arrayBoxThucDon=new Box[15];
-		for (int i = 0; i < arrayBoxThucDon.length; i++) {
-			BoxThucDon_Right.add(arrayBoxThucDon[i]=Box.createHorizontalBox());
+		Box[] boxArrayThucDon=new Box[15];
+		for (int i = 0; i < boxArrayThucDon.length; i++) {
+			BoxThucDon_Right.add(boxArrayThucDon[i]=Box.createHorizontalBox());
 			BoxThucDon_Right.add(Box.createVerticalStrut(10));
-			arrayBoxThucDon[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+			boxArrayThucDon[i].setAlignmentX(Component.LEFT_ALIGNMENT);
 		}
 		
 		JLabel lblMenuDoUong=new  JLabel("Menu đồ uống");
@@ -240,40 +253,32 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		
 		JPanel pnlCacMon=new JPanel(new GridLayout(5,4,5,5));
 		Box boxCacMon=Box.createHorizontalBox();
-		///////////////// Danh sách món ///////////////////////////////////////////////////////////
+		//////////////////////////////// Danh sách món ///////////////////////////////////////////////////////////
 		boxCacMon.add(pnlCacMon);
 		for (int i = 0; i < 10; i++) {
 			pnlCacMon.add(new JButton("Món"+i));
 			
 		}
 
-		arrayBoxThucDon[0].add(lblMenuDoUong);
-		arrayBoxThucDon[1].add(txtTimKiemDoUong);
-		arrayBoxThucDon[2].add(btnTimKiemDoUong);
-		arrayBoxThucDon[3].add(cboFilterDoUong);
-		arrayBoxThucDon[5].add(boxCacMon);
+		boxArrayThucDon[0].add(lblMenuDoUong);
+		boxArrayThucDon[1].add(txtTimKiemDoUong);
+		boxArrayThucDon[2].add(btnTimKiemDoUong);
+		boxArrayThucDon[3].add(cboFilterDoUong);
+		boxArrayThucDon[5].add(boxCacMon);
 		
-		// === Panel đặt bàn ===
+		//////////////////////////// === Panel đặt bàn ===///////////////////////////////////////////
 		JPanel pnlDatBan = new JPanel(new BorderLayout());
 		
 		Box BoxDanhSachBan_DatBan=Box.createVerticalBox();
 		BoxDanhSachBan_DatBan.setBorder(new CompoundBorder(lineBorder, emptyBorder));
-		
-		Box BoxThongTin_DatBan=Box.createVerticalBox();
-		BoxThongTin_DatBan.setBorder(new CompoundBorder(lineBorder, emptyBorder));
-		
-		Box DanhSachDonDatBan=Box.createVerticalBox();
-		DanhSachDonDatBan.setBorder(new CompoundBorder(lineBorder, emptyBorder));
-		
-		
-		
+	
 		pnlDatBan.setBackground(Color.decode("#F7F4EC"));
 		
-		JLabel lblDatBanTitle=new JLabel("Đặt Bàn");
-		lblDatBanTitle.setFont(lblFont);
+		JLabel lblDanhSachBan_DatBan=new JLabel("Danh Sách Bàn");
+		lblDanhSachBan_DatBan.setFont(lblFont);
 		Box boxTitleDatBan=Box.createHorizontalBox();
 		boxTitleDatBan.setAlignmentX(Component.LEFT_ALIGNMENT);
-		boxTitleDatBan.add(lblDatBanTitle);
+		boxTitleDatBan.add(lblDanhSachBan_DatBan);
 		BoxDanhSachBan_DatBan.add(boxTitleDatBan);
 		BoxDanhSachBan_DatBan.add(Box.createVerticalStrut(10));
 		
@@ -283,6 +288,80 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		BoxCacBan_DatBan.add(pnlCacBan_DatBan);
 		BoxCacBan_DatBan.setAlignmentX(Component.LEFT_ALIGNMENT);
 		BoxDanhSachBan_DatBan.add(BoxCacBan_DatBan);
+		
+		
+		Box BoxThongTin_DatBan=Box.createVerticalBox();
+		BoxThongTin_DatBan.setBorder(new CompoundBorder(lineBorder, emptyBorder));
+		
+		
+		Box[] boxArrayThongTinDatBan=new Box[10];
+		for (int i = 0; i < boxArrayThongTinDatBan.length; i++) {
+			BoxThongTin_DatBan.add(boxArrayThongTinDatBan[i]=Box.createHorizontalBox());
+			BoxThongTin_DatBan.add(Box.createVerticalStrut(10));
+			boxArrayThongTinDatBan[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+		}
+		JLabel lblThongTinDatBan=new JLabel("Thông Tin Đặt Bàn");
+		lblThongTinDatBan.setFont(lblFont);
+		lblTenBan_DatBan=new JLabel("Bàn 1");
+		lblTenBan_DatBan.setFont(lblFont);
+		txtTenKH_DatBan=new JTextField();
+		txtTenKH_DatBan.setPreferredSize(new Dimension(800,30));
+		txtTenKH_DatBan.setMaximumSize(txtTenKH_DatBan.getPreferredSize());
+		lblSDT_DatBan=new JLabel("Số điện thoại:");
+		txtSDT_DatBan=new JTextField();
+		txtSDT_DatBan.setPreferredSize(new Dimension(800,30));
+		txtSDT_DatBan.setMaximumSize(txtSDT_DatBan.getPreferredSize());
+		lblThoiGian_DatBan=new JLabel("Thời gian đặt:");
+		txtThoiGian_DatBan=new JTextField();
+		txtThoiGian_DatBan.setPreferredSize(new Dimension(800,30));
+		txtThoiGian_DatBan.setMaximumSize(txtThoiGian_DatBan.getPreferredSize());
+		
+		btnDatBan=new JButton("Đặt Bàn");
+		btnDatBan.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
+		btnDatBan.setForeground(Color.WHITE);
+		btnDatBan.setPreferredSize(new Dimension(800, 40));
+		btnDatBan.setMaximumSize(btnDatBan.getPreferredSize());
+		btnDatBan.setBackground(Color.decode("#e07b39"));
+		
+		boxArrayThongTinDatBan[0].add(lblThongTinDatBan);
+		boxArrayThongTinDatBan[1].add(lblTenBan_DatBan);
+		boxArrayThongTinDatBan[2].add(new JLabel("Tên khách hàng:"));
+		boxArrayThongTinDatBan[3].add(txtTenKH_DatBan);
+		boxArrayThongTinDatBan[4].add(lblSDT_DatBan);
+		boxArrayThongTinDatBan[5].add(txtSDT_DatBan);
+		boxArrayThongTinDatBan[6].add(lblThoiGian_DatBan);
+		boxArrayThongTinDatBan[7].add(txtThoiGian_DatBan);
+		boxArrayThongTinDatBan[8].add(Box.createVerticalStrut(15));
+		boxArrayThongTinDatBan[9].add(btnDatBan);
+		
+		
+		
+		
+		
+		Box DanhSachDonDatBan=Box.createVerticalBox();
+		DanhSachDonDatBan.setBorder(new CompoundBorder(lineBorder, emptyBorder));
+		
+		Box[] boxArrayDanhSachDonDatBan=new Box[10];
+		for (int i = 0; i < boxArrayDanhSachDonDatBan.length; i++) {
+			DanhSachDonDatBan.add(boxArrayDanhSachDonDatBan[i]=Box.createHorizontalBox());
+			DanhSachDonDatBan.add(Box.createVerticalStrut(10));
+			boxArrayDanhSachDonDatBan[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+		}
+		JLabel lblDanhSachDonDatBan=new JLabel("Danh Sách Đơn Đặt Bàn");
+		lblDanhSachDonDatBan.setFont(lblFont);
+		
+		String headerDatBan[] = { "Tên KH", "SĐT", "Bàn", "Thời gian" };
+		modelDatBan = new DefaultTableModel(headerDatBan, 0);
+		tableDatBan = new JTable(modelDatBan);
+		JScrollPane scrPaneDanhSachDonDatBan=new JScrollPane(tableDatBan);
+		
+		
+		boxArrayDanhSachDonDatBan[0].add(lblDanhSachDonDatBan);
+		boxArrayDanhSachDonDatBan[1].add(scrPaneDanhSachDonDatBan);
+		
+		
+		
+		
 		
 		
 		pnlDatBan.add(BoxDanhSachBan_DatBan,BorderLayout.WEST);

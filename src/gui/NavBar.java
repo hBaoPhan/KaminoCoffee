@@ -37,17 +37,16 @@ public class NavBar extends JFrame implements MouseListener {
 	private JButton btnDangXuat;
 
 	public NavBar() {
-		setTitle("Main Frame");
+		setTitle("Kamino Coffee");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		JPanel sidebar = new JPanel();
-//		sidebar.setBackground(Color.black);
-//		sidebar.setOpaque(true);
+		sidebar.setBackground(Color.WHITE);
+		sidebar.setOpaque(true);
 		sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 		sidebar.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sidebar.setBackground(new Color(230, 230, 230));
 		sidebar.setPreferredSize(new Dimension(150, getHeight()));
 		add(sidebar, BorderLayout.WEST);
 
@@ -72,7 +71,7 @@ public class NavBar extends JFrame implements MouseListener {
 		sidebar.add(btnDangXuat);
 		sidebar.add(Box.createVerticalStrut(20));
 
-		String[] tabs = { "Trang chủ", "Bàn", "Thực đơn", "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };
+		String[] tabs = { "Trang chủ", "Bàn",  "Hóa Đơn", "Khách hàng","Thực đơn", "Nhân viên", "Thống Kê" };
 		JLabel[] labels = new JLabel[tabs.length];
 
 		for (int i = 0; i < tabs.length; i++) {
@@ -87,6 +86,7 @@ public class NavBar extends JFrame implements MouseListener {
 		}
 		// CardLayout lồng vào panel chính
 		cardLayout = new CardLayout();
+		
 		contentPanel = new JPanel(cardLayout);
 
 		// Thêm các panel vào CardLayout

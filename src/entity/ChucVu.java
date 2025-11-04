@@ -1,5 +1,6 @@
 package entity;
 
-public class ChucVu {
-
+public enum ChucVu {
+	NhanVien,
+	QuanLy
 }

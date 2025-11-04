@@ -2,8 +2,6 @@ package entity;
 
 import java.util.Objects;
 
-import enums.LoaiSanPham;
-
 public class SanPham {
 	private String maSanPham;
 	private String tenSanPham;

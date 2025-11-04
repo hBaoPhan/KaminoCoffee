@@ -2,8 +2,6 @@ package entity;
 
 import java.util.Objects;
 
-import enums.TrangThaiBan;
-
 public class Ban {
 	private String maBan;
 	private int soGhe;

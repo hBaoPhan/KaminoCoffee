@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.Objects;
+
 import enums.ChucVu;
 
 public class NhanVien {
@@ -16,9 +18,6 @@ public class NhanVien {
 	}
 	public String getMaNV() {
 		return maNV;
-	}
-	public void setMaNV(String maNV) {
-		this.maNV = maNV;
 	}
 	public String getTenNV() {
 		return tenNV;
@@ -37,6 +36,25 @@ public class NhanVien {
 	}
 	public void setChucVu(ChucVu chucVu) {
 		this.chucVu = chucVu;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(maNV);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NhanVien other = (NhanVien) obj;
+		return Objects.equals(maNV, other.maNV);
+	}
+	@Override
+	public String toString() {
+		return "NhanVien [maNV=" + maNV + ", tenNV=" + tenNV + ", sDT=" + sDT + ", chucVu=" + chucVu + "]";
 	}
 	
 	

@@ -68,7 +68,7 @@ CREATE TABLE SanPham (
     tenSP NVARCHAR(100),
     gia FLOAT CHECK (gia >= 0),
     loaiSanPham NVARCHAR(100) -- Thêm c?t này t? UML
-        CHECK (loaiSanPham IN('Trà','Cafe','Bánh','Trà Sữa'))
+        CHECK (loaiSanPham IN(N'Trà',N'Cafe',N'Bánh',N'Trà Sữa'))
     -- B? c?t soLuong (không có trong UML)
 );
 GO
@@ -167,7 +167,12 @@ INSERT INTO Ban VALUES
 ('B02','Bàn 2', 2, N'Đang được sử dụng'),
 ('B03','Bàn 3', 6, N'Trống'),
 ('B04','Bàn 4', 4, N'Đang được sử dụng'),
-('B05','Bàn 5', 2, N'Trống');
+('B05','Bàn 5', 2, N'Trống'),
+('B06','Bàn 6', 4, N'Trống'),
+('B07','Bàn 7', 6, N'Đang được sử dụng'),
+('B08','Bàn 8', 2, N'Trống'),
+('B09','Bàn 9', 4, N'Đang được sử dụng'),
+('B10','Bàn 10', 6, N'Trống');
 
 -- Dữ liệu cho bảng SanPham (S?a: B? soLuong, thêm loaiSanPham)
 INSERT INTO SanPham VALUES 
@@ -175,7 +180,14 @@ INSERT INTO SanPham VALUES
 ('SP002', N'Trà đào', 30000, N'Trà'),
 ('SP003', N'Tiramisu', 35000, N'Bánh'),
 ('SP004', N'Trà Ổi', 30000, N'Trà'),
-('SP005', N'Croissant', 20000, N'Bánh');
+('SP005', N'Croissant', 20000, N'Bánh'),
+('SP006', N'Trà sen vàng', 32000, N'Trà'),
+('SP007', N'Cà phê đen đá', 18000, N'Cafe'),
+('SP008', N'Matcha Cheesecake', 40000, N'Bánh'),
+('SP009', N'Trà sữa trân châu', 35000, N'Trà Sữa'),
+('SP010', N'Trà sữa matcha', 36000, N'Trà Sữa');
+
+
 
 
 -- Dữ liệu cho bảng HoaDon (S?a: Thêm th?i gian vào/ra)

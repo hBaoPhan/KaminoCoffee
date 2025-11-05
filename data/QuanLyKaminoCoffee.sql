@@ -51,10 +51,11 @@ GO
 -- ========================================================
 CREATE TABLE Ban (
     maBan VARCHAR(20) PRIMARY KEY,
+    tenBan NVARCHAR(100),
     soGhe INT CHECK (soGhe >= 0),
     trangThai NVARCHAR(20) 
-        CHECK (trangThai IN (N'Trong', N'DangDuocSuDung', N'DaDuocDat')) 
-        DEFAULT N'Trong'
+        CHECK (trangThai IN (N'Trống', N'Đang được sử dụng', N'Đã được đặt')) 
+        DEFAULT N'Trống'
 );
 GO
 
@@ -67,7 +68,7 @@ CREATE TABLE SanPham (
     tenSP NVARCHAR(100),
     gia FLOAT CHECK (gia >= 0),
     loaiSanPham NVARCHAR(100) -- Thêm c?t này t? UML
-        CHECK (loaiSanPham IN('Tra','Cafe','Banh','TraSua'))
+        CHECK (loaiSanPham IN('Trà','Cafe','Bánh','Trà Sữa'))
     -- B? c?t soLuong (không có trong UML)
 );
 GO
@@ -162,19 +163,20 @@ INSERT INTO KhachHang VALUES
 
 -- Dữ liệu cho bảng Ban (S?a: Đ?i 0/1 -> Tr?ng thái ch?)
 INSERT INTO Ban VALUES 
-('B01', 4, N'Trong'),
-('B02', 2, N'DangDuocSuDung'),
-('B03', 6, N'Trong'),
-('B04', 4, N'DangDuocSuDung'),
-('B05', 2, N'Trong');
+('B01','Bàn 1', 4, N'Trống'),
+('B02','Bàn 2', 2, N'Đang được sử dụng'),
+('B03','Bàn 3', 6, N'Trống'),
+('B04','Bàn 4', 4, N'Đang được sử dụng'),
+('B05','Bàn 5', 2, N'Trống');
 
 -- Dữ liệu cho bảng SanPham (S?a: B? soLuong, thêm loaiSanPham)
 INSERT INTO SanPham VALUES 
-('SP001', N'Cà phê sữa', 25000, N'Cafe'),
-('SP002', N'Trà đào', 30000, N'Tra'),
-('SP003', N'Tiramisu', 35000, N'Banh'),
-('SP004', N'Trà Ổi', 10000, N'Tra'),
-('SP005', N'Croissant', 20000, N'Banh');
+('SP001', N'Cà phê sữa', 20000, N'Cafe'),
+('SP002', N'Trà đào', 30000, N'Trà'),
+('SP003', N'Tiramisu', 35000, N'Bánh'),
+('SP004', N'Trà Ổi', 30000, N'Trà'),
+('SP005', N'Croissant', 20000, N'Bánh');
+
 
 -- Dữ liệu cho bảng HoaDon (S?a: Thêm th?i gian vào/ra)
 -- Gi? s? hóa đơn đã thanh toán (1) thì có thoiGianRa

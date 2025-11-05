@@ -4,13 +4,26 @@ import java.util.Objects;
 
 public class Ban {
 	private String maBan;
+	private String tenBan;
 	private int soGhe;
 	private TrangThaiBan trangThai;
-	public Ban(String maBan, int soGhe, TrangThaiBan trangThai) {
+
+	
+	public Ban(String maBan, String tenBan, int soGhe, TrangThaiBan trangThai) {
 		super();
 		this.maBan = maBan;
+		this.tenBan = tenBan;
 		this.soGhe = soGhe;
 		this.trangThai = trangThai;
+	}
+	public String getTenBan() {
+		return tenBan;
+	}
+	public void setTenBan(String tenBan) {
+		this.tenBan = tenBan;
+	}
+	public void setMaBan(String maBan) {
+		this.maBan = maBan;
 	}
 	public int getSoGhe() {
 		return soGhe;

@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class DonDatBan {
-	private String maDonDatHang;
+	private String maDonDatBan;
 	private KhachHang khachHang;
 	private Ban ban;
 	private LocalDateTime thoiGian;
 	public DonDatBan(String maDonDatHang, KhachHang khachHang, Ban ban, LocalDateTime thoiGian) {
 		super();
-		this.maDonDatHang = maDonDatHang;
+		this.maDonDatBan = maDonDatHang;
 		this.khachHang = khachHang;
 		this.ban = ban;
 		this.thoiGian = thoiGian;
@@ -33,12 +33,12 @@ public class DonDatBan {
 	public void setThoiGian(LocalDateTime thoiGian) {
 		this.thoiGian = thoiGian;
 	}
-	public String getMaDonDatHang() {
-		return maDonDatHang;
+	public String getMaDonDatBan() {
+		return maDonDatBan;
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(maDonDatHang);
+		return Objects.hash(maDonDatBan);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -49,11 +49,11 @@ public class DonDatBan {
 		if (getClass() != obj.getClass())
 			return false;
 		DonDatBan other = (DonDatBan) obj;
-		return Objects.equals(maDonDatHang, other.maDonDatHang);
+		return Objects.equals(maDonDatBan, other.maDonDatBan);
 	}
 	@Override
 	public String toString() {
-		return "DonDatBan [maDonDatHang=" + maDonDatHang + ", khachHang=" + khachHang + ", ban=" + ban + ", thoiGian="
+		return "DonDatBan [maDonDatHang=" + maDonDatBan + ", khachHang=" + khachHang + ", ban=" + ban + ", thoiGian="
 				+ thoiGian + "]";
 	}
 	

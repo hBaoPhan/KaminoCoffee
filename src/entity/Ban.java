@@ -16,6 +16,12 @@ public class Ban {
 		this.soGhe = soGhe;
 		this.trangThai = trangThai;
 	}
+	public Ban(String maBan) {
+		this.maBan = maBan;
+		this.tenBan = "";
+		this.soGhe = 0;
+		this.trangThai = TrangThaiBan.Trong;
+	}
 	public String getTenBan() {
 		return tenBan;
 	}

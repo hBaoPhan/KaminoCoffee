@@ -85,7 +85,6 @@ CREATE TABLE HoaDon (
     thoiGianVao DATETIME DEFAULT (GETDATE()), -- S?a t? ngayLap (DATE)
     thoiGianRa DATETIME NULL, -- Thêm c?t này t? UML
     trangThaiThanhToan Bit,
-    tongTien Float CHECK(tongTien >0),
     FOREIGN KEY (maNV) REFERENCES NhanVien(maNV)
         ON DELETE SET NULL
         ON UPDATE CASCADE,

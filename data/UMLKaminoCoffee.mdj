@@ -964,24 +964,6 @@
 											"height": 13,
 											"text": "-thoiGianRa: LocalDateTime",
 											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLAttributeView",
-											"_id": "AAAAAAGaWilUId3bHrU=",
-											"_parent": {
-												"$ref": "AAAAAAGZ9uZ1+afitB0="
-											},
-											"model": {
-												"$ref": "AAAAAAGaWilUE93YEfE="
-											},
-											"font": "Arial;13;0",
-											"parentStyle": true,
-											"left": 389,
-											"top": 391,
-											"width": 193.00390625,
-											"height": 13,
-											"text": "-tongTien: double",
-											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
@@ -989,7 +971,7 @@
 									"left": 384,
 									"top": 281,
 									"width": 203.00390625,
-									"height": 128
+									"height": 113
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -1013,7 +995,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": 389,
-											"top": 414,
+											"top": 399,
 											"width": 193.00390625,
 											"height": 13,
 											"text": "+HoaDon()",
@@ -1042,7 +1024,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": 384,
-									"top": 409,
+									"top": 394,
 									"width": 203.00390625,
 									"height": 23
 								},
@@ -6509,16 +6491,6 @@
 							"name": "thoiGianRa",
 							"visibility": "private",
 							"type": "LocalDateTime"
-						},
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAGaWilUE93YEfE=",
-							"_parent": {
-								"$ref": "AAAAAAGZ9uZ1+afaqOo="
-							},
-							"name": "tongTien",
-							"visibility": "private",
-							"type": "double"
 						}
 					],
 					"operations": [

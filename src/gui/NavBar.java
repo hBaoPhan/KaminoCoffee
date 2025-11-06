@@ -50,7 +50,7 @@ public class NavBar extends JFrame implements MouseListener {
 		sidebar.setPreferredSize(new Dimension(150, getHeight()));
 		add(sidebar, BorderLayout.WEST);
 
-		ImageIcon LogoIcon = new ImageIcon("images/logo.png");
+		ImageIcon LogoIcon = new ImageIcon("data/images/logo.png");
 		Image scaledImage = LogoIcon.getImage().getScaledInstance(146, 146, Image.SCALE_SMOOTH);
 		ImageIcon resizedIcon = new ImageIcon(scaledImage);
 		JLabel lblLogo = new JLabel(resizedIcon);

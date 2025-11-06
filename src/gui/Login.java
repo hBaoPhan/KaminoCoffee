@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,6 +19,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import connectDB.ConnectDB;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -29,6 +34,15 @@ public class Login extends JFrame implements ActionListener {
 
 
 	public Login() {
+		
+		try {
+			ConnectDB.getInstance().connect();
+			System.out.println("Connected");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		setBackground(Color.WHITE);
 		setTitle("Login");
 		setSize(475, 600);
@@ -41,7 +55,7 @@ public class Login extends JFrame implements ActionListener {
 		pnlMain.setOpaque(true);
 		add(pnlMain, BorderLayout.CENTER);
 
-		ImageIcon LogoIcon = new ImageIcon("images/logo.png");
+		ImageIcon LogoIcon = new ImageIcon("data/images/logo.png");
 		Image scaledImage = LogoIcon.getImage().getScaledInstance(205, 205, Image.SCALE_SMOOTH);
 		ImageIcon resizedIcon = new ImageIcon(scaledImage);
 		JLabel lblLogo = new JLabel(resizedIcon);
@@ -121,8 +135,10 @@ public class Login extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		new Login().setVisible(true);
-	}
+        new Login().setVisible(true);
+    }
+		
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

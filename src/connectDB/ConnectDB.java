@@ -31,5 +31,22 @@ public class ConnectDB {
 		 }
 		
 	}
+	public void connect1() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/QUANLYKAMINOCOFFEE?useSSL=false&serverTimezone=UTC";
+        String user = "root";  
+        String pwd = "sapassword"; 
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, user, pwd);
+            System.out.println("✅ Kết nối MySQL thành công!");
+        } catch (ClassNotFoundException e) {
+            System.out.println("❌ Không tìm thấy driver MySQL JDBC!");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi kết nối MySQL!");
+            e.printStackTrace();
+        }
+    }
 	 
 }

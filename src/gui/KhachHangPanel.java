@@ -4,9 +4,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-
-import com.toedter.calendar.JDateChooser;
-
 import java.awt.*;
 
 public class KhachHangPanel extends JPanel {
@@ -19,7 +16,6 @@ public class KhachHangPanel extends JPanel {
 	private JTextField txtTenKH;
 	private JComboBox cmbGT;
 	private JTextField txtSDT;
-	private JDateChooser ngayDK;
 	private JCheckBox chkNu;
 
     public KhachHangPanel() {
@@ -83,17 +79,7 @@ public class KhachHangPanel extends JPanel {
         box3.add(txtSDT = new JTextField(20));
         pInput.add(box3);
         pInput.add(Box.createVerticalStrut(10));
-
-        // ===== BOX 4: Ngày đăng ký =====
-        Box box4 = Box.createHorizontalBox();
-        JLabel lblNgay = new JLabel("Ngày đăng ký:");
-        lblNgay.setPreferredSize(labelSize);
-        box4.add(lblNgay);
-        ngayDK = new JDateChooser();
-        ngayDK.setDateFormatString("yyyy-MM-dd");
-        ngayDK.setPreferredSize(new Dimension(150, 25));
-        box4.add(ngayDK);
-        pInput.add(box4);
+      
        
         // --- Thanh tìm kiếm ---
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -130,7 +116,7 @@ public class KhachHangPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // ======== PHẦN GIỮA: BẢNG DANH SÁCH KHÁCH HÀNG ========
-        String[] columnNames = {"Mã KH", "Họ tên", "Giới tính", "SĐT", "Ngày đăng ký", "Điểm tích lũy"};
+        String[] columnNames = {"Mã KH", "Họ tên", "Giới tính", "SĐT", "Điểm tích lũy"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         tableKhachHang = new JTable(model);
         tableKhachHang.setFillsViewportHeight(true);

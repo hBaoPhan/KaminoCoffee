@@ -16,6 +16,13 @@ public class KhachHang {
 		this.diemTichLuy = diemTichLuy;
 		this.KHDK = laKHDK;
 	}
+	public KhachHang(String ma) {
+		this.maKhachHang=ma;
+		this.tenKhachHang = "";
+		this.sDT = "";
+		this.diemTichLuy = 0;
+		this.KHDK = false;
+	}
 	public String getTenKhachHang() {
 		return tenKhachHang;
 	}

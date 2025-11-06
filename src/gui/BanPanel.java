@@ -40,10 +40,15 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.TimePicker;
+
 import connectDB.ConnectDB;
 import dao.Ban_dao;
+import dao.DonDatBan_dao;
 import dao.SanPham_dao;
 import entity.Ban;
+import entity.DonDatBan;
 import entity.SanPham;
 import entity.TrangThaiBan;
 
@@ -58,7 +63,8 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	private JTable tableMonAn;
 	private JLabel lblThanhTien;
 	private JTextField txtTimKiemDoUong;
-	
+	private TimePicker txtThoiGianVao;
+	private TimePicker txtThoiGianRa;
 	private JButton btnLuu;
 	private JToggleButton tggleDangSuDung;
 	private JButton btnThanhToan;
@@ -72,7 +78,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	private JLabel lblSDT_DatBan;
 	private JTextField txtSDT_DatBan;
 	private JLabel lblThoiGian_DatBan;
-	private JTextField txtThoiGian_DatBan;
+	private DatePicker txtNgay_DatBan;
 	private JButton btnDatBan;
 	private DefaultTableModel modelDatBan;
 	private JTable tableDatBan;
@@ -87,14 +93,15 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 	private SanPham_dao sanPhamDao;
 	private Dimension textFieldSize = new Dimension(600,40);
-	private JTextField txtThoiGianVao;
-	private JTextField txtThoiGianRa;
+	
+	private DonDatBan_dao donDatBanDao;
+	private JComboBox<String> cboFilterThoiGianDatBan;
+	private TimePicker txtGio_DatBan;
+	private JButton btnLocTheoThoiGian;
+	private DatePicker txtFilterNgayDatBan;
+	private TimePicker txtFilterGioDatBan;
 	public BanPanel() {
 		
-		banDao=new Ban_dao();
-		sanPhamDao=new SanPham_dao();
-	
-		initIcons();
 		// Tạo panel chính cho tab đầu tiên
 		JPanel pnlDanhSachBan = new JPanel(new BorderLayout());
 
@@ -124,7 +131,8 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		Box boxCacBan=Box.createHorizontalBox();
 		///////////////// Danh sách bàn ///////////////////////////////////////////////////////////
 		JPanel pnlCacBan = new JPanel(new GridLayout(0, 3, 5, 5));
-		
+		pnlCacBan.setMaximumSize(new Dimension(400,500));
+		pnlCacBan.setBackground(Color.decode("#F7F4EC"));
 		boxCacBan.add(pnlCacBan);
 		boxCacBan.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
@@ -182,7 +190,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		lblThoiGianVao.setPreferredSize(new Dimension(100, 25));
 		lblThoiGianVao.setMaximumSize(lblThoiGianVao.getPreferredSize());
 
-		boxArrayThongTinBan[6].add(txtThoiGianVao=new JTextField());
+		boxArrayThongTinBan[6].add(txtThoiGianVao=new TimePicker());
 		txtThoiGianVao.setPreferredSize(textFieldSize);
 
 		boxArrayThongTinBan[7].add(lblThoiGianRa = new JLabel("Thời gian ra:"));
@@ -190,7 +198,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		lblThoiGianRa.setMaximumSize(lblThoiGianRa.getPreferredSize());
 	
 
-		boxArrayThongTinBan[8].add(txtThoiGianRa=new JTextField());
+		boxArrayThongTinBan[8].add(txtThoiGianRa=new TimePicker());
 		txtThoiGianRa.setPreferredSize(textFieldSize);
 
 		boxArrayThongTinBan[9].add(new JLabel("Danh sách món:"));
@@ -198,6 +206,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		String header[] = { "Tên món", "Số lượng", "Đơn giá", "Thành tiền" };
 		modelMonAn = new DefaultTableModel(header, 0);
 		tableMonAn = new JTable(modelMonAn);
+		tableMonAn.setBackground(Color.WHITE);
 		JScrollPane scrDanhSachMon = new JScrollPane(tableMonAn);
 		boxArrayThongTinBan[10].add(scrDanhSachMon);
 		//      Tong Tien
@@ -262,7 +271,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		lblMenuDoUong.setFont(lblFont);
 		txtTimKiemDoUong = new JTextField(15);
 	
-		txtTimKiemDoUong.setPreferredSize(new Dimension(100,30));
+		txtTimKiemDoUong.setPreferredSize(new Dimension(150,30));
 		txtTimKiemDoUong.setMaximumSize(txtTimKiemDoUong.getPreferredSize());
 		
 		btnTimKiemDoUong = new JButton("Tìm kiếm");
@@ -289,6 +298,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		boxArrayThucDon[1].add(txtTimKiemDoUong);
 		boxArrayThucDon[1].add(Box.createHorizontalStrut(5));
 		boxArrayThucDon[1].add(btnTimKiemDoUong);
+		boxArrayThucDon[1].setMaximumSize(new Dimension(300,30));
 		boxArrayThucDon[2].add(cboFilterDoUong);
 		boxArrayThucDon[3].add(boxCacMon);
 		
@@ -300,21 +310,55 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	
 		pnlDatBan.setBackground(Color.decode("#F7F4EC"));
 		
+		
+		
+		
+////////////////////////////////////////////////////Thêm vào Panel bên đặt bàn
 		JLabel lblDanhSachBan_DatBan=new JLabel("Danh Sách Bàn");
 		lblDanhSachBan_DatBan.setFont(lblFont);
 		Box boxTitleDatBan=Box.createHorizontalBox();
 		boxTitleDatBan.setAlignmentX(Component.LEFT_ALIGNMENT);
 		boxTitleDatBan.add(lblDanhSachBan_DatBan);
-		BoxDanhSachBan_DatBan.add(boxTitleDatBan);
-		BoxDanhSachBan_DatBan.add(Box.createVerticalStrut(10));
 		
+		
+		txtFilterNgayDatBan=new DatePicker();
+		txtFilterNgayDatBan.setPreferredSize(new Dimension(60,30));
+		
+		
+		
+		txtFilterGioDatBan=new TimePicker();
+		txtFilterGioDatBan.setPreferredSize(new Dimension(50,30));
+	
+	
+		Box boxFilterThoiGianDatBan=Box.createHorizontalBox();
+		boxFilterThoiGianDatBan.setMaximumSize(new Dimension(300,30));
+		boxFilterThoiGianDatBan.setAlignmentX(Component.LEFT_ALIGNMENT);
+		
+		boxFilterThoiGianDatBan.add(txtFilterNgayDatBan);
+		boxFilterThoiGianDatBan.add(Box.createHorizontalStrut(5));
+		boxFilterThoiGianDatBan.add(txtFilterGioDatBan);
+		boxFilterThoiGianDatBan.add(Box.createHorizontalStrut(5));
+		
+		Box boxBtnLoc=Box.createHorizontalBox();
+		boxBtnLoc.setAlignmentX(Component.LEFT_ALIGNMENT);
+		boxBtnLoc.setMaximumSize(new Dimension(300,30));
+		btnLocTheoThoiGian=new JButton("Lọc");
+		btnLocTheoThoiGian.setBackground(Color.decode("#00A651"));
+		btnLocTheoThoiGian.setForeground(Color.white);
+		btnLocTheoThoiGian.setPreferredSize(new Dimension(150,30));
+		btnLocTheoThoiGian.setMaximumSize(btnLocTheoThoiGian.getPreferredSize());
+		boxBtnLoc.add(btnLocTheoThoiGian);
 		Box BoxCacBan_DatBan=Box.createHorizontalBox();
 		JPanel pnlCacBan_DatBan = new JPanel(new GridLayout(0, 3, 5, 5));
+		pnlCacBan_DatBan.setMaximumSize(new Dimension(400,500));
+		pnlCacBan_DatBan.setBackground(Color.decode("#F7F4EC"));
 		
-		////////////////////////////////////////////////////Thêm vào Panel bên đặt bàn
-		
-		
-		
+		BoxDanhSachBan_DatBan.add(boxTitleDatBan);
+		BoxDanhSachBan_DatBan.add(Box.createVerticalStrut(10));
+		BoxDanhSachBan_DatBan.add(boxFilterThoiGianDatBan);
+		BoxDanhSachBan_DatBan.add(Box.createVerticalStrut(10));
+		BoxDanhSachBan_DatBan.add(boxBtnLoc);
+		BoxDanhSachBan_DatBan.add(Box.createVerticalStrut(10));
 		BoxCacBan_DatBan.add(pnlCacBan_DatBan);
 		BoxCacBan_DatBan.setAlignmentX(Component.LEFT_ALIGNMENT);
 		BoxDanhSachBan_DatBan.add(BoxCacBan_DatBan);
@@ -342,9 +386,13 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		txtSDT_DatBan.setPreferredSize(new Dimension(800,30));
 		txtSDT_DatBan.setMaximumSize(txtSDT_DatBan.getPreferredSize());
 		lblThoiGian_DatBan=new JLabel("Thời gian đặt:");
-		txtThoiGian_DatBan=new JTextField();
-		txtThoiGian_DatBan.setPreferredSize(new Dimension(800,30));
-		txtThoiGian_DatBan.setMaximumSize(txtThoiGian_DatBan.getPreferredSize());
+		txtNgay_DatBan=new DatePicker();
+		txtNgay_DatBan.setPreferredSize(new Dimension(275,30));
+		txtNgay_DatBan.setMaximumSize(txtNgay_DatBan.getPreferredSize());
+		
+		txtGio_DatBan=new TimePicker();
+		txtGio_DatBan.setPreferredSize(new Dimension(275,30));
+		txtGio_DatBan.setMaximumSize(txtNgay_DatBan.getPreferredSize());
 		
 		btnDatBan=new JButton("Đặt Bàn");
 		btnDatBan.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
@@ -360,7 +408,10 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		boxArrayThongTinDatBan[4].add(lblSDT_DatBan);
 		boxArrayThongTinDatBan[5].add(txtSDT_DatBan);
 		boxArrayThongTinDatBan[6].add(lblThoiGian_DatBan);
-		boxArrayThongTinDatBan[7].add(txtThoiGian_DatBan);
+		boxArrayThongTinDatBan[7].add(txtNgay_DatBan);
+		boxArrayThongTinDatBan[7].add(Box.createHorizontalStrut(10));
+		boxArrayThongTinDatBan[7].add(txtGio_DatBan);
+		boxArrayThongTinDatBan[7].setMaximumSize(new Dimension(600,30));
 		boxArrayThongTinDatBan[8].add(Box.createVerticalStrut(15));
 		boxArrayThongTinDatBan[9].add(btnDatBan);
 		
@@ -383,33 +434,32 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		String headerDatBan[] = { "Tên KH", "SĐT", "Bàn", "Thời gian" };
 		modelDatBan = new DefaultTableModel(headerDatBan, 0);
 		tableDatBan = new JTable(modelDatBan);
+		tableDatBan.setBackground(Color.WHITE);
+		tableDatBan.setOpaque(true);
+		tableMonAn.setOpaque(true);
 		JScrollPane scrPaneDanhSachDonDatBan=new JScrollPane(tableDatBan);
-		
 		
 		boxArrayDanhSachDonDatBan[0].add(lblDanhSachDonDatBan);
 		boxArrayDanhSachDonDatBan[1].add(scrPaneDanhSachDonDatBan);
 		
-		
-		
-		
-		
-		
 		pnlDatBan.add(BoxDanhSachBan_DatBan,BorderLayout.WEST);
 		pnlDatBan.add(BoxThongTin_DatBan,BorderLayout.CENTER);
 		pnlDatBan.add(DanhSachDonDatBan,BorderLayout.EAST);
-		
 		
 		// Gắn các panel vào mainPanel
 		pnlDanhSachBan.add(BoxBan_Left, BorderLayout.WEST);
 		pnlDanhSachBan.add(BoxThongTin_Center, BorderLayout.CENTER);
 		pnlDanhSachBan.add(BoxThucDon_Right, BorderLayout.EAST);
 
-
 		// Thêm tab đầu tiên
 		this.addTab("Danh Sách Bàn", pnlDanhSachBan);
 		this.addTab("Đặt Bàn", pnlDatBan);
 		
-		
+		banDao=new Ban_dao();
+		sanPhamDao=new SanPham_dao();
+		donDatBanDao=new DonDatBan_dao();
+		//////////////////////////////
+		initIcons();
 		
 		///////////////////////
 		themBanVaoPanel(pnlCacBan,banDao.getAllBan());//Bàn bên ds Bàn
@@ -420,7 +470,10 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 		////////////////////
 		loadSanPhamVaoPanel(pnlCacMon, sanPhamDao.getAllSanPham()); //Danh sách món
 		
-
+		/////////////////////////////////
+		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan()); //Danh Sách Đơn đặt bàn
+		
+		
 	}
 	
 	@Override
@@ -478,7 +531,7 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	}
 	public void loadSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
 	    
-	    panel.setLayout(new GridLayout(0, 3, 5, 5)); // 3 nút mỗi hàng, khoảng cách 10px
+	    panel.setLayout(new GridLayout(0, 3, 5, 5)); // 3 nút mỗi hàng
 
 	    for (SanPham sp : danhSachSanPham) {
 	        String tenSP = sp.getTenSanPham();
@@ -509,6 +562,13 @@ public class BanPanel extends JTabbedPane implements ActionListener {
 	    }
    	 	return new ImageIcon(new ImageIcon(new File("data/images/default.png").getAbsolutePath()).getImage().getScaledInstance(85, 85, Image.SCALE_SMOOTH));	        
 
+	}
+	public void updateTableDonDatBanTuDao(ArrayList<DonDatBan> ds) {
+		modelDatBan.getDataVector().removeAllElements();
+		for (DonDatBan ddb : ds) {
+			modelDatBan.addRow(new Object[] {ddb.getMaDonDatBan(),ddb.getKhachHang().getMaKhachHang(),ddb.getBan().getMaBan(),ddb.getThoiGian()});
+		}
+		modelDatBan.fireTableDataChanged();
 	}
 
 

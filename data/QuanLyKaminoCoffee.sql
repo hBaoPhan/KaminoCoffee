@@ -154,11 +154,11 @@ GO
 
 -- Dữ liệu cho bảng NhanVien (Không đ?i)
 INSERT INTO NhanVien VALUES 
-('NV001', N'Nguyễn Văn A', 'NV', '0901234567'),
-('NV002', N'Trần Thị B', 'NV', '0902345678'),
-('NV003', N'Lê Văn C', 'QL', '0903456789'),
-('NV004', N'Phạm Thị D', 'NV', '0904567890'),
-('NV005', N'Hoàng Văn E', 'QL', '0905678901');
+('NV001', N'Nguyễn Văn A', 'NV', '0901234567',1),
+('NV002', N'Trần Thị B', 'NV', '0902345678',0),
+('NV003', N'Lê Văn C', 'QL', '0903456789',1),
+('NV004', N'Phạm Thị D', 'NV', '0904567890',0),
+('NV005', N'Hoàng Văn E', 'QL', '0905678901',1);
 
 -- Dữ liệu cho bảng TaiKhoan (S?a: B? chucVu, tenNV)
 INSERT INTO TaiKhoan VALUES 

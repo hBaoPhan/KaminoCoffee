@@ -23,6 +23,20 @@ public class KhachHang {
 		this.diemTichLuy = 0;
 		this.KHDK = false;
 	}
+	public KhachHang(String ma,String tenKH, String sdtKH) {
+		this.maKhachHang=ma;
+		this.tenKhachHang = tenKH;
+		this.sDT = sdtKH;
+		this.diemTichLuy = 0;
+		this.KHDK = false;
+	}
+	public KhachHang(String maKhachHang, String tenKhachHang, String sDT, boolean b) {
+		this.maKhachHang = maKhachHang;
+		this.tenKhachHang = tenKhachHang;
+		this.sDT = sDT;
+		this.diemTichLuy = 0;
+		this.KHDK = b;
+	}
 	public String getTenKhachHang() {
 		return tenKhachHang;
 	}

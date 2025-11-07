@@ -40,4 +40,26 @@ public class DonDatBan_dao {
 		return ds;
 	}
 
+	public boolean addDonDatBan(DonDatBan ddb) {
+		ConnectDB.getInstance();
+		Connection con = ConnectDB.getConnection();
+		String sql = "INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian) VALUES (?, ?, ?, ?)";
+		try (PreparedStatement stmt = con.prepareStatement(sql)) {
+			stmt.setString(1, ddb.getMaDonDatBan());
+			stmt.setString(2, ddb.getKhachHang().getMaKhachHang());
+			stmt.setString(3, ddb.getBan().getMaBan());
+			if (ddb.getThoiGian() != null) {
+				stmt.setTimestamp(4, Timestamp.valueOf(ddb.getThoiGian()));
+			} else {
+				stmt.setTimestamp(4, null);
+			}
+			int rowsInserted = stmt.executeUpdate();
+			return rowsInserted > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+
 }

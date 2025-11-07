@@ -14,6 +14,13 @@ public class NhanVien {
 		this.sDT = sDT;
 		this.chucVu = chucVu;
 	}
+	public NhanVien(String maNV) {
+		this.maNV = maNV;
+		this.tenNV = "";
+		this.sDT = "";
+		this.chucVu = ChucVu.NhanVien;
+	}
+	
 	public String getMaNV() {
 		return maNV;
 	}

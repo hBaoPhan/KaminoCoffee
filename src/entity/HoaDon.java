@@ -11,6 +11,8 @@ public class HoaDon {
 	private KhachHang khachHang;
 	private LocalDateTime thoiGianVao;
 	private LocalDateTime thoiGianRa;
+
+
 	public HoaDon(String maHoaDon, Ban ban, NhanVien nhanVienBan, boolean trangThaiThanhToan, KhachHang khachHang,
 			LocalDateTime thoiGianVao, LocalDateTime thoiGianRa) {
 		super();
@@ -21,6 +23,7 @@ public class HoaDon {
 		this.khachHang = khachHang;
 		this.thoiGianVao = thoiGianVao;
 		this.thoiGianRa = thoiGianRa;
+		
 	}
 	public Ban getBan() {
 		return ban;

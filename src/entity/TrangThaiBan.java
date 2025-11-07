@@ -2,7 +2,7 @@ package entity;
 
 public enum TrangThaiBan {
 	Trong("Trống"),
-	DaDuocDat("Đã đặt trước"),
+	DaDuocDat("Đã được đặt"),
 	DangDuocSuDung("Đang được sử dụng");
 
 	private final String moTa;

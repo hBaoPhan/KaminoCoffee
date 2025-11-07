@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import connectDB.ConnectDB;
@@ -12,11 +13,7 @@ import entity.TrangThaiBan;
 public class Ban_dao {
 	public ArrayList<Ban> getAllBan() {
 		ArrayList<Ban> ds=new ArrayList<Ban>();
-		try {
-			ConnectDB.getInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		ConnectDB.getInstance();
 		Connection con=ConnectDB.getConnection();
 		PreparedStatement stmt=null;
 		ResultSet rs = null;
@@ -54,6 +51,23 @@ public class Ban_dao {
 		}
 		return ds;
 	}
+	public boolean updateBan(Ban ban) {
+		ConnectDB.getInstance();
+		Connection con=ConnectDB.getConnection();
+        String sql = "UPDATE Ban SET tenBan = ?, soGhe = ?, trangThai = ? WHERE maBan = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, ban.getTenBan());
+            stmt.setInt(2, ban.getSoGhe());
+            stmt.setString(3, ban.getTrangThai().getMoTa()); 
+            stmt.setString(4, ban.getMaBan());
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
 }

@@ -1,6 +1,10 @@
 ﻿-- ========================================================
 -- DATABASE: QUANLYQUANCOFFEE
 -- ========================================================
+USE [master]
+GO 
+DROP DATABASE IF EXISTS QUANLYKAMINOCOFFEE
+GO
 CREATE DATABASE QUANLYKAMINOCOFFEE;
 GO
 USE QUANLYKAMINOCOFFEE;
@@ -13,7 +17,8 @@ CREATE TABLE NhanVien (
     maNV VARCHAR(20) PRIMARY KEY,
     tenNV NVARCHAR(100) NOT NULL,
     chucVu NVARCHAR(10) CHECK (chucVu IN (N'NV', N'QL')) NOT NULL, -- Gi? nguyên 'NV', 'QL' t? enum ChucVu
-    sDT VARCHAR(15)
+    sDT VARCHAR(15),
+    gioiTinh Bit not null
 );
 GO
 
@@ -68,7 +73,7 @@ CREATE TABLE SanPham (
     tenSP NVARCHAR(100),
     gia FLOAT CHECK (gia >= 0),
     loaiSanPham NVARCHAR(100) -- Thêm c?t này t? UML
-        CHECK (loaiSanPham IN(N'Trà',N'Cafe',N'Bánh',N'Trà Sữa'))
+        CHECK (loaiSanPham IN(N'Trà',N'Cafe',N'Bánh',N'Trà Sữa',N'Sinh tố',N'YOGURT',N'Nước uống đóng chai'))
     -- B? c?t soLuong (không có trong UML)
 );
 GO
@@ -133,17 +138,27 @@ CREATE TABLE DonDatBan (
 );
 GO
 
+
+DELETE FROM ChiTietHoaDon;
+DELETE FROM HoaDon;
+DELETE FROM DonDatBan;
+DELETE FROM TaiKhoan;
+DELETE FROM NhanVien;
+DELETE FROM KhachHang;
+DELETE FROM Ban;
+DELETE FROM SanPham;
+GO
 -- ========================================================
 -- D? LI?U M?U (ĐÃ C?P NH?T THEO C?U TRÚC M?I)
 -- ========================================================
 
 -- Dữ liệu cho bảng NhanVien (Không đ?i)
 INSERT INTO NhanVien VALUES 
-('NV001', N'Nguyễn Văn A', 'NV', '0901234567'),
-('NV002', N'Trần Thị B', 'NV', '0902345678'),
-('NV003', N'Lê Văn C', 'QL', '0903456789'),
-('NV004', N'Phạm Thị D', 'NV', '0904567890'),
-('NV005', N'Hoàng Văn E', 'QL', '0905678901');
+('NV001', N'Nguyễn Văn A', 'NV', '0901234567',1),
+('NV002', N'Trần Thị B', 'NV', '0902345678',0),
+('NV003', N'Lê Văn C', 'QL', '0903456789',1),
+('NV004', N'Phạm Thị D', 'NV', '0904567890',0),
+('NV005', N'Hoàng Văn E', 'QL', '0905678901',1);
 
 -- Dữ liệu cho bảng TaiKhoan (S?a: B? chucVu, tenNV)
 INSERT INTO TaiKhoan VALUES 
@@ -176,19 +191,23 @@ INSERT INTO Ban VALUES
 
 -- Dữ liệu cho bảng SanPham (S?a: B? soLuong, thêm loaiSanPham)
 INSERT INTO SanPham VALUES 
-('SP001', N'Cà phê sữa', 20000, N'Cafe'),
-('SP002', N'Trà đào', 30000, N'Trà'),
-('SP003', N'Tiramisu', 35000, N'Bánh'),
-('SP004', N'Trà Ổi', 30000, N'Trà'),
-('SP005', N'Croissant', 20000, N'Bánh'),
-('SP006', N'Trà sen vàng', 32000, N'Trà'),
-('SP007', N'Cà phê đen đá', 18000, N'Cafe'),
-('SP008', N'Matcha Cheesecake', 40000, N'Bánh'),
-('SP009', N'Trà sữa trân châu', 35000, N'Trà Sữa'),
-('SP010', N'Trà sữa matcha', 36000, N'Trà Sữa');
-
-
-
+('SP001', N'Cà phê đen', 23000, N'Cafe'),
+('SP002', N'Cà phê sữa', 25000, N'Cafe'),
+('SP003', N'Trà đào', 35000, N'Trà'),
+('SP004', N'Trà ổi', 35000, N'Trà'),
+('SP005', N'Sinh tố bơ', 40000, N'Sinh tố'),
+('SP006', N'Sinh tố dừa', 40000, N'Sinh tố'),
+('SP007', N'Sữa chua', 30000, N'YOGURT'),
+('SP008', N'Sữa chua việt quất', 35000, N'YOGURT'),
+('SP009', N'Trà sữa matcha', 38000, N'Trà Sữa'),
+('SP0010', N'Trà sữa trân châu đường đen', 38000, N'Trà Sữa'),
+('SP0011', N'Trà sữa kem trứng nướng', 40000, N'Trà Sữa'),
+('SP0012', N'Sting', 25000, N'Nước uống đóng chai'),
+('SP0013', N'Nước suối', 25000, N'Nước uống đóng chai'),
+('SP0014', N'Bò húc', 25000, N'Nước uống đóng chai'),
+('SP0015', N'Tiramisu', 35000, N'Bánh'),
+('SP0016', N'Bánh chuối', 35000, N'Bánh'),
+('SP0017', N'Mousse', 35000, N'Bánh');
 
 -- Dữ liệu cho bảng HoaDon (S?a: Thêm th?i gian vào/ra)
 -- Gi? s? hóa đơn đã thanh toán (1) thì có thoiGianRa

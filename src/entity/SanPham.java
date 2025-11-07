@@ -31,6 +31,13 @@ public class SanPham {
 	public String getMaSanPham() {
 		return maSanPham;
 	}
+	
+	public LoaiSanPham getLoaiSanPham() {
+		return loaiSanPham;
+	}
+	public void setLoaiSanPham(LoaiSanPham loaiSanPham) {
+		this.loaiSanPham = loaiSanPham;
+	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(maSanPham);

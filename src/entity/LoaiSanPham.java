@@ -2,6 +2,9 @@ package entity;
 
 public enum LoaiSanPham {
 	Tra("Trà"),
+	SinhTo("Sinh tố"),
+	NuocUongDongChai("Nước uống đóng chai"),
+	Yogurt("YOGURT"),
 	Cafe("Cafe"),
 	Banh("Bánh"),
 	TraSua("Trà sữa");

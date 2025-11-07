@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -110,6 +111,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private JScrollPane jscrCacMon;
 	private HoaDon_dao hoaDonDao;
 	private KhachHang_dao khachHangDao;
+	private JPanel pnlCacBan_DatBan;
+	private JPanel pnlCacBan;
 
 	public BanPanel() {
 
@@ -139,7 +142,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		Box boxCacBan = Box.createHorizontalBox();
 		///////////////// Danh sách bàn
 		///////////////// ///////////////////////////////////////////////////////////
-		JPanel pnlCacBan = new JPanel(new GridLayout(0, 3, 5, 5));
+		pnlCacBan = new JPanel(new GridLayout(0, 3, 5, 5));
 		pnlCacBan.setMaximumSize(new Dimension(400, 500));
 		pnlCacBan.setBackground(Color.decode("#F7F4EC"));
 		boxCacBan.add(pnlCacBan);
@@ -345,7 +348,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		btnLocTheoThoiGian.setMaximumSize(btnLocTheoThoiGian.getPreferredSize());
 		boxBtnLoc.add(btnLocTheoThoiGian);
 		Box BoxCacBan_DatBan = Box.createHorizontalBox();
-		JPanel pnlCacBan_DatBan = new JPanel(new GridLayout(0, 3, 5, 5));
+		pnlCacBan_DatBan = new JPanel(new GridLayout(0, 3, 5, 5));
 		pnlCacBan_DatBan.setMaximumSize(new Dimension(400, 500));
 		pnlCacBan_DatBan.setBackground(Color.decode("#F7F4EC"));
 
@@ -509,8 +512,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 //			return false;
 //		}
 		if (thoiGianDatBan.isBefore(LocalDateTime.now())) {
-			JOptionPane.showMessageDialog(this,
-					"Thời gian đặt bàn phải sau thời gian hiện tại! Vui lòng chọn lại.");
+			JOptionPane.showMessageDialog(this, "Thời gian đặt bàn phải sau thời gian hiện tại! Vui lòng chọn lại.");
 			txtGio_DatBan.requestFocus();
 			return false;
 		}
@@ -521,19 +523,30 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 		ButtonGroup tableGroup = new ButtonGroup();
 		for (Ban ban : danhSachBan) {
-//			System.out.println(ban.getTenBan() + " - " + ban.getTrangThai());
+			String ten=ban.getTenBan();
+			if(ban.getTrangThai()==TrangThaiBan.DaDuocDat) {
+				donDatBanDao.getAllDonDatBan();
+				for(DonDatBan ddb:donDatBanDao.getAllDonDatBan()) {
+					if(ddb.getBan().getMaBan().equals(ban.getMaBan()) && ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+						ten+=" ("+ ddb.getThoiGian().getHour() + ":" + String.format("%02d", ddb.getThoiGian().getMinute())+")";;
+						break;
+					}
+				}
+				
+			}
+
 			ImageIcon icon = getIconForTrangThai(ban.getTrangThai());
-			JRadioButton btnBan = new JRadioButton(ban.getTenBan(), icon);
-			btnBan.setVerticalTextPosition(SwingConstants.TOP);
-			btnBan.setHorizontalTextPosition(SwingConstants.CENTER);
-			btnBan.setHorizontalAlignment(SwingConstants.CENTER);
-			btnBan.setPreferredSize(new Dimension(100, 80));
-			btnBan.setMaximumSize(btnBan.getPreferredSize());
-			btnBan.setBackground(Color.decode("#F7F4EC"));
-			btnBan.setOpaque(true);
-			btnBan.addActionListener(this);
-			tableGroup.add(btnBan);
-			pnl.add(btnBan);
+			JRadioButton radBan = new JRadioButton(ten, icon);
+			radBan.setVerticalTextPosition(SwingConstants.TOP);
+			radBan.setHorizontalTextPosition(SwingConstants.CENTER);
+			radBan.setHorizontalAlignment(SwingConstants.CENTER);
+			radBan.setPreferredSize(new Dimension(100, 80));
+			radBan.setMaximumSize(radBan.getPreferredSize());
+			radBan.setBackground(Color.decode("#F7F4EC"));
+			radBan.setOpaque(true);
+			radBan.addActionListener(this);
+			tableGroup.add(radBan);
+			pnl.add(radBan);
 		}
 
 		pnl.revalidate();
@@ -631,7 +644,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			for (Ban b : banDao.getAllBan()) {
 				if (b.getMaBan().equals(ban.getMaBan())) {
 					if (b.getTrangThai() != TrangThaiBan.DangDuocSuDung) {
-						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0) {
+						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60
+								&& Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0) {
 //							System.out.println(Duration.between(LocalDateTime.now(),ddb.getThoiGian()).toMinutes());
 							b.setTrangThai(TrangThaiBan.DaDuocDat);
 							banDao.updateBan(b);
@@ -675,7 +689,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
 			if (ddb.getBan().getMaBan().equals(ddbMoi.getBan().getMaBan())) {
 				long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(), ddbMoi.getThoiGian()).toMinutes());
-				JOptionPane.showMessageDialog(this, "Khoảng cách: " + khoangCach);
+//				JOptionPane.showMessageDialog(this, "Khoảng cách: " + khoangCach);
 				if (khoangCach < 60 && khoangCach > -60) {
 					return false;
 				}
@@ -710,32 +724,44 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 						thoiGianDatBan);
 
 				if (kiemTraKhongTrungThoiGian(ddb) == true) {
-					int confirm = JOptionPane.showConfirmDialog(this,"Bạn có muốn đăng ký thành viên cho khách hàng  " + tenKH + " không?", "Xác nhận",JOptionPane.YES_NO_OPTION);
+					int confirm = JOptionPane.showConfirmDialog(this,
+							"Bạn có muốn đăng ký thành viên cho khách hàng  " + tenKH + " không?", "Xác nhận",
+							JOptionPane.YES_NO_OPTION);
 					if (confirm == JOptionPane.YES_OPTION) {
-						if (khachHangDao.addKhachHang(new KhachHang(maKhachHang, tenKH, sdtKH, true))&& donDatBanDao.addDonDatBan(ddb)) {
-							JOptionPane.showMessageDialog(this,"Đặt bàn thành công và đăng ký thành viên cho khách hàng " + tenKH);
+						if (khachHangDao.addKhachHang(new KhachHang(maKhachHang, tenKH, sdtKH, true))
+								&& donDatBanDao.addDonDatBan(ddb)) {
+							JOptionPane.showMessageDialog(this,
+									"Đặt bàn thành công và đăng ký thành viên cho khách hàng " + tenKH);
+							updateTrangThaiDatBan();
 							updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
+							themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());/// Bàn bên đặt bàn
+							themBanVaoPanel(pnlCacBan, banDao.getAllBan());
 						}
 					} else if (confirm == JOptionPane.NO_OPTION) {
-						if (khachHangDao.addKhachHang(new KhachHang(maKhachHang, tenKH, sdtKH, false))&& donDatBanDao.addDonDatBan(ddb)) {
+						if (khachHangDao.addKhachHang(new KhachHang(maKhachHang, tenKH, sdtKH, false))
+								&& donDatBanDao.addDonDatBan(ddb)) {
 							JOptionPane.showMessageDialog(this, "Đặt bàn thành công cho khách hàng " + tenKH);
+							updateTrangThaiDatBan();
 							updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
 
 						} else {
 							JOptionPane.showMessageDialog(this, "Đặt bàn không thành công! Vui lòng thử lại.");
 						}
+					}
 
 				} else {
 					JOptionPane.showMessageDialog(this,
 							"Đặt bàn không thành công!\nDo bàn đã được đặt vào khoảng thời gian này!\nVui lòng đặt bàn trước hoặc sau đó 60p gần với thời gian mà bạn mong muốn");
 					return;
-					
-					}
 
 				}
+
 			}
 		}
-		if (o instanceof JRadioButton) {
+
+		if (o instanceof JRadioButton)
+
+		{
 			JRadioButton btn = (JRadioButton) o;
 			lblTenBan.setText(btn.getText());
 			lblTenBan_DatBan.setText(btn.getText());
@@ -751,6 +777,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		updateTrangThaiDatBan();
+		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
 
 	}
 

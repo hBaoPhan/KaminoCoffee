@@ -3,11 +3,15 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container; // Import thêm java.awt.Container
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout; 
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -36,401 +40,424 @@ import dao.SanPham_dao;
 import entity.LoaiSanPham;
 import entity.SanPham;
 
-public class ThucDonPanel extends JPanel implements ActionListener, MouseListener{
+public class ThucDonPanel extends JPanel implements ActionListener, MouseListener {
 
-	private SanPham_dao sanPhanDao;
-	
-	private Font lblFont = new Font("Time New Roman", Font.BOLD, 20);
-	Border lineBorder = BorderFactory.createLineBorder(Color.decode("#e07b39"), 5);
-	Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+	private SanPham_dao daoSanPham;
 
-	private JTextField txtTimKiemDoUong;
-	private JButton btnTimKiemDoUong;
-	private JComboBox<String> cboFilterDoUong;
-	private JPanel pnlCacMon;
+	private Font fontTieuDe = new Font("Time New Roman", Font.BOLD, 20);
+	private Border vienVienNgoai = BorderFactory.createLineBorder(Color.decode("#e07b39"), 5);
+	private Border vienTrong = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
-    private JTextField txtMaSP, txtTenSP, txtGiaSP;
-    private JComboBox<String> cboLoaiSP;
-    private JButton btnThem, btnSua, btnXoa, btnLamMoi, btnChonAnh;
-    private JLabel lblAnhSanPham;
+	private JTextField txtThanhTimKiem;
+	private JButton btnTimKiem;
+	private JComboBox<String> cboLocTheoLoai;
+	private JPanel pnlDanhSachMon;
 
-	private String currentImagePath;
-	private SanPham selectedSanPham; 
+	private JTextField txtMaSanPham, txtTenSanPham, txtGiaSanPham;
+	private JComboBox<String> cboLoaiSanPham;
+	private JButton btnThem, btnSua, btnXoa, btnLamMoi, btnChonAnh;
+	private JLabel lblHienThiAnh;
+
+	private String duongDanAnhHienTai;
+	private SanPham sanPhamDaChon;
 
 	public ThucDonPanel() {
-		sanPhanDao = new SanPham_dao();
+		daoSanPham = new SanPham_dao();
+
+		setLayout(new BorderLayout(10, 10));
+		setBackground(Color.WHITE);
+
+		Box hopThucDonBenTrai = Box.createVerticalBox();
+		hopThucDonBenTrai.setPreferredSize(new Dimension(950, 800));
+		hopThucDonBenTrai.setBackground(Color.decode("#F7F4EC"));
+		hopThucDonBenTrai.setOpaque(true);
+		hopThucDonBenTrai.setBorder(new CompoundBorder(vienVienNgoai, vienTrong));
+
+		Box hopHang1 = Box.createHorizontalBox();
+		hopHang1.setAlignmentX(Component.LEFT_ALIGNMENT);
+		JLabel lblTieuDeMenu = new JLabel("Menu Sản Phẩm");
+		lblTieuDeMenu.setFont(fontTieuDe);
+		hopHang1.add(lblTieuDeMenu);
+		hopThucDonBenTrai.add(hopHang1);
+		hopThucDonBenTrai.add(Box.createVerticalStrut(10));
+
+		Box hopHang2 = Box.createHorizontalBox();
+		hopHang2.setAlignmentX(Component.LEFT_ALIGNMENT);
+		txtThanhTimKiem = new JTextField(15);
+		txtThanhTimKiem.setPreferredSize(new Dimension(150, 30));
+		txtThanhTimKiem.setMaximumSize(txtThanhTimKiem.getPreferredSize());
+
+		btnTimKiem = new JButton("Tìm kiếm");
+		btnTimKiem.setPreferredSize(new Dimension(100, 30));
+		btnTimKiem.setMaximumSize(btnTimKiem.getPreferredSize());
+		btnTimKiem.setBackground(Color.decode("#00A651"));
+		btnTimKiem.setBorder(BorderFactory.createLineBorder(Color.decode("#00A651"), 3, true));
+		btnTimKiem.setForeground(Color.WHITE);
+
+		hopHang2.add(txtThanhTimKiem);
+		hopHang2.add(Box.createHorizontalStrut(5));
+		hopHang2.add(btnTimKiem);
+
+		hopHang2.add(Box.createHorizontalStrut(20));
+		JLabel lblTieuDeLoc = new JLabel("Lọc theo loại:");
+		hopHang2.add(lblTieuDeLoc);
+		hopHang2.add(Box.createHorizontalStrut(5));
+
+		cboLocTheoLoai = new JComboBox<String>();
+		cboLocTheoLoai.setPreferredSize(new Dimension(255, 30));
+		cboLocTheoLoai.setMaximumSize(cboLocTheoLoai.getPreferredSize());
+		hopHang2.add(cboLocTheoLoai);
+		hopThucDonBenTrai.add(hopHang2);
+
+		pnlDanhSachMon = new JPanel(new GridLayout(0, 4, 10, 10));
+		pnlDanhSachMon.setBackground(Color.decode("#F7F4EC"));
+
+		JScrollPane thanhCuonDanhSachMon = new JScrollPane(pnlDanhSachMon);
+		thanhCuonDanhSachMon.setBorder(null);
+		thanhCuonDanhSachMon.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		thanhCuonDanhSachMon.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		thanhCuonDanhSachMon.setBackground(Color.decode("#F7F4EC"));
+		thanhCuonDanhSachMon.setPreferredSize(new Dimension(400, 600));
+
+		hopThucDonBenTrai.add(thanhCuonDanhSachMon);
+
+		JPanel pnlChinhGiua = new JPanel(new BorderLayout());
+		pnlChinhGiua.add(hopThucDonBenTrai, BorderLayout.CENTER);
+		add(pnlChinhGiua, BorderLayout.CENTER);
+
 		
-        setLayout(new BorderLayout(10, 10));
-        setBackground(Color.WHITE);
+		Box hopThongTinBenPhai = Box.createVerticalBox();
+		hopThongTinBenPhai.setBackground(Color.WHITE);
+		hopThongTinBenPhai.setOpaque(true);
+		hopThongTinBenPhai.setBorder(new CompoundBorder(vienVienNgoai, vienTrong));
+
+		JLabel lblTieuDeThongTin = new JLabel("Thông Tin Sản Phẩm");
+		lblTieuDeThongTin.setFont(fontTieuDe);
+		lblTieuDeThongTin.setAlignmentX(Component.CENTER_ALIGNMENT);
+		hopThongTinBenPhai.add(lblTieuDeThongTin);
+		hopThongTinBenPhai.add(Box.createVerticalStrut(20));
+
+		Box hopChuaAnh = Box.createVerticalBox();
+		hopChuaAnh.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblHienThiAnh = new JLabel();
+		lblHienThiAnh.setPreferredSize(new Dimension(200, 200));
+		lblHienThiAnh.setMaximumSize(new Dimension(200, 200));
+		lblHienThiAnh.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+		lblHienThiAnh.setIcon(taiHinhAnhSanPham("data/images/default", false));
+
+		btnChonAnh = new JButton("Chọn Ảnh");
+		btnChonAnh.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		hopChuaAnh.add(lblHienThiAnh);
+		hopChuaAnh.add(Box.createVerticalStrut(10));
+		hopChuaAnh.add(btnChonAnh);
+		hopThongTinBenPhai.add(hopChuaAnh);
+		hopThongTinBenPhai.add(Box.createVerticalStrut(20));
+
+		JPanel pnlNhapLieu = new JPanel(new GridBagLayout());
+		pnlNhapLieu.setBackground(Color.WHITE);
+		pnlNhapLieu.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weightx = 0.0;
+		JLabel lblMaSanPham = new JLabel("Mã sản phẩm:");
+		pnlNhapLieu.add(lblMaSanPham, gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		txtMaSanPham = new JTextField();
+		txtMaSanPham.setEditable(false);
+		txtMaSanPham.setBackground(Color.LIGHT_GRAY);
+		pnlNhapLieu.add(txtMaSanPham, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weightx = 0.0;
+		JLabel lblTenSanPham = new JLabel("Tên sản phẩm:");
+		pnlNhapLieu.add(lblTenSanPham, gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		txtTenSanPham = new JTextField();
+		pnlNhapLieu.add(txtTenSanPham, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weightx = 0.0;
+		JLabel lblGiaSanPham = new JLabel("Đơn giá:");
+		pnlNhapLieu.add(lblGiaSanPham, gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		txtGiaSanPham = new JTextField();
+		pnlNhapLieu.add(txtGiaSanPham, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.weightx = 0.0;
+		JLabel lblLoaiSanPham = new JLabel("Loại sản phẩm:");
+		pnlNhapLieu.add(lblLoaiSanPham, gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		cboLoaiSanPham = new JComboBox<>();
+		pnlNhapLieu.add(cboLoaiSanPham, gbc);
+
+		hopThongTinBenPhai.add(pnlNhapLieu);
+		hopThongTinBenPhai.add(Box.createVerticalStrut(30));
+
+		JPanel pnlCacNut = new JPanel(new GridLayout(2, 2, 10, 10));
+		pnlCacNut.setBackground(Color.WHITE);
+		pnlCacNut.setMaximumSize(new Dimension(400, 100));
+		pnlCacNut.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		btnThem = taoNutChucNang("Thêm", Color.decode("#00A651"));
+		btnSua = taoNutChucNang("Sửa", Color.decode("#e07b39"));
+		btnXoa = taoNutChucNang("Xóa", Color.decode("#DC3545"));
+		btnLamMoi = taoNutChucNang("Làm Mới", Color.decode("#6C757D"));
+
+		pnlCacNut.add(btnThem);
+		pnlCacNut.add(btnSua);
+		pnlCacNut.add(btnXoa);
+		pnlCacNut.add(btnLamMoi);
+
+		hopThongTinBenPhai.add(pnlCacNut);
+		hopThongTinBenPhai.add(Box.createVerticalGlue());
+
+		JPanel pnlBaoBenPhai = new JPanel(new BorderLayout());
+		pnlBaoBenPhai.add(hopThongTinBenPhai, BorderLayout.CENTER);
+		add(pnlBaoBenPhai, BorderLayout.EAST);
+
 		
-        Box BoxThucDon_Left = Box.createVerticalBox();
-		BoxThucDon_Left.setPreferredSize(new Dimension(950, 800));
-		BoxThucDon_Left.setBackground(Color.decode("#F7F4EC"));
-		BoxThucDon_Left.setOpaque(true);
-		BoxThucDon_Left.setBorder(new CompoundBorder(lineBorder, emptyBorder));
+		cboLocTheoLoai.addItem("Tất cả");
+		for (LoaiSanPham loai : LoaiSanPham.values()) {
+			cboLoaiSanPham.addItem(loai.getMoTa());
+			cboLocTheoLoai.addItem(loai.getMoTa());
+		}
 		
-		Box box1 = Box.createHorizontalBox();
-		box1.setAlignmentX(Component.LEFT_ALIGNMENT);
-		JLabel lblMenuDoUong = new JLabel("Menu Sản Phẩm");
-		lblMenuDoUong.setFont(lblFont);
-		box1.add(lblMenuDoUong);
-		BoxThucDon_Left.add(box1);
-		BoxThucDon_Left.add(Box.createVerticalStrut(10));
+		taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, daoSanPham.getAllSanPham());
 
-		Box box2 = Box.createHorizontalBox();
-		box2.setAlignmentX(Component.LEFT_ALIGNMENT);
-		txtTimKiemDoUong = new JTextField(15);
-		txtTimKiemDoUong.setPreferredSize(new Dimension(150, 30));
-		txtTimKiemDoUong.setMaximumSize(txtTimKiemDoUong.getPreferredSize());
-		
-		btnTimKiemDoUong = new JButton("Tìm kiếm");
-		btnTimKiemDoUong.setPreferredSize(new Dimension(100, 30));
-		btnTimKiemDoUong.setMaximumSize(btnTimKiemDoUong.getPreferredSize());
-		btnTimKiemDoUong.setBackground(Color.decode("#00A651"));
-		btnTimKiemDoUong.setBorder(BorderFactory.createLineBorder(Color.decode("#00A651"), 3, true));
-		btnTimKiemDoUong.setForeground(Color.WHITE);
-		
-		box2.add(txtTimKiemDoUong);
-		box2.add(Box.createHorizontalStrut(5));
-		box2.add(btnTimKiemDoUong);
-
-		box2.add(Box.createHorizontalStrut(20));
-		JLabel lblLoc = new JLabel("Lọc theo loại:");
-		box2.add(lblLoc);
-		box2.add(Box.createHorizontalStrut(5));
-		
-		cboFilterDoUong = new JComboBox<String>();
-		cboFilterDoUong.setPreferredSize(new Dimension(255, 30));
-		cboFilterDoUong.setMaximumSize(cboFilterDoUong.getPreferredSize());
-		box2.add(cboFilterDoUong);
-		BoxThucDon_Left.add(box2);
-
-		pnlCacMon = new JPanel(new GridLayout(0, 4, 10, 10)); 
-		pnlCacMon.setBackground(Color.decode("#F7F4EC"));
-		
-		JScrollPane scrollMon = new JScrollPane(pnlCacMon);
-		scrollMon.setBorder(null);
-		scrollMon.setBackground(Color.decode("#F7F4EC"));
-		scrollMon.setPreferredSize(new Dimension(400, 600)); 
-		
-		BoxThucDon_Left.add(scrollMon);
-		
-		
-		JPanel pnlCenter = new JPanel(new BorderLayout());
-		pnlCenter.add(BoxThucDon_Left, BorderLayout.CENTER);
-        add(pnlCenter, BorderLayout.CENTER);
-
-        
-        
-        Box BoxThongTin_Right = Box.createVerticalBox();
-        BoxThongTin_Right.setBackground(Color.WHITE);
-        BoxThongTin_Right.setOpaque(true);
-        BoxThongTin_Right.setBorder(new CompoundBorder(lineBorder, emptyBorder));
-        
-        JLabel lblTitle = new JLabel("Thông Tin Sản Phẩm");
-        lblTitle.setFont(lblFont);
-        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        BoxThongTin_Right.add(lblTitle);
-        BoxThongTin_Right.add(Box.createVerticalStrut(20));
-
-        Box boxAnh = Box.createVerticalBox();
-        boxAnh.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblAnhSanPham = new JLabel();
-        lblAnhSanPham.setPreferredSize(new Dimension(200, 200));
-        lblAnhSanPham.setMaximumSize(new Dimension(200, 200));
-        lblAnhSanPham.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        lblAnhSanPham.setIcon(loadSanPhamIcon("data/images/default", false)); 
-        
-        btnChonAnh = new JButton("Chọn Ảnh");
-        btnChonAnh.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        boxAnh.add(lblAnhSanPham);
-        boxAnh.add(Box.createVerticalStrut(10));
-        boxAnh.add(btnChonAnh);
-        BoxThongTin_Right.add(boxAnh);
-        BoxThongTin_Right.add(Box.createVerticalStrut(20));
-
-        JPanel pnlForm = new JPanel();
-        pnlForm.setLayout(new BoxLayout(pnlForm, BoxLayout.Y_AXIS));
-        pnlForm.setBackground(Color.WHITE);
-        
-        Dimension labelSize = new Dimension(100, 30);
-        Dimension fieldSize = new Dimension(300, 30);
-
-        Box boxMa = Box.createHorizontalBox();
-        JLabel lblMa = new JLabel("Mã sản phẩm:");
-        lblMa.setPreferredSize(labelSize);
-        txtMaSP = new JTextField();
-        txtMaSP.setPreferredSize(fieldSize);
-        txtMaSP.setMaximumSize(fieldSize);
-        txtMaSP.setEditable(false);
-        txtMaSP.setBackground(Color.LIGHT_GRAY);
-        boxMa.add(lblMa);
-        boxMa.add(txtMaSP);
-        pnlForm.add(boxMa);
-        pnlForm.add(Box.createVerticalStrut(10));
-
-        Box boxTen = Box.createHorizontalBox();
-        JLabel lblTen = new JLabel("Tên sản phẩm:");
-        lblTen.setPreferredSize(labelSize);
-        txtTenSP = new JTextField();
-        txtTenSP.setPreferredSize(fieldSize);
-        txtTenSP.setMaximumSize(fieldSize);
-        boxTen.add(lblTen);
-        boxTen.add(txtTenSP);
-        pnlForm.add(boxTen);
-        pnlForm.add(Box.createVerticalStrut(10));
-
-        Box boxGia = Box.createHorizontalBox();
-        JLabel lblGia = new JLabel("Đơn giá:");
-        lblGia.setPreferredSize(labelSize);
-        txtGiaSP = new JTextField();
-        txtGiaSP.setPreferredSize(fieldSize);
-        txtGiaSP.setMaximumSize(fieldSize);
-        boxGia.add(lblGia);
-        boxGia.add(txtGiaSP);
-        pnlForm.add(boxGia);
-        pnlForm.add(Box.createVerticalStrut(10));
-
-        Box boxLoai = Box.createHorizontalBox();
-        JLabel lblLoai = new JLabel("Loại sản phẩm:");
-        lblLoai.setPreferredSize(labelSize);
-        cboLoaiSP = new JComboBox<>();
-        cboLoaiSP.setPreferredSize(fieldSize);
-        cboLoaiSP.setMaximumSize(fieldSize);
-        boxLoai.add(lblLoai);
-        boxLoai.add(cboLoaiSP);
-        pnlForm.add(boxLoai);
-        
-        BoxThongTin_Right.add(pnlForm);
-        BoxThongTin_Right.add(Box.createVerticalStrut(30));
-
-        JPanel pnlButtons = new JPanel(new GridLayout(2, 2, 10, 10)); // 2x2 grid
-        pnlButtons.setBackground(Color.WHITE);
-        pnlButtons.setMaximumSize(new Dimension(400, 100));
-        
-        btnThem = createCrudButton("Thêm", Color.decode("#00A651"));
-        btnSua = createCrudButton("Sửa", Color.decode("#e07b39"));
-        btnXoa = createCrudButton("Xóa", Color.decode("#DC3545"));
-        btnLamMoi = createCrudButton("Làm Mới", Color.decode("#6C757D"));
-
-        pnlButtons.add(btnThem);
-        pnlButtons.add(btnSua);
-        pnlButtons.add(btnXoa);
-        pnlButtons.add(btnLamMoi);
-        
-        BoxThongTin_Right.add(pnlButtons);
-        BoxThongTin_Right.add(Box.createVerticalGlue()); 
-        
-        JPanel pnlLeft = new JPanel(new BorderLayout());
-        pnlLeft.add(BoxThongTin_Right, BorderLayout.CENTER);
-        add(pnlLeft, BorderLayout.EAST);
-        
-        cboFilterDoUong.addItem("Tất cả");
-        for (LoaiSanPham loai : LoaiSanPham.values()) {
-            cboLoaiSP.addItem(loai.getMoTa());
-            cboFilterDoUong.addItem(loai.getMoTa());
-        }
-        
-        loadSanPhamVaoPanel(pnlCacMon, sanPhanDao.getAllSanPham());
-        
-        btnChonAnh.addActionListener(this);
-        btnLamMoi.addActionListener(this);
-        btnSua.addActionListener(this);
-        btnThem.addActionListener(this);
-        btnTimKiemDoUong.addActionListener(this);
-        btnXoa.addActionListener(this);
-        cboFilterDoUong.addActionListener(this);
-	}
-	
-	
-	
-	private JButton createCrudButton(String text, Color color) {
-        JButton btn = new JButton(text);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btn.setBackground(color);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(150, 40));
-        return btn;
-    }
-	
-	public void loadSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
-	    panel.removeAll();
-	    
-	    for (SanPham sp : danhSachSanPham) {
-	    	JPanel cardPanel = new JPanel(new BorderLayout(15, 0)); 
-	        cardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 15));
-	        cardPanel.setPreferredSize(new Dimension(150, 110)); 
-	        cardPanel.setBackground(Color.WHITE); 
-	        
-	        String tenSP = sp.getTenSanPham();
-	        ImageIcon icon = loadSanPhamIcon("data/images/" + tenSP, true); 
-	        
-	        JLabel lblImage = new JLabel(icon);
-	        lblImage.setPreferredSize(new Dimension(90, 90));
-	        lblImage.setOpaque(false);
-	        cardPanel.add(lblImage, BorderLayout.WEST);
-
-	        JPanel infoPanel = new JPanel();
-	        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-	        infoPanel.setOpaque(false); 
-
-	        JLabel lblTen = new JLabel(tenSP);
-	        lblTen.setName("lblTenSP"); 
-	        lblTen.setFont(new Font("Segoe UI", Font.BOLD, 16));
-	        lblTen.setForeground(new Color(60, 60, 60));
-
-	        double gia = sp.getGia();
-	        String giaFormatted = String.format("%,.0f₫", gia);
-	        JLabel lblGia = new JLabel(giaFormatted);
-	        lblGia.setFont(new Font("Segoe UI", Font.BOLD, 14));
-	        lblGia.setForeground(new Color(220, 0, 0));
-
-	        String loai = sp.getLoaiSanPham() != null ? sp.getLoaiSanPham().getMoTa() : "-";
-	        JLabel lblLoaiMon = new JLabel("Loại: " + loai);
-	        lblLoaiMon.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-	        lblLoaiMon.setForeground(new Color(100, 100, 100));
-
-	        boolean isAvailable = true; 
-	        JLabel lblTrangThai = new JLabel(isAvailable ? "Có sẵn" : "Hết món");
-	        lblTrangThai.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-	        lblTrangThai.setForeground(isAvailable ? new Color(0, 128, 0) : Color.RED);
-	        
-	        infoPanel.add(lblTen);
-	        infoPanel.add(Box.createVerticalGlue()); 
-	        infoPanel.add(lblGia);
-	        infoPanel.add(Box.createVerticalStrut(5));
-	        infoPanel.add(lblLoaiMon); 
-	        infoPanel.add(lblTrangThai);
-
-	        cardPanel.add(infoPanel, BorderLayout.CENTER);
-	        
-	        panel.add(cardPanel);
-	        cardPanel.addMouseListener(this);
-	    }
-
-	    panel.revalidate();
-	    panel.repaint();
-	}
-	
-	public ImageIcon loadSanPhamIcon(String tenSP, boolean isSmall) {
-	    String[] extensions = { ".png", ".jpg", ".jpeg" };
-	    File file = null;
-	    int size = isSmall ? 85 : 200; 
-	    
-	    if (currentImagePath != null && !isSmall) {
-	        file = new File(currentImagePath);
-	        if (file.exists()) {
-	            return new ImageIcon(new ImageIcon(file.getAbsolutePath()).getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
-	        }
-	    }
-
-	    for (String ext : extensions) {
-	        file = new File(tenSP + ext);
-	        if (file.exists()) {
-	        	 return new ImageIcon(new ImageIcon(file.getAbsolutePath()).getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));	        
-	        }
-	    }
-	    
-   	 	file = new File("data/images/default.png");
-   	 	return new ImageIcon(new ImageIcon(file.getAbsolutePath()).getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));	        
+		btnChonAnh.addActionListener(this);
+		btnLamMoi.addActionListener(this);
+		btnSua.addActionListener(this);
+		btnThem.addActionListener(this);
+		btnTimKiem.addActionListener(this);
+		btnXoa.addActionListener(this);
+		cboLocTheoLoai.addActionListener(this);
 	}
 
+	private JButton taoNutChucNang(String text, Color color) {
+		JButton btn = new JButton(text);
+		btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		btn.setBackground(color);
+		btn.setForeground(Color.WHITE);
+		btn.setFocusPainted(false);
+		btn.setPreferredSize(new Dimension(150, 40));
+		return btn;
+	}
 
+	public void taiDanhSachSanPhamVaoPanel(JPanel panelHienThi, ArrayList<SanPham> dsSanPham) {
+		panelHienThi.removeAll();
 
+		for (SanPham sp : dsSanPham) {
+			JPanel pnlTheSanPham = new JPanel(new BorderLayout(15, 0));
+			pnlTheSanPham.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 15));
+			pnlTheSanPham.setPreferredSize(new Dimension(225, 110)); 
+			pnlTheSanPham.setBackground(Color.WHITE);
+
+			String tenSanPham = sp.getTenSanPham();
+			ImageIcon hinhAnh = taiHinhAnhSanPham("data/images/" + tenSanPham, true);
+
+			JLabel lblAnh = new JLabel(hinhAnh);
+			lblAnh.setPreferredSize(new Dimension(90, 90));
+			lblAnh.setOpaque(false);
+			pnlTheSanPham.add(lblAnh, BorderLayout.WEST);
+
+			JPanel pnlThongTin = new JPanel();
+			pnlThongTin.setLayout(new BoxLayout(pnlThongTin, BoxLayout.Y_AXIS));
+			pnlThongTin.setOpaque(false);
+
+			JLabel lblTenSP = new JLabel(tenSanPham);
+			lblTenSP.setName("lblTenSP"); 
+			lblTenSP.setFont(new Font("Segoe UI", Font.BOLD, 16));
+			lblTenSP.setForeground(new Color(60, 60, 60));
+
+			double giaBan = sp.getGia();
+			String giaDinhDang = String.format("%,.0f₫", giaBan);
+			JLabel lblGiaSP = new JLabel(giaDinhDang);
+			lblGiaSP.setFont(new Font("Segoe UI", Font.BOLD, 14));
+			lblGiaSP.setForeground(new Color(220, 0, 0));
+
+			String tenLoai = sp.getLoaiSanPham() != null ? sp.getLoaiSanPham().getMoTa() : "-";
+			JLabel lblLoaiSP = new JLabel("Loại: " + tenLoai);
+			lblLoaiSP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+			lblLoaiSP.setForeground(new Color(100, 100, 100));
+
+			boolean conHang = true; 
+			JLabel lblTrangThai = new JLabel(conHang ? "Có sẵn" : "Hết món");
+			lblTrangThai.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+			lblTrangThai.setForeground(conHang ? new Color(0, 128, 0) : Color.RED);
+
+			pnlThongTin.add(lblTenSP);
+			pnlThongTin.add(Box.createVerticalGlue());
+			pnlThongTin.add(lblGiaSP);
+			pnlThongTin.add(Box.createVerticalStrut(5));
+			pnlThongTin.add(lblLoaiSP);
+			pnlThongTin.add(lblTrangThai);
+
+			pnlTheSanPham.add(pnlThongTin, BorderLayout.CENTER);
+
+			JPanel pnlBaoBoc = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+			pnlBaoBoc.setBackground(Color.decode("#F7F4EC"));
+			pnlBaoBoc.add(pnlTheSanPham);
+			
+			panelHienThi.add(pnlBaoBoc);
+			
+			pnlTheSanPham.addMouseListener(this);
+		}
+
+		panelHienThi.revalidate();
+		panelHienThi.repaint();
+	}
+
+	public ImageIcon taiHinhAnhSanPham(String tenFileAnh, boolean laHinhNho) {
+		String[] danhSachPhanMoRong = { ".png", ".jpg", ".jpeg" };
+		File tepAnh = null;
+		int kichThuoc = laHinhNho ? 85 : 200;
+
+		if (duongDanAnhHienTai != null && !laHinhNho) {
+			tepAnh = new File(duongDanAnhHienTai);
+			if (tepAnh.exists()) {
+				return new ImageIcon(
+						new ImageIcon(tepAnh.getAbsolutePath()).getImage().getScaledInstance(kichThuoc, kichThuoc, Image.SCALE_SMOOTH));
+			}
+		}
+
+		for (String phanMoRong : danhSachPhanMoRong) {
+			tepAnh = new File(tenFileAnh + phanMoRong);
+			if (tepAnh.exists()) {
+				return new ImageIcon(
+						new ImageIcon(tepAnh.getAbsolutePath()).getImage().getScaledInstance(kichThuoc, kichThuoc, Image.SCALE_SMOOTH));
+			}
+		}
+
+		tepAnh = new File("data/images/default.png");
+		return new ImageIcon(
+				new ImageIcon(tepAnh.getAbsolutePath()).getImage().getScaledInstance(kichThuoc, kichThuoc, Image.SCALE_SMOOTH));
+	}
+
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object o = e.getSource();
-		
-		if (o == btnChonAnh) {
+		Object nguonSuKien = e.getSource();
+
+		if (nguonSuKien == btnChonAnh) {
 			chonAnh();
-		} else if (o == btnLamMoi) {
+		} else if (nguonSuKien == btnLamMoi) {
 			lamMoi();
-		} else if (o == btnTimKiemDoUong || o == cboFilterDoUong) {
+		} else if (nguonSuKien == btnTimKiem || nguonSuKien == cboLocTheoLoai) {
 			timKiem();
-		} else if (o == btnThem) {
+		} else if (nguonSuKien == btnThem) {
 			themSanPham();
-		} else if (o == btnSua) {
+		} else if (nguonSuKien == btnSua) {
 			suaSanPham();
-		} else if (o == btnXoa) {
+		} else if (nguonSuKien == btnXoa) {
 			xoaSanPham();
 		}
 	}
 
-
 	private void suaSanPham() {
-		if (selectedSanPham == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần sửa.", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-		
-		String maSP = txtMaSP.getText().trim(); 
-		SanPham spCapNhat = taoSanPhamTuForm(maSP);
-		
-		if (spCapNhat != null) {
-			if (sanPhanDao.suaSanPham(spCapNhat)) {
+		if (sanPhamDaChon == null) {
+			JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần sửa.", "Lỗi", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		String maSanPham = txtMaSanPham.getText().trim();
+		SanPham sanPhamCapNhat = taoSanPhamTuForm(maSanPham);
+
+		if (sanPhamCapNhat != null) {
+			if (daoSanPham.suaSanPham(sanPhamCapNhat)) {
 				JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thành công!");
-				loadSanPhamVaoPanel(pnlCacMon, sanPhanDao.getAllSanPham());
+				taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, daoSanPham.getAllSanPham());
 				lamMoi();
 			} else {
 				JOptionPane.showMessageDialog(this, "Lỗi: Không thể cập nhật sản phẩm.", "Lỗi", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
-	
+
 	private void xoaSanPham() {
-		if (selectedSanPham == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần xóa.", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+		if (sanPhamDaChon == null) {
+			JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần xóa.", "Lỗi", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		int xacNhan = JOptionPane.showConfirmDialog(this,
+				"Bạn có chắc chắn muốn xóa sản phẩm '" + sanPhamDaChon.getTenSanPham() + "'?", "Xác nhận xóa",
+				JOptionPane.YES_NO_OPTION);
 		
-		int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm '" + selectedSanPham.getTenSanPham() + "'?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-		if (confirm == JOptionPane.YES_OPTION) {
-			if (sanPhanDao.xoaSanPham(selectedSanPham.getMaSanPham())) {
+		if (xacNhan == JOptionPane.YES_OPTION) {
+			if (daoSanPham.xoaSanPham(sanPhamDaChon.getMaSanPham())) {
 				JOptionPane.showMessageDialog(this, "Xóa sản phẩm thành công!");
-				loadSanPhamVaoPanel(pnlCacMon, sanPhanDao.getAllSanPham());
+				taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, daoSanPham.getAllSanPham());
 				lamMoi();
 			} else {
-				JOptionPane.showMessageDialog(this, "Lỗi: Không thể xóa sản phẩm. (Có thể do sản phẩm đang có trong hóa đơn).", "Lỗi", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this,
+						"Lỗi: Không thể xóa sản phẩm. (Có thể do sản phẩm đang có trong hóa đơn).", "Lỗi",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-
-
 	private void chonAnh() {
-		JFileChooser fileChooser = new JFileChooser("data/images/");
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh", "jpg", "jpeg", "png");
-		fileChooser.setFileFilter(filter);
-		
-		int result = fileChooser.showOpenDialog(this);
-		if (result == JFileChooser.APPROVE_OPTION) {
-		    File selectedFile = fileChooser.getSelectedFile();
-		    currentImagePath = selectedFile.getAbsolutePath();
-		    lblAnhSanPham.setIcon(loadSanPhamIcon(currentImagePath, false));
+		JFileChooser hopThoaiChonTep = new JFileChooser("data/images/");
+		FileNameExtensionFilter boLocTep = new FileNameExtensionFilter("Hình ảnh", "jpg", "jpeg", "png");
+		hopThoaiChonTep.setFileFilter(boLocTep);
+
+		int ketQua = hopThoaiChonTep.showOpenDialog(this);
+		if (ketQua == JFileChooser.APPROVE_OPTION) {
+			File tepHinhDaChon = hopThoaiChonTep.getSelectedFile();
+			duongDanAnhHienTai = tepHinhDaChon.getAbsolutePath();
+			lblHienThiAnh.setIcon(taiHinhAnhSanPham(duongDanAnhHienTai, false));
 		}
 	}
 
 	private void themSanPham() {
-        int nextId = sanPhanDao.getAllSanPham().stream()
-            .map(SanPham::getMaSanPham)
-            .filter(id -> id.matches("SP\\d+"))
-            .mapToInt(id -> Integer.parseInt(id.substring(2)))
-            .max().orElse(0) + 1;
-        String newID = "SP" + String.format("%03d", nextId);
+		int idTiepTheo = daoSanPham.getAllSanPham().stream()
+				.map(SanPham::getMaSanPham)
+				.filter(id -> id.matches("SP\\d+"))
+				.mapToInt(id -> Integer.parseInt(id.substring(2)))
+				.max().orElse(0) + 1;
+		String maSanPhamMoi = "SP" + String.format("%03d", idTiepTheo);
 
-		SanPham spMoi = taoSanPhamTuForm(newID); 
-		
-		if (spMoi != null) {
-			if (sanPhanDao.getSanPhamByTen(spMoi.getTenSanPham()) != null) {
+		SanPham sanPhamMoi = taoSanPhamTuForm(maSanPhamMoi);
+
+		if (sanPhamMoi != null) {
+			if (daoSanPham.getSanPhamByTen(sanPhamMoi.getTenSanPham()) != null) {
 				JOptionPane.showMessageDialog(this, "Lỗi: Tên sản phẩm đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
-			if (sanPhanDao.themSanPham(spMoi)) {
+
+			if (daoSanPham.themSanPham(sanPhamMoi)) {
 				JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!");
-				loadSanPhamVaoPanel(pnlCacMon, sanPhanDao.getAllSanPham());
+				taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, daoSanPham.getAllSanPham());
 				lamMoi();
 			} else {
 				JOptionPane.showMessageDialog(this, "Lỗi: Không thể thêm sản phẩm.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -438,150 +465,139 @@ public class ThucDonPanel extends JPanel implements ActionListener, MouseListene
 		}
 	}
 
-	
-	private SanPham taoSanPhamTuForm(String maSP) {
-        String tenSP = txtTenSP.getText().trim();
-        double gia = 0.0;
-        
-        if (tenSP.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-            txtTenSP.requestFocus();
-            return null;
-        }
+	private SanPham taoSanPhamTuForm(String maSanPham) {
+		String tenSanPham = txtTenSanPham.getText().trim();
+		double giaBan = 0.0;
 
-        try {
-            gia = Double.parseDouble(txtGiaSP.getText().trim().replace(",", "").replace("₫", "")); 
-            if (gia < 0) {
-                JOptionPane.showMessageDialog(this, "Giá phải là số không âm.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-                txtGiaSP.requestFocus();
-                return null;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Giá phải là một số hợp lệ (ví dụ: 50000).", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-            txtGiaSP.requestFocus();
-            return null;
-        }
+		if (tenSanPham.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống.", "Lỗi nhập liệu",
+					JOptionPane.ERROR_MESSAGE);
+			txtTenSanPham.requestFocus();
+			return null;
+		}
 
-        String loaiStr = Objects.toString(cboLoaiSP.getSelectedItem(), "");
-        LoaiSanPham loaiSP;
-        try {
-            loaiSP = LoaiSanPham.fromString(loaiStr);
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Loại sản phẩm không hợp lệ.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+		try {
+			giaBan = Double.parseDouble(txtGiaSanPham.getText().trim().replace(",", "").replace("₫", ""));
+			if (giaBan < 0) {
+				JOptionPane.showMessageDialog(this, "Giá phải là số không âm.", "Lỗi nhập liệu",
+						JOptionPane.ERROR_MESSAGE);
+				txtGiaSanPham.requestFocus();
+				return null;
+			}
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "Giá phải là một số hợp lệ (ví dụ: 50000).", "Lỗi nhập liệu",
+					JOptionPane.ERROR_MESSAGE);
+			txtGiaSanPham.requestFocus();
+			return null;
+		}
 
-        return new SanPham(maSP, tenSP, gia, loaiSP);
+		String chuoiLoaiSanPham = Objects.toString(cboLoaiSanPham.getSelectedItem(), "");
+		LoaiSanPham loaiSanPham;
+		try {
+			loaiSanPham = LoaiSanPham.fromString(chuoiLoaiSanPham);
+		} catch (IllegalArgumentException e) {
+			JOptionPane.showMessageDialog(this, "Loại sản phẩm không hợp lệ.", "Lỗi nhập liệu",
+					JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+
+		return new SanPham(maSanPham, tenSanPham, giaBan, loaiSanPham);
 	}
 
-
-	
 	private void timKiem() {
-		String tuKhoa = txtTimKiemDoUong.getText().trim();
-        String loai = Objects.toString(cboFilterDoUong.getSelectedItem(), "Tất cả");
-        
-        ArrayList<SanPham> danhSachLoc = sanPhanDao.getSanPhamByLoc(tuKhoa, loai);
-        loadSanPhamVaoPanel(pnlCacMon, danhSachLoc);
+		String tuKhoaTimKiem = txtThanhTimKiem.getText().trim();
+		String loaiDaChon = Objects.toString(cboLocTheoLoai.getSelectedItem(), "Tất cả");
+
+		ArrayList<SanPham> dsKetQuaLoc = daoSanPham.getSanPhamByLoc(tuKhoaTimKiem, loaiDaChon);
+		taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, dsKetQuaLoc);
 	}
-
-
 
 	private void lamMoi() {
-		txtMaSP.setText("");
-		txtTenSP.setText("");
-		txtGiaSP.setText("");
-		cboLoaiSP.setSelectedIndex(0); 
-		lblAnhSanPham.setIcon(loadSanPhamIcon("data/images/default", false));
-		currentImagePath = null; 
-		selectedSanPham = null;
-		
-		txtTimKiemDoUong.setText("");
-		cboFilterDoUong.setSelectedIndex(0);
-		loadSanPhamVaoPanel(pnlCacMon, sanPhanDao.getAllSanPham());
+		txtMaSanPham.setText("");
+		txtTenSanPham.setText("");
+		txtGiaSanPham.setText("");
+		cboLoaiSanPham.setSelectedIndex(0);
+		lblHienThiAnh.setIcon(taiHinhAnhSanPham("data/images/default", false));
+		duongDanAnhHienTai = null;
+		sanPhamDaChon = null;
+
+		txtThanhTimKiem.setText("");
+		cboLocTheoLoai.setSelectedIndex(0);
+		taiDanhSachSanPhamVaoPanel(pnlDanhSachMon, daoSanPham.getAllSanPham());
 	}
-
-
-
+	
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Component component = e.getComponent();
-	    JPanel clickedPanel = null;
-	    
-	    while (component != null) {
-	        if (component instanceof Container && ((Container) component).getLayout() instanceof BorderLayout) {
-	            if (component instanceof JPanel) {
-	                clickedPanel = (JPanel) component;
-	            }
-	            break; 
-	        }
-	        component = component.getParent(); 
-	    }
-	    
-	    if (clickedPanel == null) {
-	        return; 
-	    }
-	    
-	    Component infoComponent = clickedPanel.getComponent(1); 
-	    if (!(infoComponent instanceof JPanel)) return;
-	    
-	    Component[] components = ((JPanel) infoComponent).getComponents();
-	    String tenSP = "";
-	    for (Component comp : components) {
-	        if (comp instanceof JLabel && "lblTenSP".equals(comp.getName())) {
-	            tenSP = ((JLabel) comp).getText();
-	            break;
-	        }
-	    }
+		Component thanhPhan = e.getComponent();
+		JPanel pnlDuocNhan = null;
 
-	    if (!tenSP.isEmpty()) {
-	        selectedSanPham = sanPhanDao.getSanPhamByTen(tenSP); 
-	        if (selectedSanPham != null) {
-	            txtMaSP.setText(selectedSanPham.getMaSanPham());
-	            txtTenSP.setText(selectedSanPham.getTenSanPham());
-	            txtGiaSP.setText(String.format("%,.0f", selectedSanPham.getGia()));
-	            cboLoaiSP.setSelectedItem(selectedSanPham.getLoaiSanPham().getMoTa());
-	            
-	            currentImagePath = null; 
-	            lblAnhSanPham.setIcon(loadSanPhamIcon("data/images/" + selectedSanPham.getTenSanPham(), false)); 
-	        }
-	    }
+		while (thanhPhan != null) {
+			if (thanhPhan instanceof Container && ((Container) thanhPhan).getLayout() instanceof BorderLayout) {
+				if (thanhPhan instanceof JPanel) {
+					pnlDuocNhan = (JPanel) thanhPhan;
+				}
+				break;
+			}
+			thanhPhan = thanhPhan.getParent();
+		}
+
+		if (pnlDuocNhan == null) {
+			return;
+		}
+
+		Component thanhPhanThongTin = pnlDuocNhan.getComponent(1); 
+		if (!(thanhPhanThongTin instanceof JPanel))
+			return;
+
+		Component[] dsThanhPhanCon = ((JPanel) thanhPhanThongTin).getComponents();
+		String tenSanPham = "";
+		for (Component comp : dsThanhPhanCon) {
+			if (comp instanceof JLabel && "lblTenSP".equals(comp.getName())) {
+				tenSanPham = ((JLabel) comp).getText();
+				break;
+			}
+		}
+
+		if (!tenSanPham.isEmpty()) {
+			sanPhamDaChon = daoSanPham.getSanPhamByTen(tenSanPham);
+			if (sanPhamDaChon != null) {
+				txtMaSanPham.setText(sanPhamDaChon.getMaSanPham());
+				txtTenSanPham.setText(sanPhamDaChon.getTenSanPham());
+				txtGiaSanPham.setText(String.format("%,.0f", sanPhamDaChon.getGia()));
+				cboLoaiSanPham.setSelectedItem(sanPhamDaChon.getLoaiSanPham().getMoTa());
+
+				duongDanAnhHienTai = null; 
+				lblHienThiAnh.setIcon(taiHinhAnhSanPham("data/images/" + sanPhamDaChon.getTenSanPham(), false));
+			}
+		}
 	}
-
-
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
 	}
-
-
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
 	}
-
-
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-	    if (e.getSource() instanceof JPanel) {
-	    	JPanel panel = (JPanel) e.getSource();
-	    	if(panel.getLayout() instanceof BorderLayout) { 
-	    		panel.setBackground(new Color(230, 245, 255));
-	    	}
-	    }
+		if (e.getSource() instanceof JPanel) {
+			JPanel pnlHover = (JPanel) e.getSource();
+			if (pnlHover.getLayout() instanceof BorderLayout) { 
+				pnlHover.setBackground(new Color(230, 245, 255));
+			}
+		}
 	}
-
-
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-	    if (e.getSource() instanceof JPanel) {
-	    	JPanel panel = (JPanel) e.getSource();
-	    	if(panel.getLayout() instanceof BorderLayout) { 
-	    		panel.setBackground(Color.WHITE);
-	    	}
-	    }
+		if (e.getSource() instanceof JPanel) {
+			JPanel pnlHover = (JPanel) e.getSource();
+			if (pnlHover.getLayout() instanceof BorderLayout) { 
+				pnlHover.setBackground(Color.WHITE);
+			}
+		}
 	}
 }

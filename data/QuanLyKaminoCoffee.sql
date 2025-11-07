@@ -17,7 +17,8 @@ CREATE TABLE NhanVien (
     maNV VARCHAR(20) PRIMARY KEY,
     tenNV NVARCHAR(100) NOT NULL,
     chucVu NVARCHAR(10) CHECK (chucVu IN (N'NV', N'QL')) NOT NULL, -- Gi? nguyên 'NV', 'QL' t? enum ChucVu
-    sDT VARCHAR(15)
+    sDT VARCHAR(15),
+    gioiTinh Bit not null
 );
 GO
 

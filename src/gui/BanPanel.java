@@ -508,9 +508,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 //			txtNgay_DatBan.requestFocus();
 //			return false;
 //		}
-		if (Duration.between(LocalDateTime.now(), thoiGianDatBan).toMinutes() < 60) {
+		if (thoiGianDatBan.isBefore(LocalDateTime.now())) {
 			JOptionPane.showMessageDialog(this,
-					"Thời gian đặt bàn phải cách thời gian hiện tại ít nhất 60 phút! Vui lòng nhập lại.");
+					"Thời gian đặt bàn phải sau thời gian hiện tại! Vui lòng chọn lại.");
 			txtGio_DatBan.requestFocus();
 			return false;
 		}
@@ -631,7 +631,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			for (Ban b : banDao.getAllBan()) {
 				if (b.getMaBan().equals(ban.getMaBan())) {
 					if (b.getTrangThai() != TrangThaiBan.DangDuocSuDung) {
-						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60) {
+						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0) {
 //							System.out.println(Duration.between(LocalDateTime.now(),ddb.getThoiGian()).toMinutes());
 							b.setTrangThai(TrangThaiBan.DaDuocDat);
 							banDao.updateBan(b);
@@ -675,13 +675,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
 			if (ddb.getBan().getMaBan().equals(ddbMoi.getBan().getMaBan())) {
 				long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(), ddbMoi.getThoiGian()).toMinutes());
-				
-				if (khoangCach >= 60 || khoangCach <= -60) {
-					return true;
+				JOptionPane.showMessageDialog(this, "Khoảng cách: " + khoangCach);
+				if (khoangCach < 60 && khoangCach > -60) {
+					return false;
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -709,11 +709,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				DonDatBan ddb = new DonDatBan(maDonDatBan, new KhachHang(maKhachHang, tenKH, sdtKH, 0, false), banDat,
 						thoiGianDatBan);
 
-				if (kiemTraKhongTrungThoiGian(ddb) == false) {
-					JOptionPane.showMessageDialog(this,
-							"Đặt bàn không thành công!\nDo bàn đã được đặt vào khoảng thời gian này!\nVui lòng đặt bàn trước hoặc sau đó 60p gần với thời gian mà bạn mong muốn");
-					return;
-				} else {
+				if (kiemTraKhongTrungThoiGian(ddb) == true) {
 					int confirm = JOptionPane.showConfirmDialog(this,"Bạn có muốn đăng ký thành viên cho khách hàng  " + tenKH + " không?", "Xác nhận",JOptionPane.YES_NO_OPTION);
 					if (confirm == JOptionPane.YES_OPTION) {
 						if (khachHangDao.addKhachHang(new KhachHang(maKhachHang, tenKH, sdtKH, true))&& donDatBanDao.addDonDatBan(ddb)) {
@@ -729,6 +725,11 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 							JOptionPane.showMessageDialog(this, "Đặt bàn không thành công! Vui lòng thử lại.");
 						}
 
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"Đặt bàn không thành công!\nDo bàn đã được đặt vào khoảng thời gian này!\nVui lòng đặt bàn trước hoặc sau đó 60p gần với thời gian mà bạn mong muốn");
+					return;
+					
 					}
 
 				}

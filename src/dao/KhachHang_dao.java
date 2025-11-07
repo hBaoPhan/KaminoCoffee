@@ -1,5 +1,8 @@
 package dao;
 
+
+public class KhachHang_dao {
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,4 +65,5 @@ public class KhachHang_dao {
 		
 		
 	}
+
 }

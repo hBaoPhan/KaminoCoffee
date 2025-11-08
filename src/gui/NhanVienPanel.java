@@ -174,7 +174,8 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             String ten = txtHoTen.getText().trim();
             String sdt = txtSDT.getText().trim();
             boolean gioiTinh = chkNu.isSelected();
-            ChucVu cv = ChucVu.valueOf(cboChucVu.getSelectedItem().toString());
+            ChucVu cv = ChucVu.fromString(cboChucVu.getSelectedItem().toString());
+
 
             if (ma.isEmpty() || ten.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "⚠️ Mã và tên không được trống!");
@@ -186,7 +187,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
                 JOptionPane.showMessageDialog(this, "✅ Thêm thành công!");
                 taiLaiDanhSach();
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Thêm thất bại!");
+                return;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,15 +201,31 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             return;
         }
 
+        // --- 1. Lấy và kiểm tra dữ liệu ---
         String ten = txtHoTen.getText().trim();
         String sdt = txtSDT.getText().trim();
         boolean gioiTinh = chkNu.isSelected();
-        ChucVu cv = ChucVu.valueOf(cboChucVu.getSelectedItem().toString());
+        
+        // Lấy giá trị chuỗi từ ComboBox (ví dụ: "Nhân Viên" hoặc "Quản Lý")
+        String chucVuStr = cboChucVu.getSelectedItem().toString(); 
+        
+        ChucVu cv;
+        try {
+            // --- 2. SỬ DỤNG fromString() để chuyển đổi chuỗi có dấu thành Enum ---
+            cv = ChucVu.fromString(chucVuStr); 
+        } catch (IllegalArgumentException e) {
+            // Xử lý nếu giá trị từ ComboBox không khớp với bất kỳ Enum nào
+            JOptionPane.showMessageDialog(this, "⚠️ Chức vụ không hợp lệ: " + chucVuStr);
+            return;
+        }
 
+        // --- 3. Tạo và cập nhật đối tượng Nhân Viên ---
         NhanVien nv = new NhanVien(ma, ten, sdt, gioiTinh, cv);
+        
         if (nvDAO.suaNV(nv)) {
             JOptionPane.showMessageDialog(this, "✅ Sửa thành công!");
-            taiLaiDanhSach();
+            // Giả định hàm này tải lại dữ liệu bảng
+            taiLaiDanhSach(); 
         } else {
             JOptionPane.showMessageDialog(this, "❌ Sửa thất bại!");
         }
@@ -254,7 +271,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         for (NhanVien nv : ds) {
             model.addRow(new Object[]{
                     nv.getMaNV(), nv.getTenNV(), nv.isGioiTinh() ? "Nữ" : "Nam",
-                    nv.getChucVu().name(), nv.getsDT()
+                    nv.getChucVu().getTenHienThi(), nv.getsDT()
             });
         }
         lblTongNV.setText(String.valueOf(ds.size()));
@@ -266,7 +283,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         for (NhanVien nv : ds) {
             model.addRow(new Object[]{
                     nv.getMaNV(), nv.getTenNV(), nv.isGioiTinh() ? "Nữ" : "Nam",
-                    nv.getChucVu().name(), nv.getsDT()
+                    nv.getChucVu().getTenHienThi(), nv.getsDT()
             });
         }
         lblTongNV.setText(String.valueOf(ds.size()));

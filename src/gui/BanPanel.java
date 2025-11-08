@@ -12,10 +12,14 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -62,7 +66,7 @@ import entity.KhachHang;
 import entity.SanPham;
 import entity.TrangThaiBan;
 
-public class BanPanel extends JTabbedPane implements ActionListener, ChangeListener {
+public class BanPanel extends JTabbedPane implements ActionListener, ChangeListener, ItemListener {
 
 	private JLabel titleLabel;
 	private JLabel lblTenBan;
@@ -285,7 +289,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		btnTimKiemDoUong.setPreferredSize(new Dimension(60, 30));
 		btnTimKiemDoUong.setMaximumSize(btnTimKiemDoUong.getPreferredSize());
 		btnTimKiemDoUong.setBackground(Color.decode("#00A651"));
-		btnTimKiemDoUong.setBorder(BorderFactory.createLineBorder(Color.decode("#00A651"), 5, true)); /////// Màu cam///
+		btnTimKiemDoUong.setBorder(BorderFactory.createLineBorder(Color.decode("#00A651"), 5, true));
 		btnTimKiemDoUong.setForeground(Color.WHITE);
 
 		cboFilterDoUong = new JComboBox<String>();
@@ -481,6 +485,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 		this.addChangeListener(this);
 		btnDatBan.addActionListener(this);
+		btnLocTheoThoiGian.addActionListener(this);
+		btnTimKiemDoUong.addActionListener(this);
+		btnThanhToan.addActionListener(this);
+		btnLuu.addActionListener(this);
 
 	}
 
@@ -520,19 +528,22 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	}
 
 	public void themBanVaoPanel(JPanel pnl, ArrayList<Ban> danhSachBan) {
-
+		pnl.removeAll();
 		ButtonGroup tableGroup = new ButtonGroup();
 		for (Ban ban : danhSachBan) {
-			String ten=ban.getTenBan();
-			if(ban.getTrangThai()==TrangThaiBan.DaDuocDat) {
+			String ten = ban.getTenBan();
+			if (ban.getTrangThai() == TrangThaiBan.DaDuocDat) {
 				donDatBanDao.getAllDonDatBan();
-				for(DonDatBan ddb:donDatBanDao.getAllDonDatBan()) {
-					if(ddb.getBan().getMaBan().equals(ban.getMaBan()) && ddb.getThoiGian().isAfter(LocalDateTime.now())) {
-						ten+=" ("+ ddb.getThoiGian().getHour() + ":" + String.format("%02d", ddb.getThoiGian().getMinute())+")";;
+				for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+					if (ddb.getBan().getMaBan().equals(ban.getMaBan())
+							&& ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+						ten += " (" + ddb.getThoiGian().getHour() + ":"
+								+ String.format("%02d", ddb.getThoiGian().getMinute()) + ")";
+						;
 						break;
 					}
 				}
-				
+
 			}
 
 			ImageIcon icon = getIconForTrangThai(ban.getTrangThai());
@@ -545,6 +556,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			radBan.setBackground(Color.decode("#F7F4EC"));
 			radBan.setOpaque(true);
 			radBan.addActionListener(this);
+			radBan.addItemListener(this);
 			tableGroup.add(radBan);
 			pnl.add(radBan);
 		}
@@ -628,7 +640,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			for (KhachHang kh : dsKH) {
 				if (ddb.getKhachHang().getMaKhachHang().equals(kh.getMaKhachHang())) {
 					modelDatBan.addRow(new Object[] { ddb.getMaDonDatBan(), kh.getTenKhachHang(),
-							ddb.getKhachHang().getMaKhachHang(), ddb.getBan().getMaBan(), ddb.getThoiGian() });
+							ddb.getKhachHang().getMaKhachHang(), ddb.getBan().getMaBan(), ddb.getThoiGian().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")) });
 					break;
 				}
 			}
@@ -697,6 +709,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		}
 		return true;
 	}
+	public ArrayList<Ban> setTrangThaiBanVeTrongChoViecFilterBan(ArrayList<Ban> danhSachBan) {
+		for (Ban ban : danhSachBan) {
+			ban.setTrangThai(TrangThaiBan.Trong);
+		}
+		return danhSachBan;
+		
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -757,21 +776,53 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				}
 
 			}
-		}
-
-		if (o instanceof JRadioButton)
-
-		{
-			JRadioButton btn = (JRadioButton) o;
-			lblTenBan.setText(btn.getText());
-			lblTenBan_DatBan.setText(btn.getText());
-
-			for (Ban ban : banDao.getAllBan()) {
-				if (ban.getTenBan().equals(btn.getText())) {
-
+			}
+			if(o.equals(btnLocTheoThoiGian)) {
+				LocalDate date = txtFilterNgayDatBan.getDate();
+				LocalTime time = txtFilterGioDatBan.getTime();
+				if(date == null || time == null) {
+					JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ để lọc!");
+					themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());
+					return;
 				}
+				LocalDateTime filterDateTime = LocalDateTime.of(date, time);
+				ArrayList<Ban> filteredBan = new ArrayList<>();
+				for(Ban ban : banDao.getAllBan()) {
+					boolean isAvailable = true;
+					for(DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+						if(ddb.getBan().getMaBan().equals(ban.getMaBan()) && ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+							long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(), filterDateTime).toMinutes());
+							if(khoangCach < 60 && khoangCach > -60) {
+								isAvailable = false;
+								break;
+							}
+						}
+					}
+					if(isAvailable) {
+						filteredBan.add(ban);
+					}
+				}
+				
+				themBanVaoPanel(pnlCacBan_DatBan, setTrangThaiBanVeTrongChoViecFilterBan(filteredBan));
+				
+				lblTenBan_DatBan.setText(filteredBan.get(0).getTenBan());
+			}
+		
+
+	if(o instanceof JRadioButton)
+
+	{
+
+		JRadioButton btn = (JRadioButton) o;
+		lblTenBan.setText(btn.getText());
+		lblTenBan_DatBan.setText(btn.getText());
+
+		for (Ban ban : banDao.getAllBan()) {
+			if (ban.getTenBan().equals(btn.getText())) {
+
 			}
 		}
+	}
 	}
 
 	@Override
@@ -779,6 +830,17 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		updateTrangThaiDatBan();
 		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
 
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		// TODO Auto-generated method stub
+		JRadioButton source = (JRadioButton) e.getItem();
+        if (source.isSelected()) {
+        	 source.setForeground(Color.decode("#00A651"));
+        } else {
+            source.setForeground(Color.BLACK);
+        }
 	}
 
 }

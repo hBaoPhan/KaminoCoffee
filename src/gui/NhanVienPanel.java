@@ -187,7 +187,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
                 JOptionPane.showMessageDialog(this, "✅ Thêm thành công!");
                 taiLaiDanhSach();
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Thêm thất bại!");
+                return;
             }
         } catch (Exception e) {
             e.printStackTrace();

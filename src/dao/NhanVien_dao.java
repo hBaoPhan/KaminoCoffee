@@ -3,6 +3,8 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import connectDB.ConnectDB;
 import entity.NhanVien;
 import entity.ChucVu;
@@ -69,24 +71,39 @@ public class NhanVien_dao {
  // ======================================================
  // THÊM NHÂN VIÊN
  // ======================================================
- public boolean themNV(NhanVien nv) {
-     try {
-         String sql = "INSERT INTO NhanVien (MaNV, TenNV, GioiTinh, ChucVu, SDT) VALUES (?, ?, ?, ?, ?)";
-         PreparedStatement pst = con.prepareStatement(sql);
-         pst.setString(1, nv.getMaNV());
-         pst.setString(2, nv.getTenNV());
-         pst.setBoolean(3, nv.isGioiTinh());
-         pst.setString(4, nv.getChucVu().toDatabaseValue());
-         pst.setString(5, nv.getsDT());
+    public boolean themNV(NhanVien nv) {
+        Connection con = ConnectDB.getInstance().getConnection();
+        String sql = "INSERT INTO NhanVien (maNV, tenNV, sDT, gioiTinh, chucVu) VALUES (?, ?, ?, ?, ?)";
 
-         int rows = pst.executeUpdate();
-         pst.close();
-         return rows > 0;
-     } catch (SQLException e) {
-         e.printStackTrace();
-         return false;
-     }
- }
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, nv.getMaNV());
+            stmt.setString(2, nv.getTenNV());
+            stmt.setString(3, nv.getsDT());
+            stmt.setBoolean(4, nv.isGioiTinh());
+            stmt.setString(5, nv.getChucVu().name());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            // 🔹 Lỗi trùng khóa chính
+            if (e.getErrorCode() == 1062 || e.getMessage().toLowerCase().contains("duplicate")) {
+                JOptionPane.showMessageDialog(null, "⚠️ Mã nhân viên đã tồn tại, vui lòng nhập mã khác!");
+                return false;
+            }
+
+            // 🔹 Lỗi vi phạm CHECK constraint
+            if (e.getMessage().toLowerCase().contains("check constraint")) {
+                JOptionPane.showMessageDialog(null, "⚠️ Dữ liệu nhập không hợp lệ (vi phạm ràng buộc)!");
+                return false;
+            }
+
+            // 🔹 Các lỗi SQL khác
+            JOptionPane.showMessageDialog(null, "⚠️ Lỗi SQL: " + e.getMessage());
+            return false;
+        }
+    }
+
+
 
  // ======================================================
  // SỬA NHÂN VIÊN

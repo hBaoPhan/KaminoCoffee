@@ -6,10 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import connectDB.ConnectDB;
 import entity.KhachHang;
 
 public class KhachHang_dao {
+	private Connection con;
+
+	public KhachHang_dao() {
+        con = ConnectDB.getInstance().getConnection();
+    }
 
     // ✅ Lấy danh sách tất cả khách hàng
     public ArrayList<KhachHang> getAllKhachHang() {
@@ -48,8 +55,26 @@ public class KhachHang_dao {
             stmt.setBoolean(5, kh.isLaKHDK());
 
             return stmt.executeUpdate() > 0;
+            
         } catch (SQLException e) {
-            e.printStackTrace();
+            // 🔹 Lỗi trùng khóa chính (MySQL Error Code 1062)
+            if (e.getErrorCode() == 1062 || e.getMessage().toLowerCase().contains("duplicate")) {
+                // Giả định lỗi trùng lặp thường xảy ra với maKH
+                JOptionPane.showMessageDialog(null, "⚠️ Mã khách hàng đã tồn tại, vui lòng nhập mã khác!");
+                return false;
+            }
+
+            // 🔹 Lỗi vi phạm CHECK constraint hoặc NOT NULL
+            // Thường kiểm tra bằng thông báo lỗi (tùy thuộc vào CSDL và Driver)
+            if (e.getMessage().toLowerCase().contains("check constraint") || 
+                e.getMessage().toLowerCase().contains("cannot be null")) {
+                JOptionPane.showMessageDialog(null, "⚠️ Dữ liệu nhập không hợp lệ (vi phạm ràng buộc)!");
+                return false;
+            }
+
+            // 🔹 Các lỗi SQL khác
+            JOptionPane.showMessageDialog(null, "⚠️ Lỗi SQL khi thêm khách hàng: " + e.getMessage());
+            e.printStackTrace(); // In lỗi ra console để debug
             return false;
         }
     }

@@ -825,6 +825,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		BoxThucDon_Right.setEnabled(true);
 		txtTenKH.setEditable(true);
 		txtSDT.setEditable(true);
+		modelMonAn.getDataVector().removeAllElements();
 	    
 	}
 	public void themMon(String tenMon, int soLuongMoi, double donGia) {
@@ -871,15 +872,26 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 	    
 	}
+	public void loadMonAnChoHoaDon() {
+		String maHD=lblMaHoaDonChoBan.getText();
+		modelMonAn.getDataVector().removeAllElements();
+		for (ChiTietHoaDon cthd : chiTietHoaDonDao.getChiTietHoaDonByMaHoaDon(maHD)) {
+			SanPham sp=sanPhamDao.getSanPhamByMa(cthd.getSanPham().getMaSanPham());
+			modelMonAn.addRow(new Object[] {sp.getTenSanPham(),cthd.getSoLuong(),sp.getGia(),sp.getGia()*cthd.getSoLuong()});	
+		}
+		modelMonAn.fireTableDataChanged();
+		
+	}
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if (o instanceof JRadioButton){
-			JRadioButton btn = (JRadioButton) o;
+			JRadioButton btn = (JRadioButton) o;	
 			lblTenBan.setText(btn.getText());
 			lblTenBan_DatBan.setText(btn.getText());
+			
 			for (Ban ban : banDao.getAllBan()) {
 				if((ban.getMaBan().equals(btn.getText().substring(8,13))) || (ban.getMaBan().equals(btn.getText().substring(0,5)))) {
 					if(ban.getTrangThai().equals(TrangThaiBan.Trong)) {
@@ -897,7 +909,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 										txtThoiGianVao.setText(hd.getThoiGianVao().format(DateTimeFormatter.ofPattern("HH:mm")));
 										tggleDangSuDung.setSelected(true);
 										lblMaHoaDonChoBan.setText(hd.getMaHoaDon());
-										
+										loadMonAnChoHoaDon();
+										tinhTongTien();
 										break;
 									}
 								}

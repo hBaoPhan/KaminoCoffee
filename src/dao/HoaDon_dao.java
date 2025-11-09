@@ -13,7 +13,9 @@ import connectDB.ConnectDB;
 import entity.Ban;
 import entity.HoaDon;
 import entity.KhachHang;
+import entity.LoaiSanPham;
 import entity.NhanVien;
+import entity.SanPham;
 import entity.TrangThaiBan;
 
 public class HoaDon_dao {
@@ -91,4 +93,41 @@ public class HoaDon_dao {
             return false;
         }
     }
+	public HoaDon getHoaDonByMa(String maHD) {
+	    ConnectDB.getInstance();
+	    Connection con = ConnectDB.getConnection();
+	    PreparedStatement stmt = null;
+	    String sql = "SELECT * FROM HoaDon WHERE maHD = ?";
+	    try {
+	        stmt = con.prepareStatement(sql);
+	        stmt.setString(1, maHD);
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	        	    String ma = rs.getString("maHD");
+		            NhanVien nv = new NhanVien(rs.getString("maNV"));
+		            KhachHang kh = new KhachHang(rs.getString("maKH"));
+		            Ban ban = new Ban(rs.getString("maBan"));
+
+		            // Xử lý thời gian vào
+		            LocalDateTime thoiGianVao = rs.getTimestamp("thoiGianVao").toLocalDateTime();
+
+		            // Xử lý thời gian ra có thể null
+		            Timestamp tsRa = rs.getTimestamp("thoiGianRa");
+		            LocalDateTime thoiGianRa = (tsRa != null) ? tsRa.toLocalDateTime() : null;
+
+		            boolean trangThaiThanhToan = rs.getBoolean("trangThaiThanhToan");
+
+		            return new HoaDon(ma, ban, nv, trangThaiThanhToan, kh, thoiGianVao, thoiGianRa);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return null;
+	}
 }

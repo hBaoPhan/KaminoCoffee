@@ -72,5 +72,40 @@ public class ChiTietHoaDon_dao {
             return false;
         }
     }
+	public ArrayList<ChiTietHoaDon> getChiTietHoaDonByMaHoaDon(String maHD) {
+	    ArrayList<ChiTietHoaDon> ds = new ArrayList<>();
+	    ConnectDB.getInstance();
+	    Connection con = ConnectDB.getConnection();
+	    PreparedStatement stmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        String sql = "SELECT * FROM ChiTietHoaDon Where maHD = ?";
+	        stmt = con.prepareStatement(sql);
+	        stmt.setString(1, maHD);
+	        rs = stmt.executeQuery();
+
+	        while (rs.next()) {
+	            HoaDon hd=new HoaDon(rs.getString("maHD"));
+	            SanPham sp=new SanPham(rs.getString("maSP"));
+	            int soLuong=rs.getInt("soLuong");
+	            
+	            ChiTietHoaDon cthd=new ChiTietHoaDon(hd, sp, soLuong);
+	            ds.add(cthd);
+	            
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (stmt != null) stmt.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return ds;
+	}
 
 }

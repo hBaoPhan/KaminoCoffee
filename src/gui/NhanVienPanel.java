@@ -1,15 +1,14 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import connectDB.ConnectDB;
 import dao.NhanVien_dao;
 import entity.ChucVu;
 import entity.NhanVien;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Connection;
 import java.util.ArrayList;
 
 public class NhanVienPanel extends JPanel implements ActionListener, MouseListener {
@@ -24,28 +23,29 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
     private DefaultTableModel model;
 
     public NhanVienPanel() {
-       
-    	nvDAO = new NhanVien_dao();
-        // ==== THIẾT LẬP GIAO DIỆN ====
+
+        nvDAO = new NhanVien_dao();
+        
+        // ================== THIẾT LẬP GIAO DIỆN ==================
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        setBackground(Color.WHITE);
+        setBackground(new Color(235, 225, 210)); 
 
         // ======== PHẦN TRÊN: FORM NHẬP ========
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
-        topPanel.setBackground(Color.WHITE);
+        topPanel.setBackground(new Color(235, 225, 210)); 
         add(topPanel, BorderLayout.NORTH);
 
         JLabel lblTitle = new JLabel("THÔNG TIN NHÂN VIÊN", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
-        lblTitle.setForeground(new Color(52, 73, 94));
+        lblTitle.setForeground(new Color(52, 73, 94)); 
         lblTitle.setBorder(new EmptyBorder(15, 10, 15, 10));
         topPanel.add(lblTitle, BorderLayout.NORTH);
 
         JPanel pInput = new JPanel();
         pInput.setLayout(new BoxLayout(pInput, BoxLayout.Y_AXIS));
         pInput.setBorder(new EmptyBorder(15, 30, 15, 30));
-        pInput.setBackground(new Color(245, 245, 245));
+        pInput.setBackground(Color.decode("#F7F4EC")); 
         topPanel.add(pInput, BorderLayout.CENTER);
 
         Dimension labelSize = new Dimension(120, 25);
@@ -56,6 +56,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         lblMa.setPreferredSize(labelSize);
         box1.add(lblMa);
         box1.add(txtMaNV = new JTextField(20));
+        txtMaNV.setEditable(false); // 💡 KHÔNG CHO CHỈNH SỬA MÃ NV
         pInput.add(box1);
         pInput.add(Box.createVerticalStrut(10));
 
@@ -69,7 +70,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         JLabel lblGT = new JLabel("Giới tính:");
         box2.add(lblGT);
         chkNu = new JCheckBox("Nữ");
-        chkNu.setBackground(new Color(245, 245, 245));
+        chkNu.setBackground(Color.decode("#F7F4EC")); 
         box2.add(Box.createHorizontalStrut(5));
         box2.add(chkNu);
         pInput.add(box2);
@@ -95,24 +96,39 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         pInput.add(box4);
 
         // ======== THANH CÔNG CỤ ========
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        buttonPanel.setBackground(new Color(235, 225, 210)); 
 
         btnThem = new JButton("Thêm");
         btnSua = new JButton("Sửa");
         btnXoa = new JButton("Xóa");
         btnLamMoi = new JButton("Làm mới");
-        btnTimKiem = new JButton("🔍 Tìm");
+        btnTimKiem = new JButton("Tìm");
 
         Font btnFont = new Font("Segoe UI", Font.BOLD, 14);
+        Color primaryColor = new Color(52, 152, 219); 
+        Color shadowColor = new Color(150, 150, 150); 
+
         JButton[] allButtons = {btnThem, btnSua, btnXoa, btnLamMoi, btnTimKiem};
+
         for (JButton b : allButtons) {
             b.setFont(btnFont);
-            b.setBackground(new Color(70, 130, 180));
+            b.setBackground(primaryColor);
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
             b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            b.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+            b.setContentAreaFilled(true); 
+            b.setOpaque(true); 
+            Border paddingBorder = BorderFactory.createEmptyBorder(8, 20, 8, 20);
+            
+            Border bevelBorder = BorderFactory.createSoftBevelBorder(
+                javax.swing.border.BevelBorder.RAISED, 
+                new Color(173, 216, 230),              
+                new Color(0, 51, 102)                  
+            );
+            b.setBorder(BorderFactory.createCompoundBorder(bevelBorder, paddingBorder)); 
+
             b.addActionListener(this);
             buttonPanel.add(b);
         }
@@ -138,7 +154,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
 
         // ======== DƯỚI CÙNG ========
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.setBackground(Color.WHITE);
+        bottomPanel.setBackground(new Color(235, 225, 210)); 
         bottomPanel.add(new JLabel("Tổng số nhân viên: "));
         lblTongNV = new JLabel("0");
         lblTongNV.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -147,6 +163,37 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
 
         // Tải danh sách ban đầu
         taiLaiDanhSach();
+        
+        // 🚀 Tự động gán mã nhân viên khi khởi tạo
+        txtMaNV.setText(generateNextCodeForNhanVien());
+    }
+    
+    // ----------------------------------------------------
+    // ========== HÀM SINH MÃ NHÂN VIÊN TỰ ĐỘNG ==========
+    // ----------------------------------------------------
+    private String generateNextCodeForNhanVien() {
+        ArrayList<NhanVien> dsNV = nvDAO.getDsnv();
+
+        if (dsNV.isEmpty()) {
+            return "NV001";
+        }
+
+        int max = 0;
+        for (NhanVien nv : dsNV) {
+            String ma = nv.getMaNV();
+            if (ma != null && ma.startsWith("NV")) {
+                try {
+                    // Lấy phần số sau "NV"
+                    int so = Integer.parseInt(ma.substring(2));
+                    if (so > max) max = so;
+                } catch (NumberFormatException ignored) {
+                    // Bỏ qua nếu mã không đúng định dạng số
+                }
+            }
+        }
+
+        // Trả về mã tiếp theo với định dạng NVxxx
+        return String.format("NV%03d", max + 1);
     }
 
     // ================== ACTION XỬ LÝ ==================
@@ -170,27 +217,52 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
     // ================== HÀM CHỨC NĂNG ==================
     private void themNhanVien() {
         try {
-            String ma = txtMaNV.getText().trim();
+            String ma = txtMaNV.getText().trim(); 
             String ten = txtHoTen.getText().trim();
             String sdt = txtSDT.getText().trim();
             boolean gioiTinh = chkNu.isSelected();
-            ChucVu cv = ChucVu.fromString(cboChucVu.getSelectedItem().toString());
-
-
-            if (ma.isEmpty() || ten.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "⚠️ Mã và tên không được trống!");
+            // Giả định ChucVu.fromString() là an toàn
+            ChucVu cv = ChucVu.fromString(cboChucVu.getSelectedItem().toString()); 
+            
+            // 🔹 Kiểm tra rỗng (Mã NV đã có tự động, chỉ cần kiểm tra Tên và SĐT)
+            if (ten.isEmpty() || sdt.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "⚠️ Vui lòng nhập đầy đủ Họ tên và Số điện thoại!");
                 return;
             }
 
+            // 🔹 Ràng buộc tên nhân viên (chỉ chữ và khoảng trắng)
+            if (!ten.matches("^[\\p{L}\\s]+$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Tên nhân viên chỉ được chứa chữ cái và khoảng trắng!");
+                return;
+            }
+
+            // 🔹 Ràng buộc số điện thoại (10 chữ số, đầu số VN)
+            if (!sdt.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
+                return;
+            }
+
+            // 🔹 Kiểm tra trùng số điện thoại
+            // Giả định nvDAO có hàm timNVTheoSDT
+            NhanVien nvTonTai = nvDAO.timNVTheoSDT(sdt); 
+            if (nvTonTai != null) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại cho nhân viên khác!");
+                return;
+            }
+
+            // 🔹 Tạo đối tượng và thêm vào DB
             NhanVien nv = new NhanVien(ma, ten, sdt, gioiTinh, cv);
             if (nvDAO.themNV(nv)) {
                 JOptionPane.showMessageDialog(this, "✅ Thêm thành công!");
                 taiLaiDanhSach();
+                xoaTrang(); 
             } else {
-                return;
+                // Lỗi DB (ví dụ: trùng mã NV, dù đã sinh tự động nhưng vẫn nên giữ)
+                JOptionPane.showMessageDialog(this, "❌ Thêm thất bại! Mã nhân viên đã tồn tại.");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "⚠️ Đã xảy ra lỗi khi thêm nhân viên!");
         }
     }
 
@@ -201,33 +273,59 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             return;
         }
 
-        // --- 1. Lấy và kiểm tra dữ liệu ---
-        String ten = txtHoTen.getText().trim();
-        String sdt = txtSDT.getText().trim();
-        boolean gioiTinh = chkNu.isSelected();
-        
-        // Lấy giá trị chuỗi từ ComboBox (ví dụ: "Nhân Viên" hoặc "Quản Lý")
-        String chucVuStr = cboChucVu.getSelectedItem().toString(); 
-        
-        ChucVu cv;
         try {
-            // --- 2. SỬ DỤNG fromString() để chuyển đổi chuỗi có dấu thành Enum ---
-            cv = ChucVu.fromString(chucVuStr); 
-        } catch (IllegalArgumentException e) {
-            // Xử lý nếu giá trị từ ComboBox không khớp với bất kỳ Enum nào
-            JOptionPane.showMessageDialog(this, "⚠️ Chức vụ không hợp lệ: " + chucVuStr);
-            return;
-        }
+            String ten = txtHoTen.getText().trim();
+            String sdt = txtSDT.getText().trim();
+            boolean gioiTinh = chkNu.isSelected();
+            String chucVuStr = cboChucVu.getSelectedItem().toString();
 
-        // --- 3. Tạo và cập nhật đối tượng Nhân Viên ---
-        NhanVien nv = new NhanVien(ma, ten, sdt, gioiTinh, cv);
-        
-        if (nvDAO.suaNV(nv)) {
-            JOptionPane.showMessageDialog(this, "✅ Sửa thành công!");
-            // Giả định hàm này tải lại dữ liệu bảng
-            taiLaiDanhSach(); 
-        } else {
-            JOptionPane.showMessageDialog(this, "❌ Sửa thất bại!");
+            // 🔹 Kiểm tra rỗng
+            if (ten.isEmpty() || sdt.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "⚠️ Vui lòng nhập đầy đủ Họ tên và Số điện thoại!");
+                return;
+            }
+            
+            // 🔹 Ràng buộc tên nhân viên
+            if (!ten.matches("^[\\p{L}\\s]+$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Tên nhân viên chỉ được chứa chữ cái và khoảng trắng!");
+                return;
+            }
+
+            // 🔹 Ràng buộc số điện thoại
+            if (!sdt.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
+                return;
+            }
+
+            // 🔹 Kiểm tra trùng số điện thoại (trừ chính nhân viên đang sửa)
+            // Giả định nvDAO có hàm timNVTheoSDT
+            NhanVien nvTonTai = nvDAO.timNVTheoSDT(sdt); 
+            if (nvTonTai != null && !nvTonTai.getMaNV().equals(ma)) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại cho nhân viên khác!");
+                return;
+            }
+
+            // 🔹 Lấy Chức vụ
+            ChucVu cv;
+            try {
+                cv = ChucVu.fromString(chucVuStr);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, "⚠️ Chức vụ không hợp lệ: " + chucVuStr);
+                return;
+            }
+
+            // 🔹 Cập nhật
+            NhanVien nv = new NhanVien(ma, ten, sdt, gioiTinh, cv);
+            
+            if (nvDAO.suaNV(nv)) {
+                JOptionPane.showMessageDialog(this, "✅ Sửa thành công!");
+                taiLaiDanhSach();
+            } else {
+                JOptionPane.showMessageDialog(this, "❌ Sửa thất bại!");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "⚠️ Đã xảy ra lỗi khi sửa nhân viên!");
         }
     }
 
@@ -243,6 +341,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             if (nvDAO.xoaNV(ma)) {
                 JOptionPane.showMessageDialog(this, "🗑 Xóa thành công!");
                 taiLaiDanhSach();
+                xoaTrang();
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Xóa thất bại!");
             }
@@ -250,12 +349,15 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
     }
 
     private void xoaTrang() {
-        txtMaNV.setText("");
         txtHoTen.setText("");
         chkNu.setSelected(false);
         cboChucVu.setSelectedItem("Nhân Viên");
         txtSDT.setText("");
         txtTimKiem.setText("");
+        
+        // 🚀 Sinh mã mới sau khi xóa trắng
+        txtMaNV.setText(generateNextCodeForNhanVien()); 
+        
         taiLaiDanhSach();
     }
 
@@ -307,5 +409,4 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
 
-   
 }

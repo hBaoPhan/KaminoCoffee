@@ -36,6 +36,7 @@ public class Ban_dao {
 				trangThai = TrangThaiBan.fromString(trangThaiStr);
 				
 				Ban ban=new Ban(ma, ten, soGhe, trangThai);
+				
 				ds.add(ban);
 			}
 		} catch (Exception e) {

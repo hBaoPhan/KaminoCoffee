@@ -15,6 +15,12 @@ public class SanPham {
 		this.gia = gia;
 		this.loaiSanPham = loaiSanPham;
 	}
+	public SanPham(String ma) {
+		this.maSanPham = ma;
+		this.tenSanPham = "";
+		this.gia = 0;
+		this.loaiSanPham = LoaiSanPham.Tra;
+	}
 	public String getTenSanPham() {
 		return tenSanPham;
 	}

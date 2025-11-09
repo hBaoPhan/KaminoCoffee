@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -26,23 +27,23 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         // ==== GIAO DIỆN CHÍNH ====
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        setBackground(Color.WHITE);
+        setBackground(new Color(235, 225, 210));
 
         // ==== PHẦN TRÊN (THÔNG TIN) ====
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
-        topPanel.setBackground(Color.WHITE);
+        topPanel.setBackground(new Color(235, 225, 210));
         add(topPanel, BorderLayout.NORTH);
 
         JLabel lblTitle = new JLabel("THÔNG TIN KHÁCH HÀNG", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
-        lblTitle.setForeground(new Color(52, 73, 94));
+        lblTitle.setBackground(Color.decode("#F7F4EC"));
         lblTitle.setBorder(new EmptyBorder(15, 10, 15, 10));
         topPanel.add(lblTitle, BorderLayout.NORTH);
 
         JPanel pInput = new JPanel();
         pInput.setLayout(new BoxLayout(pInput, BoxLayout.Y_AXIS));
         pInput.setBorder(new EmptyBorder(15, 30, 15, 30));
-        pInput.setBackground(new Color(245, 245, 245));
+        pInput.setBackground(Color.decode("#F7F4EC"));
         topPanel.add(pInput, BorderLayout.CENTER);
 
         Dimension labelSize = new Dimension(120, 25);
@@ -53,6 +54,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         lblMa.setPreferredSize(labelSize);
         box1.add(lblMa);
         box1.add(txtMaKH = new JTextField(20));
+        txtMaKH.setEditable(false); // ❌ Không cho sửa
         pInput.add(box1);
         pInput.add(Box.createVerticalStrut(10));
 
@@ -94,24 +96,41 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         pInput.add(box5);
 
         // ==== THANH CÔNG CỤ ====
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10)); 
+//        buttonPanel.setBackground(Color.WHITE); // Giữ nền trắng
 
         btnThem = new JButton("Thêm");
         btnSua = new JButton("Sửa");
         btnXoa = new JButton("Xóa");
         btnLamMoi = new JButton("Làm mới");
-        btnTimKiem = new JButton("🔍 Tìm");
+        btnTimKiem = new JButton("Tìm");
 
+        // --- Thiết lập Style cơ bản ---
         Font btnFont = new Font("Segoe UI", Font.BOLD, 14);
+        Color primaryColor = new Color(52, 152, 219); // Xanh dương tươi sáng
+        Color shadowColor = new Color(150, 150, 150); // Màu cho hiệu ứng đổ bóng/nổi
+
         JButton[] allButtons = {btnThem, btnSua, btnXoa, btnLamMoi, btnTimKiem};
+
         for (JButton b : allButtons) {
             b.setFont(btnFont);
-            b.setBackground(new Color(70, 130, 180));
+            b.setBackground(primaryColor);
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
             b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            b.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+            b.setContentAreaFilled(true); // Cần đổ đầy lại để thấy màu nền
+            b.setOpaque(true); 
+            Border paddingBorder = BorderFactory.createEmptyBorder(8, 20, 8, 20);
+            Border lineBorder = BorderFactory.createLineBorder(shadowColor, 1);
+            Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
+            Border bevelBorder = BorderFactory.createSoftBevelBorder(
+                javax.swing.border.BevelBorder.RAISED, // Loại viền
+                new Color(173, 216, 230),              // Highlight Outer (màu sáng)
+                new Color(0, 51, 102)                  // Shadow Inner (màu tối)
+            );
+            b.setBorder(BorderFactory.createCompoundBorder(bevelBorder, paddingBorder)); 
+
             b.addActionListener(this);
             buttonPanel.add(b);
         }
@@ -120,6 +139,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         txtTimKiem = new JTextField(20);
         buttonPanel.add(new JLabel("Tìm theo tên: "));
         buttonPanel.add(txtTimKiem);
+        buttonPanel.setBackground(new Color(235, 225, 210));
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // ==== BẢNG KHÁCH HÀNG ====
@@ -137,15 +157,19 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
 
         // ==== DƯỚI CÙNG ====
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.setBackground(Color.WHITE);
+//        bottomPanel.setBackground(Color.WHITE);
         bottomPanel.add(new JLabel("Tổng số khách hàng: "));
         lblTongKH = new JLabel("0");
         lblTongKH.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        bottomPanel.setBackground(new Color(235, 225, 210));
         bottomPanel.add(lblTongKH);
         add(bottomPanel, BorderLayout.SOUTH);
 
         // Tải dữ liệu ban đầu
         taiLaiDanhSach();
+
+        // Gán mã khách hàng tự động
+        txtMaKH.setText(generateNextCodeForKhachHang());
     }
 
     // ================== ACTION HANDLING ==================
@@ -172,6 +196,72 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             String ma = txtMaKH.getText().trim();
             String ten = txtTenKH.getText().trim();
             String sdt = txtSDT.getText().trim();
+            String diemText = txtDiem.getText().trim();
+            boolean laKHDK = chkLaKHDK.isSelected();
+
+            // 🔹 Kiểm tra rỗng
+            if (ten.isEmpty() || sdt.isEmpty() || diemText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "⚠️ Vui lòng nhập đầy đủ thông tin khách hàng!");
+                return;
+            }
+
+            // 🔹 Ràng buộc tên khách hàng (chỉ chữ và khoảng trắng)
+            if (!ten.matches("^[\\p{L}\\s]+$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Tên khách hàng chỉ được chứa chữ cái và khoảng trắng!");
+                return;
+            }
+
+            // 🔹 Ràng buộc số điện thoại (10 chữ số)
+            if (!sdt.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
+                return;
+            }
+
+            // 🔹 Ràng buộc điểm tích lũy
+            int diem;
+            try {
+                diem = Integer.parseInt(diemText);
+                if (diem < 0) {
+                    JOptionPane.showMessageDialog(this, "⚠️ Điểm tích lũy không được âm!");
+                    return;
+                }
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(this, "⚠️ Điểm tích lũy phải là số nguyên!");
+                return;
+            }
+
+            // 🔹 Kiểm tra trùng số điện thoại
+            KhachHang khTonTai = khDAO.timTheoSDT(sdt);
+            if (khTonTai != null) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại trong hệ thống!");
+                return;
+            }
+
+            // 🔹 Tạo đối tượng và thêm vào DB
+            KhachHang kh = new KhachHang(ma, ten, sdt, diem, laKHDK);
+            if (khDAO.addKhachHang(kh)) {
+                JOptionPane.showMessageDialog(this, "✅ Thêm khách hàng thành công!");
+                taiLaiDanhSach();
+                lamMoi();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "⚠️ Đã xảy ra lỗi khi thêm khách hàng!");
+        }
+    }
+
+
+    private void suaKhachHang() {
+        try {
+            int row = tableKhachHang.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "⚠️ Vui lòng chọn khách hàng cần sửa!");
+                return;
+            }
+
+            String ma = txtMaKH.getText().trim();
+            String ten = txtTenKH.getText().trim();
+            String sdt = txtSDT.getText().trim();
             int diem = Integer.parseInt(txtDiem.getText().trim());
             boolean laKHDK = chkLaKHDK.isSelected();
 
@@ -180,37 +270,25 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
                 return;
             }
 
-            KhachHang kh = new KhachHang(ma, ten, sdt, diem, laKHDK);
-            if (khDAO.addKhachHang(kh)) {
-                JOptionPane.showMessageDialog(this, "✅ Thêm thành công!");
-                taiLaiDanhSach();
-            } else {
+            // ✅ Kiểm tra trùng số điện thoại (trừ chính khách hàng đang sửa)
+            KhachHang khTonTai = khDAO.timTheoSDT(sdt);
+            if (khTonTai != null && !khTonTai.getMaKhachHang().equals(ma)) {
+                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại cho khách hàng khác!");
                 return;
             }
+
+            KhachHang kh = new KhachHang(ma, ten, sdt, diem, laKHDK);
+            if (khDAO.suaKhachHang(kh)) {
+                JOptionPane.showMessageDialog(this, "✅ Sửa thông tin khách hàng thành công!");
+                taiLaiDanhSach();
+            } else {
+                JOptionPane.showMessageDialog(this, "❌ Không thể sửa khách hàng!");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "⚠️ Điểm tích lũy phải là số nguyên!");
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "⚠️ Lỗi dữ liệu!");
-        }
-    }
-
-    private void suaKhachHang() {
-        String ma = txtMaKH.getText().trim();
-        if (ma.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "⚠️ Vui lòng chọn khách hàng cần sửa!");
-            return;
-        }
-
-        String ten = txtTenKH.getText().trim();
-        String sdt = txtSDT.getText().trim();
-        int diem = Integer.parseInt(txtDiem.getText().trim());
-        boolean laKHDK = chkLaKHDK.isSelected();
-
-        KhachHang kh = new KhachHang(ma, ten, sdt, diem, laKHDK);
-        if (khDAO.suaKhachHang(kh)) {
-            JOptionPane.showMessageDialog(this, "✅ Sửa thành công!");
-            taiLaiDanhSach();
-        } else {
-            JOptionPane.showMessageDialog(this, "❌ Sửa thất bại!");
+            JOptionPane.showMessageDialog(this, "⚠️ Đã xảy ra lỗi khi sửa khách hàng!");
         }
     }
 
@@ -226,6 +304,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             if (khDAO.xoaKhachHang(ma)) {
                 JOptionPane.showMessageDialog(this, "🗑 Xóa thành công!");
                 taiLaiDanhSach();
+                lamMoi();
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Xóa thất bại!");
             }
@@ -251,12 +330,12 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
     }
 
     private void lamMoi() {
-        txtMaKH.setText("");
         txtTenKH.setText("");
         txtSDT.setText("");
         txtDiem.setText("0");
         chkLaKHDK.setSelected(false);
         txtTimKiem.setText("");
+        txtMaKH.setText(generateNextCodeForKhachHang());
         taiLaiDanhSach();
     }
 
@@ -270,6 +349,28 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             });
         }
         lblTongKH.setText(String.valueOf(ds.size()));
+    }
+
+    // ================== SINH MÃ KHÁCH HÀNG TỰ ĐỘNG ==================
+    private String generateNextCodeForKhachHang() {
+        ArrayList<KhachHang> dsKH = khDAO.getAllKhachHang();
+
+        if (dsKH.isEmpty()) {
+            return "KH001";
+        }
+
+        int max = 0;
+        for (KhachHang kh : dsKH) {
+            String ma = kh.getMaKhachHang();
+            if (ma != null && ma.startsWith("KH")) {
+                try {
+                    int so = Integer.parseInt(ma.substring(2));
+                    if (so > max) max = so;
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        return String.format("KH%03d", max + 1);
     }
 
     // ================== MOUSE EVENT ==================

@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -66,13 +67,9 @@ public class NavBar extends JFrame implements MouseListener {
 		sidebar.add(lblTenTaiKhoan);
 		sidebar.add(lblChucVu);
 		sidebar.add(Box.createVerticalStrut(10));
-		btnDangXuat=new JButton("Đăng xuất");
-		btnDangXuat.setBackground(Color.RED);
-		btnDangXuat.setForeground(Color.WHITE);
-		sidebar.add(btnDangXuat);
-		sidebar.add(Box.createVerticalStrut(20));
+		
 
-		String[] tabs = { "Trang chủ", "Bàn",  "Hóa Đơn", "Khách hàng","Thực đơn", "Nhân viên", "Thống Kê" };
+		String[] tabs = { "Trang chủ", "Bàn","Thực đơn",  "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };
 		JLabel[] labels = new JLabel[tabs.length];
 
 		for (int i = 0; i < tabs.length; i++) {
@@ -91,6 +88,7 @@ public class NavBar extends JFrame implements MouseListener {
 		contentPanel = new JPanel(cardLayout);
 
 		// Thêm các panel vào CardLayout
+
 		contentPanel.add(new TrangChuPanel(), "Trang chủ");//
 		contentPanel.add(pnlBan=new BanPanel(), "Bàn");
 		contentPanel.add(new ThucDonPanel(), "Thực đơn");//
@@ -100,6 +98,13 @@ public class NavBar extends JFrame implements MouseListener {
 		contentPanel.add(new ThongKePanel(), "Thống Kê");//
 
 		add(contentPanel, BorderLayout.CENTER);
+		btnDangXuat=new JButton("Đăng xuất");
+		btnDangXuat.setBackground(Color.RED);
+		btnDangXuat.setForeground(Color.WHITE);
+		JPanel pbot = new JPanel();
+		pbot.setLayout(new FlowLayout(FlowLayout.LEFT));
+		pbot.add(btnDangXuat);
+		add(pbot, BorderLayout.SOUTH);
 
 	}
 	private void onCardChanged() {
@@ -108,6 +113,8 @@ public class NavBar extends JFrame implements MouseListener {
 	    
 	}
 
+
+		
 
 	@Override
 	public void mouseClicked(MouseEvent e) {

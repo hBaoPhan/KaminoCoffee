@@ -35,6 +35,7 @@ public class NavBar extends JFrame implements MouseListener {
 	private Color textDefaultColor = Color.BLACK;
 	private Font customFont = new Font("Time New Romans", Font.BOLD, 20);
 	private JButton btnDangXuat;
+	private BanPanel pnlBan;
 
 	public NavBar() {
 		setTitle("Kamino Coffee");
@@ -90,23 +91,30 @@ public class NavBar extends JFrame implements MouseListener {
 		contentPanel = new JPanel(cardLayout);
 
 		// Thêm các panel vào CardLayout
-		contentPanel.add(new TrangChuPanel(), "Trang chủ");
-		contentPanel.add(new BanPanel(), "Bàn");
-		contentPanel.add(new ThucDonPanel(), "Thực đơn");
-		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");
-		contentPanel.add(new KhachHangPanel(), "Khách hàng");
-		contentPanel.add(new NhanVienPanel(), "Nhân viên");
-		contentPanel.add(new ThongKePanel(), "Thống Kê");
+		contentPanel.add(new TrangChuPanel(), "Trang chủ");//
+		contentPanel.add(pnlBan=new BanPanel(), "Bàn");
+		contentPanel.add(new ThucDonPanel(), "Thực đơn");//
+		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");//
+		contentPanel.add(new KhachHangPanel(), "Khách hàng");//
+		contentPanel.add(new NhanVienPanel(), "Nhân viên");//
+		contentPanel.add(new ThongKePanel(), "Thống Kê");//
 
 		add(contentPanel, BorderLayout.CENTER);
 
 	}
+	private void onCardChanged() {
+		pnlBan.loadDataBanPanel();
+		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
+	    
+	}
+
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		JLabel clickedLabel = (JLabel) e.getSource();
 		String tabName = clickedLabel.getText();
 		cardLayout.show(contentPanel, tabName);
+		onCardChanged();
 	}
 
 	@Override

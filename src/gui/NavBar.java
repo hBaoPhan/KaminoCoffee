@@ -89,9 +89,9 @@ public class NavBar extends JFrame implements MouseListener {
 
 		// Thêm các panel vào CardLayout
 
-		contentPanel.add(new TrangChuPanel(), "Trang chủ");//
+		contentPanel.add(new TrangChuPanel(), "Trang chủ");// 
 		contentPanel.add(pnlBan=new BanPanel(), "Bàn");
-		contentPanel.add(new ThucDonPanel(), "Thực đơn");//
+		contentPanel.add(new ThucDonPanel(), "Thực đơn");//Đổi chỗ này thành thuộc tính
 		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");//
 		contentPanel.add(new KhachHangPanel(), "Khách hàng");//
 		contentPanel.add(new NhanVienPanel(), "Nhân viên");//
@@ -101,10 +101,13 @@ public class NavBar extends JFrame implements MouseListener {
 		btnDangXuat=new JButton("Đăng xuất");
 		btnDangXuat.setBackground(Color.RED);
 		btnDangXuat.setForeground(Color.WHITE);
-		JPanel pbot = new JPanel();
-		pbot.setLayout(new FlowLayout(FlowLayout.LEFT));
+		Box pbot=Box.createHorizontalBox();
+		pbot.setMaximumSize(new Dimension(50,30));
+		pbot.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pbot.setBackground(Color.WHITE);
+
 		pbot.add(btnDangXuat);
-		add(pbot, BorderLayout.SOUTH);
+		
 
 	}
 	private void onCardChanged() {

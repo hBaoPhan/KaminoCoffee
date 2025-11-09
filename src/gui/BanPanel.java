@@ -132,7 +132,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	public BanPanel() {
 		
 		// Tạo panel chính cho tab đầu tiên
-		JPanel pnlDanhSachBan = new JPanel(new BorderLayout());
+		JPanel pnlGoiMon = new JPanel(new BorderLayout());
 
 		// === Panel trái: Danh sách bàn ===
 		Box BoxBan_Left = Box.createVerticalBox();
@@ -468,19 +468,29 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 		boxArrayDanhSachDonDatBan[0].add(lblDanhSachDonDatBan);
 		boxArrayDanhSachDonDatBan[1].add(scrPaneDanhSachDonDatBan);
-
+		//////////////////////// CRUD Bàn////////////////////////////////////
+		JPanel pnlQuanLyBan=new JPanel(new BorderLayout());
+		
+		
+		
+		// Gắn các panel vào mainPanel
+		pnlGoiMon.add(BoxBan_Left, BorderLayout.WEST);
+		pnlGoiMon.add(BoxThongTin_Center, BorderLayout.CENTER);
+		pnlGoiMon.add(BoxThucDon_Right, BorderLayout.EAST);
+		
 		pnlDatBan.add(BoxDanhSachBan_DatBan, BorderLayout.WEST);
 		pnlDatBan.add(BoxThongTin_DatBan, BorderLayout.CENTER);
 		pnlDatBan.add(DanhSachDonDatBan, BorderLayout.EAST);
 
-		// Gắn các panel vào mainPanel
-		pnlDanhSachBan.add(BoxBan_Left, BorderLayout.WEST);
-		pnlDanhSachBan.add(BoxThongTin_Center, BorderLayout.CENTER);
-		pnlDanhSachBan.add(BoxThucDon_Right, BorderLayout.EAST);
-
+		
+		
+		
+		
+		
 		// Thêm tab đầu tiên
-		this.addTab("Danh Sách Bàn", pnlDanhSachBan);
+		this.addTab("Gọi Món", pnlGoiMon);
 		this.addTab("Đặt Bàn", pnlDatBan);
+		this.addTab("Quản Lý Bàn", pnlQuanLyBan);
 
 		banDao = new Ban_dao();
 		sanPhamDao = new SanPham_dao();
@@ -576,6 +586,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			JRadioButton radBan = new JRadioButton(ten,icon);
 			radBan.setVerticalTextPosition(SwingConstants.TOP);
 			radBan.setHorizontalTextPosition(SwingConstants.CENTER);
+			radBan.setToolTipText(ban.getSoGhe()+" ghế");
 			radBan.setHorizontalAlignment(SwingConstants.CENTER);
 			radBan.setPreferredSize(new Dimension(100, 80));
 			radBan.setMaximumSize(radBan.getPreferredSize());
@@ -793,8 +804,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	public boolean checkValidTaoHoaDon() {
 		String tenKH = txtTenKH.getText().trim();
 		String sdtKH = txtSDT.getText().trim();
-		LocalTime thoiGianVao = txtThoiGianVao.getTime();
-		LocalTime thoiGianRa = txtThoiGianRa.getTime();
+//		LocalTime thoiGianVao = txtThoiGianVao.getTime();
+//		LocalTime thoiGianRa = txtThoiGianRa.getTime();
 		if (!tenKH.matches(
 				"([A-ZĐ][a-zàầáấảãạăâđèéẻẽễẹêìíỉĩịòốóỏõọôơùúủũụưỳýỷỹỵ]+ )+[A-ZĐ][a-zàầấáảãạăâđèéẻẽễẹêìíỉĩịòốóỏõọôơùúủũụưỳýỷỹỵ]+")) {
 			JOptionPane.showMessageDialog(this, "Tên khách hàng không hợp lệ! Vui lòng nhập lại.");
@@ -826,6 +837,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		txtTenKH.setEditable(true);
 		txtSDT.setEditable(true);
 		modelMonAn.getDataVector().removeAllElements();
+		lblThanhTien.setText("0");
 	    
 	}
 	public void themMon(String tenMon, int soLuongMoi, double donGia) {
@@ -880,6 +892,39 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			modelMonAn.addRow(new Object[] {sp.getTenSanPham(),cthd.getSoLuong(),sp.getGia(),sp.getGia()*cthd.getSoLuong()});	
 		}
 		modelMonAn.fireTableDataChanged();
+		
+	}
+	public void capNhatTrangThaiKhiThanhToanXong(String maHD) {
+		HoaDon hd=hoaDonDao.getHoaDonByMa(maHD);
+		
+		LocalTime gioRa=txtThoiGianRa.getTime();
+		if(gioRa==null) {
+			gioRa=LocalTime.now();
+		}
+		LocalDateTime thoiGianRa=LocalDateTime.of(LocalDate.now(), gioRa);
+		hd.setThoiGianRa(thoiGianRa);
+		hd.setTrangThaiThanhToan(true);
+		
+		double thanhTien=Double.parseDouble(lblThanhTien.getText().substring(0, lblThanhTien.getText().length() - 4).replace(",", ""));
+		int diemTichLuy=(int)thanhTien/100;
+		KhachHang kh=khachHangDao.timTheoMa(hd.getKhachHang().getMaKhachHang());
+		if(kh.isLaKHDK()) {
+			
+			kh.congDiemTichLuy(diemTichLuy);
+		}
+		
+		Ban ban=banDao.timTheoMa(hd.getBan().getMaBan());
+		ban.setTrangThai(TrangThaiBan.Trong);
+		
+		if(hoaDonDao.updateHoaDon(hd) && khachHangDao.suaKhachHang(kh) &&  banDao.updateBan(ban) ) {
+			JOptionPane.showMessageDialog(this, "Thanh Toán thành Công");
+			if(kh.isLaKHDK()) {
+				JOptionPane.showMessageDialog(this, "Cộng thành công "+ diemTichLuy+" điểm tích lũy cho khách hàng "+kh.getTenKhachHang()+" <3");
+			}
+			
+		}else {
+			JOptionPane.showMessageDialog(this, "Thanh Toán Thất bại");
+		}
 		
 	}
 
@@ -1141,7 +1186,81 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 
 		}else if(o.equals(btnThanhToan)) {
-			String maBan=lblTenBan.getText().substring(8,13);
+			String maHD=lblMaHoaDonChoBan.getText();
+			if(maHD.equals("")) {
+				JOptionPane.showMessageDialog(this, "Vui lòng tạo hóa đơn");
+				return;
+			}else if( lblThanhTien.getText().equals("0")) {
+				JOptionPane.showMessageDialog(this, "Vui lòng gọi món");
+				return;
+			}
+			HoaDon hd=hoaDonDao.getHoaDonByMa(maHD);
+			KhachHang kh=khachHangDao.timTheoMa(hd.getKhachHang().getMaKhachHang());
+			if(kh.isLaKHDK()) {
+				int confirm=JOptionPane.showConfirmDialog(this, "Khách hàng "+ kh.getTenKhachHang()+" hiện đang là khách hàng thành viên và có "
+			                                           + kh.getDiemTichLuy()+" điểm tích lũy\nBạn có muốn áp dụng điểm tích lũy hay không?");
+				
+				if(confirm==JOptionPane.YES_OPTION) {
+					double thanhTien=Double.parseDouble(lblThanhTien.getText().substring(0, lblThanhTien.getText().length() - 4).replace(",", ""));
+					StringBuilder hoaDon = new StringBuilder();
+			        hoaDon.append("================== HÓA ĐƠN ================\n");
+			        hoaDon.append("Mã Hóa Đơn: "+maHD+"\n");
+			        hoaDon.append("Khách Hàng: "+kh.getTenKhachHang()+"\n");
+			        hoaDon.append("Bàn: "+lblTenBan.getText().substring(0,5)+"\n");
+			        hoaDon.append("Người In: "+"\n");
+			        hoaDon.append("------------ Chi tiết món ----------\n");
+
+			        // Thêm từng dòng sản phẩm
+			        for (ChiTietHoaDon cthd : chiTietHoaDonDao.getChiTietHoaDonByMaHoaDon(maHD)) {
+			        	SanPham sp=sanPhamDao.getSanPhamByMa(cthd.getSanPham().getMaSanPham());
+			        	hoaDon.append(String.format("+ %s (x%d): %s\n", sp.getTenSanPham(), cthd.getSoLuong(),new DecimalFormat("#,###").format(cthd.getSoLuong()* sp.getGia()) ));
+					}	  
+			        hoaDon.append("-------------------------------------\n");       
+			        hoaDon.append("Tổng cộng: "+ lblThanhTien.getText()+"\n");
+			        hoaDon.append("Giảm giá: "+ kh.getDiemTichLuy()+" VND\n");
+			        hoaDon.append("Thành Tiền: "+new DecimalFormat("#,### VND").format(thanhTien-kh.getDiemTichLuy())+"\n");
+			        hoaDon.append("============================================");
+			        JOptionPane.showMessageDialog(this, hoaDon.toString(), "Hóa đơn", JOptionPane.INFORMATION_MESSAGE);
+			        
+			        // CỘng điểm cho kahch1
+			        /// set hoaDOn thành true
+			        /// set Ban về trống
+			        /// resetKhi doi nut
+			        capNhatTrangThaiKhiThanhToanXong(maHD);
+			        resetFieldKhiDoiNut();
+			        themBanVaoPanel(pnlCacBan, banDao.getAllBan());
+			        
+				}else if(confirm==JOptionPane.NO_OPTION) {
+					double thanhTien=Double.parseDouble(lblThanhTien.getText().substring(0, lblThanhTien.getText().length() - 4).replace(",", ""));
+					StringBuilder hoaDon = new StringBuilder();
+			        hoaDon.append("================== HÓA ĐƠN ================\n");
+			        hoaDon.append("Mã Hóa Đơn: "+maHD+"\n");
+			        hoaDon.append("Khách Hàng: "+kh.getTenKhachHang()+"\n");
+			        hoaDon.append("Bàn: "+lblTenBan.getText().substring(0,5)+"\n");
+			        hoaDon.append("Người In: "+"\n");
+			        hoaDon.append("------------ Chi tiết món ----------\n");
+
+			        // Thêm từng dòng sản phẩm
+			        for (ChiTietHoaDon cthd : chiTietHoaDonDao.getChiTietHoaDonByMaHoaDon(maHD)) {
+			        	SanPham sp=sanPhamDao.getSanPhamByMa(cthd.getSanPham().getMaSanPham());
+			        	hoaDon.append(String.format("+ %s (x%d): %s\n", sp.getTenSanPham(), cthd.getSoLuong(),new DecimalFormat("#,###").format(cthd.getSoLuong()* sp.getGia()) ));
+					}	  
+			        hoaDon.append("-------------------------------------\n");       
+			        hoaDon.append("Tổng cộng: "+ lblThanhTien.getText()+"\n");
+			   
+			        hoaDon.append("Thành Tiền: "+new DecimalFormat("#,### VND").format(thanhTien-kh.getDiemTichLuy())+"\n");
+			        hoaDon.append("============================================");
+			        JOptionPane.showMessageDialog(this, hoaDon.toString(), "Hóa đơn", JOptionPane.INFORMATION_MESSAGE);
+			        
+			        capNhatTrangThaiKhiThanhToanXong(maHD);
+			        resetFieldKhiDoiNut();
+			        themBanVaoPanel(pnlCacBan, banDao.getAllBan());
+			      /// set hoaDOn thành true
+			        /// set Ban về trống
+			        /// resetKhi doi nut
+				}
+			}
+			
 			
 		}
 		if(o.equals(tggleDangSuDung)) {
@@ -1157,6 +1276,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 						if(banDao.updateBan(ban)) {
 							themBanVaoPanel(pnlCacBan, banDao.getAllBan());
 							lblTenBan.setText(ban.getTenBan()+" - "+ban.getMaBan());
+							
 							break;
 						}else {
 							JOptionPane.showMessageDialog(this, "NO");
@@ -1193,7 +1313,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
+		
 		resetFieldKhiDoiNut();
 		JRadioButton source = (JRadioButton) e.getItem();
 		if (source.isSelected()) {
@@ -1207,7 +1327,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -1238,19 +1358,19 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
+		 
 		
 	}
 

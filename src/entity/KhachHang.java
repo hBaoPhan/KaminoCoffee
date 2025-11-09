@@ -37,6 +37,9 @@ public class KhachHang {
 		this.diemTichLuy = 0;
 		this.KHDK = b;
 	}
+	public void congDiemTichLuy(int diemTichLuy) {
+		this.diemTichLuy+=diemTichLuy;
+	}
 	public String getTenKhachHang() {
 		return tenKhachHang;
 	}

@@ -58,7 +58,15 @@ public class ChiTietHoaDon_dao {
 		PreparedStatement stmt=null;
 		ResultSet rs = null;
         try {
-        	String sql = "INSERT INTO ChiTietHoaDon (maHD, maSP, soLuong,tongTien) " +"VALUES (?, ?, ?, ?)";
+        	String sql="MERGE INTO ChiTietHoaDon AS target "
+        			+ "USING (SELECT ? AS maHD, ? AS maSP, ? AS soLuong, ? AS tongTien) AS source " 
+        			+ "ON (target.maHD = source.maHD AND target.maSP = source.maSP) "
+        			+ "WHEN MATCHED THEN "
+        			+ "UPDATE SET target.soLuong = source.soLuong, "
+        			+ "target.tongTien = source.tongTien "
+        			+ "WHEN NOT MATCHED THEN "
+        			+ "INSERT (maHD, maSP, soLuong, tongTien) "
+        			+ "VALUES (source.maHD, source.maSP, source.soLuong, source.tongTien);";
         	stmt = con.prepareStatement(sql);
             stmt.setString(1, cthd.getHoaDon().getMaHoaDon());
             stmt.setString(2, cthd.getSanPham().getMaSanPham());

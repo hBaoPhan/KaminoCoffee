@@ -37,6 +37,8 @@ public class NavBar extends JFrame implements MouseListener {
 	private Font customFont = new Font("Time New Romans", Font.BOLD, 20);
 	private JButton btnDangXuat;
 	private BanPanel pnlBan;
+	private KhachHangPanel pnlKhachHang;
+	private NhanVienPanel pnlNhanVien;
 
 	public NavBar() {
 	    setTitle("Kamino Coffee");
@@ -110,8 +112,8 @@ public class NavBar extends JFrame implements MouseListener {
 		contentPanel.add(pnlBan=new BanPanel(), "Bàn");
 		contentPanel.add(new ThucDonPanel(), "Thực đơn");//Đổi chỗ này thành thuộc tính
 		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");//
-		contentPanel.add(new KhachHangPanel(), "Khách hàng");//
-		contentPanel.add(new NhanVienPanel(), "Nhân viên");//
+		contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");//
+		contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");//
 		contentPanel.add(new ThongKePanel(), "Thống Kê");//
 
 		
@@ -155,6 +157,8 @@ public class NavBar extends JFrame implements MouseListener {
 	
 	private void onCardChanged() {
 		pnlBan.loadDataBanPanel();
+		pnlKhachHang.taiLaiDanhSach();
+		pnlNhanVien.taiLaiDanhSach();
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
 	    
 	}

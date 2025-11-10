@@ -982,7 +982,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 						
 						for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
 							long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(),LocalDateTime.now()).toMinutes());
-							if(ddb.getBan().getMaBan().equals(maBan) && khoangCach < 60 || khoangCach >-60 ) {
+							if(ddb.getBan().getMaBan().equals(maBan) && (khoangCach < 60 || khoangCach >-60) && ddb.isDaNhan()==false ) {
 								for (KhachHang kh : khachHangDao.getAllKhachHang()) {
 									if(ddb.getKhachHang().getMaKhachHang().equals(kh.getMaKhachHang())) {
 										txtTenKH.setText(kh.getTenKhachHang());

@@ -44,11 +44,12 @@ public class DonDatBan_dao {
 	public boolean addDonDatBan(DonDatBan ddb) {
 		ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
-		String sql = "INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian,daNhan) VALUES (?, ?, ?, ?,?)";
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			stmt.setString(1, ddb.getMaDonDatBan());
 			stmt.setString(2, ddb.getKhachHang().getMaKhachHang());
 			stmt.setString(3, ddb.getBan().getMaBan());
+			stmt.setBoolean(4, ddb.isDaNhan());
 			if (ddb.getThoiGian() != null) {
 				stmt.setTimestamp(4, Timestamp.valueOf(ddb.getThoiGian()));
 			} else {

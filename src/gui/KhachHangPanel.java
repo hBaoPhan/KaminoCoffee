@@ -343,7 +343,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         taiLaiDanhSach();
     }
 
-    private void taiLaiDanhSach() {
+    public void taiLaiDanhSach() {
         model.setRowCount(0);
         ArrayList<KhachHang> ds = khDAO.getAllKhachHang();
         for (KhachHang kh : ds) {

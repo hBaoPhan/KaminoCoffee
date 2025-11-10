@@ -384,7 +384,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         lblTongNV.setText(String.valueOf(ds.size()));
     }
 
-    private void taiLaiDanhSach() {
+    public void taiLaiDanhSach() {
         model.setRowCount(0);
         ArrayList<NhanVien> ds = nvDAO.getDsnv();
         for (NhanVien nv : ds) {

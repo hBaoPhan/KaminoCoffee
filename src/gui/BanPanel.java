@@ -576,7 +576,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			if (ban.getTrangThai() == TrangThaiBan.DaDuocDat) {
 				donDatBanDao.getAllDonDatBan();
 				for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
-					if (ddb.getBan().getMaBan().equals(ban.getMaBan()) && ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+					if (ddb.getBan().getMaBan().equals(ban.getMaBan()) && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() < 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() > -60) {
 						ten =ban.getMaBan()+ " (" + ddb.getThoiGian().getHour() + ":"+ String.format("%02d", ddb.getThoiGian().getMinute()) + ")";
 						;
 						break;

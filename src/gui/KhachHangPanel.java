@@ -96,8 +96,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         pInput.add(box5);
 
         // ==== THANH CÔNG CỤ ====
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10)); 
-//        buttonPanel.setBackground(Color.WHITE); // Giữ nền trắng
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
 
         btnThem = new JButton("Thêm");
         btnSua = new JButton("Sửa");
@@ -107,33 +106,37 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
 
         // --- Thiết lập Style cơ bản ---
         Font btnFont = new Font("Segoe UI", Font.BOLD, 14);
-        Color primaryColor = new Color(52, 152, 219); // Xanh dương tươi sáng
-        Color shadowColor = new Color(150, 150, 150); // Màu cho hiệu ứng đổ bóng/nổi
+        Color primaryColor = new Color(52, 152, 219); // Xanh dương (cho nút Tìm)
+        Color shadowColor = new Color(150, 150, 150); // Màu đổ bóng
 
         JButton[] allButtons = {btnThem, btnSua, btnXoa, btnLamMoi, btnTimKiem};
 
         for (JButton b : allButtons) {
             b.setFont(btnFont);
-            b.setBackground(primaryColor);
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
             b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            b.setContentAreaFilled(true);
+            b.setOpaque(true);
 
-            b.setContentAreaFilled(true); // Cần đổ đầy lại để thấy màu nền
-            b.setOpaque(true); 
             Border paddingBorder = BorderFactory.createEmptyBorder(8, 20, 8, 20);
             Border lineBorder = BorderFactory.createLineBorder(shadowColor, 1);
-            Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
             Border bevelBorder = BorderFactory.createSoftBevelBorder(
-                javax.swing.border.BevelBorder.RAISED, // Loại viền
-                new Color(173, 216, 230),              // Highlight Outer (màu sáng)
-                new Color(0, 51, 102)                  // Shadow Inner (màu tối)
+                javax.swing.border.BevelBorder.RAISED,
+                new Color(173, 216, 230),
+                new Color(0, 51, 102)
             );
-            b.setBorder(BorderFactory.createCompoundBorder(bevelBorder, paddingBorder)); 
-
+            b.setBorder(BorderFactory.createCompoundBorder(bevelBorder, paddingBorder));
             b.addActionListener(this);
             buttonPanel.add(b);
         }
+
+        // --- Gán màu riêng cho từng nút ---
+        btnThem.setBackground(new Color(46, 204, 113));    // Xanh lá
+        btnSua.setBackground(new Color(243, 156, 18));     // Cam
+        btnXoa.setBackground(new Color(231, 76, 60));      // Đỏ
+        btnLamMoi.setBackground(new Color(127, 140, 141)); // Xám
+        btnTimKiem.setBackground(primaryColor);            // Xanh dương
 
         // --- ô tìm kiếm ---
         txtTimKiem = new JTextField(20);

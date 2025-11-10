@@ -81,5 +81,19 @@ public class DonDatBan_dao {
             return false;
         }
     }
+	public boolean deleteDonDatBan(String maDonDatBan) {
+	    ConnectDB.getInstance();
+	    Connection con = ConnectDB.getConnection();
+	    String sql = "DELETE FROM DonDatBan WHERE maDonDatBan = ?";
+	    try (PreparedStatement stmt = con.prepareStatement(sql)) {
+	        stmt.setString(1, maDonDatBan);
+	        int rowsDeleted = stmt.executeUpdate();
+	        return rowsDeleted > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 }

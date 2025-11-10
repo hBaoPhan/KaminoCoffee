@@ -47,12 +47,12 @@ public class NavBar extends JFrame implements MouseListener {
 	    setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 	    // Định nghĩa màu nền sidebar (Giả định bạn muốn màu gỗ nhạt đã thảo luận trước)
-	    Color sidebarColor = new Color(235, 225, 210); 
+	    Color sidebarColor = new Color(255, 255, 255); 
 
 	    // --- SIDEBAR (BorderLayout.WEST) ---
 	    JPanel sidebar = new JPanel();
 	    // Sử dụng màu nền phù hợp
-//	    sidebar.setBackground(sidebarColor); 
+	    sidebar.setBackground(sidebarColor); 
 	    sidebar.setOpaque(true);
 	    sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 	    sidebar.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -128,7 +128,7 @@ public class NavBar extends JFrame implements MouseListener {
 	    // 3. Đặt nút vào Sidebar
 	    // Dùng JPanel để kiểm soát padding và màu nền xung quanh nút
 	    JPanel pLogout = new JPanel();
-//	    pLogout.setBackground(sidebarColor);
+	    pLogout.setBackground(sidebarColor);
 	    pLogout.add(btnDangXuat);
 	    
 	    sidebar.add(pLogout);
@@ -138,21 +138,10 @@ public class NavBar extends JFrame implements MouseListener {
 	    // --- CardLayout (CENTER) (GIỮ NGUYÊN) ---
 	   
 
-	    // Thêm các panel vào CardLayout
-	   
-	    
+	 
 	    add(contentPanel, BorderLayout.CENTER);
 	    
-	    // 4. XÓA BỎ KHỐI CODE cũ ở BorderLayout.SOUTH
-	    /*
-	    btnDangXuat=new JButton("Đăng xuất");
-	    btnDangXuat.setBackground(Color.RED);
-	    btnDangXuat.setForeground(Color.WHITE);
-	    JPanel pbot = new JPanel();
-	    pbot.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    pbot.add(btnDangXuat);
-	    add(pbot, BorderLayout.SOUTH);
-	    */
+	
 	}
 	
 	private void onCardChanged() {

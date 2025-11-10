@@ -68,6 +68,7 @@ import entity.KhachHang;
 import entity.LoaiSanPham;
 import entity.NhanVien;
 import entity.SanPham;
+import entity.TaiKhoan;
 import entity.TrangThaiBan;
 
 public class BanPanel extends JTabbedPane implements ActionListener, ChangeListener, ItemListener, MouseListener {
@@ -126,8 +127,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private ButtonGroup tableGroup;
 	private ChiTietHoaDon_dao chiTietHoaDonDao;
 	private JButton btnHuyDonDatBan;
+	private JPanel pnlCacBan_QLBan;
 
-	public BanPanel() {
+	public BanPanel(TaiKhoan taiKhoan) {
 		
 		// Tạo panel chính cho tab đầu tiên
 		JPanel pnlGoiMon = new JPanel(new BorderLayout());
@@ -481,6 +483,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		boxArrayDanhSachDonDatBan[2].add(boxBtnHuyDonDatBan);
 		//////////////////////// CRUD Bàn////////////////////////////////////
 		JPanel pnlQuanLyBan=new JPanel(new BorderLayout());
+		pnlCacBan_QLBan=new JPanel(new GridLayout(0,3,5,5));
+		pnlQuanLyBan.add(pnlCacBan_QLBan);
 		
 		
 		
@@ -536,8 +540,11 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		////////////////////
 		themSanPhamVaoPanel(pnlCacMon, sanPhamDao.getAllSanPham()); // Danh sách món
 
-
 		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan()); // Danh Sách Đơn đặt bàn
+		///////////////////////////////////
+		themBanVaoPanel(pnlCacBan_QLBan,banDao.getAllBan());
+		//////////////////
+
 	}
 
 	public boolean checkValidDataDatBan() {
@@ -1480,7 +1487,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		
 		ArrayList<SanPham> dsDaLoc = sanPhamDao.getSanPhamByLoc(tuKhoa, loaiDaChon);
 		
-		loadSanPhamVaoPanel(pnlCacMon, dsDaLoc);
+		themSanPhamVaoPanel(pnlCacMon, dsDaLoc);
 	}
 
 	@Override

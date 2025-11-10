@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -62,6 +63,7 @@ import dao.KhachHang_dao;
 import dao.SanPham_dao;
 import entity.Ban;
 import entity.ChiTietHoaDon;
+import entity.ChucVu;
 import entity.DonDatBan;
 import entity.HoaDon;
 import entity.KhachHang;
@@ -505,7 +507,11 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		// Thêm tab đầu tiên
 		this.addTab("Gọi Món", pnlGoiMon);
 		this.addTab("Đặt Bàn", pnlDatBan);
-		this.addTab("Quản Lý Bàn", pnlQuanLyBan);
+		
+		if(taiKhoan.getNhanVien().getChucVu().equals(ChucVu.QUAN_LY)) {
+			this.addTab("Quản Lý Bàn", pnlQuanLyBan);
+		}
+		
 
 		banDao = new Ban_dao();
 		sanPhamDao = new SanPham_dao();
@@ -650,28 +656,73 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			return imgBanTrong;
 		}
 	}
-
 	public void themSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
-		panel.removeAll();
-		for (SanPham sp : danhSachSanPham) {
-			String tenSP = sp.getTenSanPham();
-			ImageIcon icon = loadSanPhamIcon("data/images/" + tenSP);
-			JButton btn = new JButton(tenSP, icon);
-			btn.setPreferredSize(new Dimension(100, 100));
-			btn.setMaximumSize(btn.getPreferredSize());
-			btn.setBackground(Color.WHITE);
-			btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-			btn.setToolTipText(tenSP + " - " + String.format("%.0f", sp.getGia()) + " VND");
-			btn.setVerticalTextPosition(SwingConstants.TOP);
-			btn.setHorizontalTextPosition(SwingConstants.CENTER);
-			btn.setHorizontalAlignment(SwingConstants.CENTER);
-			btn.addActionListener(this);
-			panel.add(btn);
-		}
+	    panel.removeAll();
 
-		panel.revalidate();
-		panel.repaint();
+	    // Ví dụ: 4 cột, số dòng tính theo số sản phẩm
+	    int soCot = 3;
+	    int soDong = (int) Math.ceil((double) danhSachSanPham.size() / soCot);
+	    panel.setLayout(new GridLayout(soDong, soCot, 5, 5));
+
+	    for (SanPham sp : danhSachSanPham) {
+	        String tenSP = sp.getTenSanPham();
+	        ImageIcon icon = loadSanPhamIcon("data/images/" + tenSP);
+
+	        JButton btn = new JButton(tenSP, icon);
+	        btn.setPreferredSize(new Dimension(100, 110));
+	        btn.setMaximumSize(btn.getPreferredSize());
+	        btn.setBackground(Color.WHITE);
+	        btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+	        btn.setToolTipText(tenSP + " - " + String.format("%.0f", sp.getGia()) + " VND");
+	        btn.setVerticalTextPosition(SwingConstants.TOP);
+	        btn.setHorizontalTextPosition(SwingConstants.CENTER);
+	        btn.setHorizontalAlignment(SwingConstants.CENTER);
+	        btn.addActionListener(this);
+
+	        // Bọc button vào Box để không bị giãn
+	        Box box = Box.createVerticalBox();
+	        box.add(Box.createVerticalGlue()); // căn giữa theo chiều dọc
+	        box.add(btn);
+	        box.add(Box.createVerticalGlue());
+
+	        panel.add(box);
+	    }
+
+	    // Nếu số sản phẩm chưa đủ để lấp đầy grid, thêm filler
+	    int soOConThieu = soDong * soCot - danhSachSanPham.size();
+	    for (int i = 0; i < soOConThieu; i++) {
+	        JPanel pnl=new JPanel();
+	        pnl.setBackground(Color.decode("#F7F4EC"));
+	        pnl.setOpaque(true);
+	        panel.add(pnl);
+	    }
+
+	    panel.revalidate();
+	    panel.repaint();
 	}
+
+//	public void themSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
+//	
+//		panel.removeAll();
+//		for (SanPham sp : danhSachSanPham) {
+//			String tenSP = sp.getTenSanPham();
+//			ImageIcon icon = loadSanPhamIcon("data/images/" + tenSP);
+//			JButton btn = new JButton(tenSP, icon);
+//			btn.setPreferredSize(new Dimension(100, 100));
+//			btn.setMaximumSize(btn.getPreferredSize());
+//			btn.setBackground(Color.WHITE);
+//			btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+//			btn.setToolTipText(tenSP + " - " + String.format("%.0f", sp.getGia()) + " VND");
+//			btn.setVerticalTextPosition(SwingConstants.TOP);
+//			btn.setHorizontalTextPosition(SwingConstants.CENTER);
+//			btn.setHorizontalAlignment(SwingConstants.CENTER);
+//			btn.addActionListener(this);
+//			panel.add(btn);
+//		}
+//
+//		panel.revalidate();
+//		panel.repaint();
+//	}
 
 	public ImageIcon loadSanPhamIcon(String tenSP) {
 		String[] extensions = { ".png", ".jpg", ".jpeg" };
@@ -1228,6 +1279,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 			
 
+		}if (o.equals(btnTimKiemDoUong) || o.equals(cboFilterDoUong)) {
+			locSanPham();
+			return; 
 		}
 		if(o instanceof JButton ) {
 			if(lblMaHoaDonChoBan.getText().equals("")  && this.getSelectedIndex()==0) {
@@ -1412,10 +1466,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 			
 		}
-		if (o.equals(btnTimKiemDoUong) || o.equals(cboFilterDoUong)) {
-			locSanPham();
-			return; 
-		}
+		
 	}
 
 	@Override

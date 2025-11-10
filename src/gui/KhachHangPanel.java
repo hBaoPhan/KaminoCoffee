@@ -82,6 +82,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         lblDiem.setPreferredSize(labelSize);
         box4.add(lblDiem);
         box4.add(txtDiem = new JTextField("0", 20));
+//        txtDiem.setEditable(false);
         pInput.add(box4);
         pInput.add(Box.createVerticalStrut(10));
 

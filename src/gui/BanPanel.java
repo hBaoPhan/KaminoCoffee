@@ -5,11 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -17,7 +14,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -69,6 +65,7 @@ import entity.ChiTietHoaDon;
 import entity.DonDatBan;
 import entity.HoaDon;
 import entity.KhachHang;
+import entity.LoaiSanPham;
 import entity.NhanVien;
 import entity.SanPham;
 import entity.TrangThaiBan;
@@ -311,7 +308,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		cboFilterDoUong = new JComboBox<String>();
 		cboFilterDoUong.setPreferredSize(new Dimension(300, 30));
 		cboFilterDoUong.setMaximumSize(cboFilterDoUong.getPreferredSize());
-
+		loadComboBoxLoaiSanPham();
+		
 		pnlCacMon = new JPanel(new GridLayout(0, 3, 5, 5));
 		pnlCacMon.setBackground(Color.decode("#F7F4EC"));
 		Box boxCacMon = Box.createHorizontalBox();
@@ -523,25 +521,23 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		btnLuu.addActionListener(this);
 		tggleDangSuDung.addActionListener(this);
 		tableMonAn.addMouseListener(this);
+		cboFilterDoUong.addActionListener(this);
+
 		btnHuyDonDatBan.addActionListener(this);
-		
+
 
 	}
 	public void loadDataBanPanel() {
 		initIcons();
 		
 		capNhatTrangThaiDatBan();
-		//////////
 		themBanVaoPanel(pnlCacBan, banDao.getAllBan());
-		//////////////////////////////////////////////////////////////////////////
 		themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());/// Bàn bên đặt bàn
-
 		////////////////////
 		themSanPhamVaoPanel(pnlCacMon, sanPhamDao.getAllSanPham()); // Danh sách món
 
-		/////////////////////////////////
+
 		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan()); // Danh Sách Đơn đặt bàn
-		///////////////////////////////////
 	}
 
 	public boolean checkValidDataDatBan() {
@@ -1409,6 +1405,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 			
 		}
+		if (o.equals(btnTimKiemDoUong) || o.equals(cboFilterDoUong)) {
+			locSanPham();
+			return; 
+		}
 	}
 
 	@Override
@@ -1464,6 +1464,24 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
             }
         }
     }
+	
+	private void loadComboBoxLoaiSanPham() {
+		cboFilterDoUong.removeAllItems(); 
+		
+		cboFilterDoUong.addItem("Tất cả");
+		
+		for (LoaiSanPham loai : LoaiSanPham.values()) {
+			cboFilterDoUong.addItem(loai.getMoTa()); 
+		}
+	}
+	private void locSanPham() {
+		String tuKhoa = txtTimKiemDoUong.getText().trim();
+		String loaiDaChon = (String) cboFilterDoUong.getSelectedItem();
+		
+		ArrayList<SanPham> dsDaLoc = sanPhamDao.getSanPhamByLoc(tuKhoa, loaiDaChon);
+		
+		loadSanPhamVaoPanel(pnlCacMon, dsDaLoc);
+	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {

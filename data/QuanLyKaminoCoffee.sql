@@ -129,6 +129,7 @@ CREATE TABLE DonDatBan (
     maKH VARCHAR(20),
     maBan VARCHAR(20),
     thoiGian DATETIME NOT NULL,
+    daNhan Bit,
     FOREIGN KEY (maKH) REFERENCES KhachHang(maKH)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
@@ -148,48 +149,8 @@ DELETE FROM KhachHang;
 DELETE FROM Ban;
 DELETE FROM SanPham;
 GO
--- ========================================================
--- D? LI?U M?U (ĐÃ C?P NH?T THEO C?U TRÚC M?I)
--- ========================================================
 
--- Dữ liệu cho bảng NhanVien (Không đ?i)
-INSERT INTO NhanVien VALUES 
-('NV001', N'Nguyễn Văn A', 'NV', '0901234567',1),
-('NV002', N'Trần Thị B', 'NV', '0902345678',0),
-('NV003', N'Lê Văn C', 'QL', '0903456789',1),
-('NV004', N'Phạm Thị D', 'NV', '0904567890',0),
-('NV005', N'Hoàng Văn E', 'QL', '0905678901',1);
 
--- Dữ liệu cho bảng TaiKhoan (S?a: B? chucVu, tenNV)
-INSERT INTO TaiKhoan VALUES 
-('nguyena', 'pass123', 'NV001'),
-('tranb', 'pass234', 'NV002'),
-('lec', 'pass345', 'NV003'),
-('phamd', 'pass456', 'NV004'),
-('hoange', 'pass567', 'NV005');
-
--- Dữ liệu cho bảng KhachHang (Không đ?i)
-INSERT INTO KhachHang VALUES 
-('KH001', N'Nguyễn Thị X', '0911111111', 120, 1),
-('KH002', N'Trần Văn Y', '0912222222', 80, 0),
-('KH003', N'Lê Thị Z', '0913333333', 150, 1),
-('KH004', N'Phạm Văn W', '0914444444', 60, 0),
-('KH005', N'Hoàng Thị V', '0915555555', 200, 1);
-
--- Dữ liệu cho bảng Ban (S?a: Đ?i 0/1 -> Tr?ng thái ch?)
-INSERT INTO Ban VALUES 
-('B01','Bàn 1', 4, N'Trống'),
-('B02','Bàn 2', 2, N'Đang được sử dụng'),
-('B03','Bàn 3', 6, N'Trống'),
-('B04','Bàn 4', 4, N'Đang được sử dụng'),
-('B05','Bàn 5', 2, N'Trống'),
-('B06','Bàn 6', 4, N'Trống'),
-('B07','Bàn 7', 6, N'Đang được sử dụng'),
-('B08','Bàn 8', 2, N'Trống'),
-('B09','Bàn 9', 4, N'Đang được sử dụng'),
-('B10','Bàn 10', 6, N'Trống');
-
--- Dữ liệu cho bảng SanPham (S?a: B? soLuong, thêm loaiSanPham)
 INSERT INTO SanPham VALUES 
 ('SP001', N'Cà phê đen', 23000, N'Cafe'),
 ('SP002', N'Cà phê sữa', 25000, N'Cafe'),
@@ -208,27 +169,57 @@ INSERT INTO SanPham VALUES
 ('SP0015', N'Tiramisu', 35000, N'Bánh'),
 ('SP0016', N'Bánh chuối', 35000, N'Bánh'),
 ('SP0017', N'Mousse', 35000, N'Bánh');
+INSERT INTO NhanVien (maNV, tenNV, chucVu, sDT, gioiTinh) VALUES
+('NV001', N'Nguyễn Văn A', N'NV', '0901234567', 1),
+('NV002', N'Trần Thị B', N'NV', '0912345678', 0),
+('NV003', N'Lê Văn C', N'QL', '0923456789', 1),
+('NV004', N'Phạm Thị D', N'NV', '0934567890', 0),
+('NV005', N'Hoàng Văn E', N'QL', '0945678901', 1);
+INSERT INTO TaiKhoan (tenDangNhap, matKhau, maNV) VALUES
+('userA', 'passA', 'NV001'),
+('userB', 'passB', 'NV002'),
+('userC', 'passC', 'NV003'),
+('userD', 'passD', 'NV004'),
+('userE', 'passE', 'NV005');
+INSERT INTO KhachHang (maKH, tenKH, sDT, diemTichLuy, laKHDK) VALUES
+('KH001', N'Nguyễn Khách 1', '0981111111', 50, 1),
+('KH002', N'Nguyễn Khách 2', '0982222222', 0, 0),
+('KH003', N'Nguyễn Khách 3', '0983333333', 100, 1),
+('KH004', N'Nguyễn Khách 4', '0984444444', 0, 0),
+('KH005', N'Nguyễn Khách 5', '0985555555', 70, 1);
 
--- Dữ liệu cho bảng HoaDon (S?a: Thêm th?i gian vào/ra)
--- Gi? s? hóa đơn đã thanh toán (1) thì có thoiGianRa
--- Hóa đơn chua thanh toán (0) thì thoiGianRa là NULL
-INSERT INTO HoaDon VALUES 
-('HD001', 'NV001', 'KH001', 'B01', '2025-10-25 10:30:00', '2025-10-25 11:15:00', 1),
-('HD002', 'NV002', 'KH002', 'B02', '2025-10-26 14:00:00', NULL, 0),
-('HD003', 'NV003', 'KH003', 'B03', '2025-10-26 18:45:00', '2025-10-26 19:30:00', 1),
-('HD004', 'NV004', 'KH004', 'B04', '2025-10-27 08:15:00', NULL, 0),
-('HD005', 'NV005', 'KH005', 'B05', '2025-10-27 09:00:00', '2025-10-27 09:45:00', 1);
+INSERT INTO Ban VALUES 
+('BA001','Bàn 1',4,N'Trống'),
+('BA002','Bàn 2',2,N'Đang được sử dụng'),
+('BA003','Bàn 3',6,N'Trống'),
+('BA004','Bàn 4', 4, N'Trống'),
+('BA005','Bàn 5', 6, N'Trống'),
+('BA006','Bàn 6', 2, N'Trống'),
+('BA007','Bàn 7', 4, N'Trống'),
+('BA008','Bàn 8', 6, N'Trống'),
+('BA009','Bàn 9', 4, N'Trống'),
+('BA010','Bàn 10', 6, N'Trống');
+INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian, daNhan) VALUES
+('DB001', 'KH001', 'BA002', GETDATE(), 1),
+('DB002', 'KH002', 'BA003', GETDATE(), 1),
+('DB003', 'KH003', 'BA004', GETDATE(), 1),
+('DB004', 'KH004', 'BA005', GETDATE(), 1),
+('DB005', 'KH005', 'BA006', GETDATE(), 1);
+INSERT INTO HoaDon (maHD, maNV, maKH, maBan, thoiGianVao, thoiGianRa, trangThaiThanhToan) VALUES
+('HD001', 'NV001', 'KH001', 'BA001', GETDATE(), NULL, 1),
+('HD002', 'NV002', 'KH002', 'BA002', GETDATE(), NULL, 1),
+('HD003', 'NV003', 'KH003', 'BA003', GETDATE(), NULL, 1),
+('HD004', 'NV004', 'KH004', 'BA004', GETDATE(), NULL, 1),
+('HD005', 'NV005', 'KH005', 'BA005', GETDATE(), NULL, 1);
+INSERT INTO ChiTietHoaDon (maHD, maSP, soLuong, tongTien) VALUES
+('HD001', 'SP001', 2, 40000),
+('HD002', 'SP002', 1, 25000),
+('HD003', 'SP004', 3, 105000),
+('HD004', 'SP005', 2, 80000),
+('HD005', 'SP007', 5, 50000);
 
--- Dữ liệu cho bảng ChiTietHoaDon (Không đ?i)
-INSERT INTO ChiTietHoaDon VALUES 
-('HD001', 'SP001', 2, 50000),
-('HD001', 'SP005', 1, 20000),
-('HD002', 'SP002', 1, 30000),
-('HD003', 'SP003', 2, 70000),
-('HD004', 'SP004', 3, 30000);
 
--- Dữ liệu cho bảng DonDatBan (B?ng m?i)
-INSERT INTO DonDatBan VALUES
-('DDB001', 'KH001', 'B03', '2025-11-05 19:00:00'),
-('DDB002', 'KH003', 'B05', '2025-11-06 12:00:00');
-GO
+
+
+
+

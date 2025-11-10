@@ -576,7 +576,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			if (ban.getTrangThai() == TrangThaiBan.DaDuocDat) {
 				donDatBanDao.getAllDonDatBan();
 				for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
-					if (ddb.getBan().getMaBan().equals(ban.getMaBan()) && ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+					if (ddb.getBan().getMaBan().equals(ban.getMaBan()) && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() < 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() > -60) {
 						ten =ban.getMaBan()+ " (" + ddb.getThoiGian().getHour() + ":"+ String.format("%02d", ddb.getThoiGian().getMinute()) + ")";
 						;
 						break;
@@ -700,7 +700,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			for (Ban b : banDao.getAllBan()) {
 				if (b.getMaBan().equals(ban.getMaBan())) {
 					if (b.getTrangThai() != TrangThaiBan.DangDuocSuDung) {
-						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0) {
+						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0 && ddb.isDaNhan()==false) {
 //							System.out.println(Duration.between(LocalDateTime.now(),ddb.getThoiGian()).toMinutes());
 							b.setTrangThai(TrangThaiBan.DaDuocDat);
 							banDao.updateBan(b);
@@ -917,6 +917,12 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 			kh.congDiemTichLuy(diemTichLuy);
 		}
+		for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+			if(ddb.getBan().getMaBan().equals(hd.getBan().getMaBan()) && ddb.getKhachHang().getMaKhachHang().equals(hd.getKhachHang().getMaKhachHang()) ) {
+				ddb.setDaNhan(true);
+				donDatBanDao.updateDonDatBan(ddb);
+			}
+		}
 		
 		Ban ban=banDao.timTheoMa(hd.getBan().getMaBan());
 		ban.setTrangThai(TrangThaiBan.Trong);
@@ -982,7 +988,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 						
 						for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
 							long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(),LocalDateTime.now()).toMinutes());
-							if(ddb.getBan().getMaBan().equals(maBan) && khoangCach < 60 || khoangCach >-60 ) {
+							if(ddb.getBan().getMaBan().equals(maBan) && (khoangCach < 60 || khoangCach >-60) && ddb.isDaNhan()==false ) {
 								for (KhachHang kh : khachHangDao.getAllKhachHang()) {
 									if(ddb.getKhachHang().getMaKhachHang().equals(kh.getMaKhachHang())) {
 										txtTenKH.setText(kh.getTenKhachHang());
@@ -1036,13 +1042,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				String maKhachHang = generateNextCodeForKhachHang(
 						donDatBanDao.getAllDonDatBan().getLast().getKhachHang().getMaKhachHang());
 				DonDatBan ddb = new DonDatBan(maDonDatBan, new KhachHang(maKhachHang, tenKH, sdtKH, 0, false), banDat,
-						thoiGianDatBan);
+						thoiGianDatBan,false);
 
 				if (kiemTraKhongTrungThoiGian(ddb) == true) {
 					KhachHang kh=khachHangDao.timTheoSDT(sdtKH);
 					if(kh!=null) {
 						JOptionPane.showMessageDialog(this, "Khách Hàng "+ tenKH+" hiện đang là khách hàng thành viên của Kamino Coffee với tên là "+kh.getTenKhachHang());
-						if(donDatBanDao.addDonDatBan(new DonDatBan(maDonDatBan, kh, banDat, thoiGianDatBan))) {
+						if(donDatBanDao.addDonDatBan(new DonDatBan(maDonDatBan, kh, banDat, thoiGianDatBan,false))) {
 							JOptionPane.showMessageDialog(this, "Đặt bàn thành công cho khách hàng " + tenKH);
 							capNhatTrangThaiDatBan();
 							updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());

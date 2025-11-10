@@ -36,7 +36,7 @@ public class Login extends JFrame implements ActionListener {
 	public Login() {
 		
 		try {
-			ConnectDB.getInstance().connect1();
+			ConnectDB.getInstance().connect();
 			System.out.println("Connected");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -48,7 +48,7 @@ public class Login extends JFrame implements ActionListener {
 		setSize(475, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-//		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		JPanel pnlMain = new JPanel();
 		pnlMain.setBackground(Color.WHITE);

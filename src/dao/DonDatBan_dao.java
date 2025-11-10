@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +31,8 @@ public class DonDatBan_dao {
 				// read timestamp and convert to LocalDateTime (handle nulls)
 				Timestamp ts = rs.getTimestamp("thoiGian");
 				LocalDateTime thoiGian = (ts != null) ? ts.toLocalDateTime() : null;
-				DonDatBan ddb = new DonDatBan(ma, kh, ban, thoiGian);
+				boolean daNhan=rs.getBoolean("daNhan");
+				DonDatBan ddb = new DonDatBan(ma, kh, ban, thoiGian,daNhan);
 				ds.add(ddb);
 			}
 		} catch (Exception e) {
@@ -43,11 +45,12 @@ public class DonDatBan_dao {
 	public boolean addDonDatBan(DonDatBan ddb) {
 		ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
-		String sql = "INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian,daNhan) VALUES (?, ?, ?, ?,?)";
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			stmt.setString(1, ddb.getMaDonDatBan());
 			stmt.setString(2, ddb.getKhachHang().getMaKhachHang());
 			stmt.setString(3, ddb.getBan().getMaBan());
+			stmt.setBoolean(5, ddb.isDaNhan());
 			if (ddb.getThoiGian() != null) {
 				stmt.setTimestamp(4, Timestamp.valueOf(ddb.getThoiGian()));
 			} else {
@@ -61,5 +64,22 @@ public class DonDatBan_dao {
 		}
 		
 	}
+	public boolean updateDonDatBan(DonDatBan donDatBan) {
+		ConnectDB.getInstance();
+		Connection con=ConnectDB.getConnection();
+        String sql = "UPDATE DonDatBan SET maBan= ?, thoiGian= ?,daNhan= ? WHERE maDonDatBan= ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, donDatBan.getBan().getMaBan());
+            stmt.setTimestamp(2, Timestamp.valueOf(donDatBan.getThoiGian()));
+            stmt.setBoolean(3, donDatBan.isDaNhan()); 
+            stmt.setString(4, donDatBan.getMaDonDatBan());
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

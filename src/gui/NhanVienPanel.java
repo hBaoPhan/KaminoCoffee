@@ -242,7 +242,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             }
 
             // 🔹 Ràng buộc số điện thoại (10 chữ số, đầu số VN)
-            if (!sdt.matches("^0{9}$")) {
+            if (!sdt.matches("^0[0-9]{9}$")) {
                 JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
                 return;
             }
@@ -297,7 +297,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
             }
 
             // 🔹 Ràng buộc số điện thoại
-            if (!sdt.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+            if (!sdt.matches("^0[0-9]{9}$")) {
                 JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
                 return;
             }

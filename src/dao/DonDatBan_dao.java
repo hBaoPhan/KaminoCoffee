@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class DonDatBan_dao {
 			stmt.setString(1, ddb.getMaDonDatBan());
 			stmt.setString(2, ddb.getKhachHang().getMaKhachHang());
 			stmt.setString(3, ddb.getBan().getMaBan());
-			stmt.setBoolean(4, ddb.isDaNhan());
+			stmt.setBoolean(5, ddb.isDaNhan());
 			if (ddb.getThoiGian() != null) {
 				stmt.setTimestamp(4, Timestamp.valueOf(ddb.getThoiGian()));
 			} else {
@@ -63,5 +64,22 @@ public class DonDatBan_dao {
 		}
 		
 	}
+	public boolean updateDonDatBan(DonDatBan donDatBan) {
+		ConnectDB.getInstance();
+		Connection con=ConnectDB.getConnection();
+        String sql = "UPDATE DonDatBan SET maBan= ?, thoiGian= ?,daNhan= ? WHERE maDonDatBan= ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, donDatBan.getBan().getMaBan());
+            stmt.setTimestamp(2, Timestamp.valueOf(donDatBan.getThoiGian()));
+            stmt.setBoolean(3, donDatBan.isDaNhan()); 
+            stmt.setString(4, donDatBan.getMaDonDatBan());
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

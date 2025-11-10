@@ -700,7 +700,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			for (Ban b : banDao.getAllBan()) {
 				if (b.getMaBan().equals(ban.getMaBan())) {
 					if (b.getTrangThai() != TrangThaiBan.DangDuocSuDung) {
-						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0) {
+						if (Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() <= 60 && Duration.between(LocalDateTime.now(), ddb.getThoiGian()).toMinutes() >= 0 && ddb.isDaNhan()==false) {
 //							System.out.println(Duration.between(LocalDateTime.now(),ddb.getThoiGian()).toMinutes());
 							b.setTrangThai(TrangThaiBan.DaDuocDat);
 							banDao.updateBan(b);
@@ -916,6 +916,12 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		if(kh.isLaKHDK()) {
 			
 			kh.congDiemTichLuy(diemTichLuy);
+		}
+		for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+			if(ddb.getBan().getMaBan().equals(hd.getBan().getMaBan()) && ddb.getKhachHang().getMaKhachHang().equals(hd.getKhachHang().getMaKhachHang()) ) {
+				ddb.setDaNhan(true);
+				donDatBanDao.updateDonDatBan(ddb);
+			}
 		}
 		
 		Ban ban=banDao.timTheoMa(hd.getBan().getMaBan());

@@ -1036,13 +1036,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				String maKhachHang = generateNextCodeForKhachHang(
 						donDatBanDao.getAllDonDatBan().getLast().getKhachHang().getMaKhachHang());
 				DonDatBan ddb = new DonDatBan(maDonDatBan, new KhachHang(maKhachHang, tenKH, sdtKH, 0, false), banDat,
-						thoiGianDatBan);
+						thoiGianDatBan,false);
 
 				if (kiemTraKhongTrungThoiGian(ddb) == true) {
 					KhachHang kh=khachHangDao.timTheoSDT(sdtKH);
 					if(kh!=null) {
 						JOptionPane.showMessageDialog(this, "Khách Hàng "+ tenKH+" hiện đang là khách hàng thành viên của Kamino Coffee với tên là "+kh.getTenKhachHang());
-						if(donDatBanDao.addDonDatBan(new DonDatBan(maDonDatBan, kh, banDat, thoiGianDatBan))) {
+						if(donDatBanDao.addDonDatBan(new DonDatBan(maDonDatBan, kh, banDat, thoiGianDatBan,false))) {
 							JOptionPane.showMessageDialog(this, "Đặt bàn thành công cho khách hàng " + tenKH);
 							capNhatTrangThaiDatBan();
 							updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());

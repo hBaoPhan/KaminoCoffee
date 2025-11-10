@@ -30,7 +30,8 @@ public class DonDatBan_dao {
 				// read timestamp and convert to LocalDateTime (handle nulls)
 				Timestamp ts = rs.getTimestamp("thoiGian");
 				LocalDateTime thoiGian = (ts != null) ? ts.toLocalDateTime() : null;
-				DonDatBan ddb = new DonDatBan(ma, kh, ban, thoiGian);
+				boolean daNhan=rs.getBoolean("daNhan");
+				DonDatBan ddb = new DonDatBan(ma, kh, ban, thoiGian,daNhan);
 				ds.add(ddb);
 			}
 		} catch (Exception e) {

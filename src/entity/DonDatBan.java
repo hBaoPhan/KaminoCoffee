@@ -8,13 +8,26 @@ public class DonDatBan {
 	private KhachHang khachHang;
 	private Ban ban;
 	private LocalDateTime thoiGian;
-	public DonDatBan(String maDonDatHang, KhachHang khachHang, Ban ban, LocalDateTime thoiGian) {
+	private boolean daNhan;
+	public DonDatBan(String maDonDatHang, KhachHang khachHang, Ban ban, LocalDateTime thoiGian,boolean daNhan) {
 		super();
 		this.maDonDatBan = maDonDatHang;
 		this.khachHang = khachHang;
 		this.ban = ban;
 		this.thoiGian = thoiGian;
+		this.daNhan=daNhan;
 	}
+	
+	public boolean isDaNhan() {
+		return daNhan;
+	}
+
+	public void setDaNhan(boolean daNhan) {
+		this.daNhan = daNhan;
+	}
+
+	
+
 	public KhachHang getKhachHang() {
 		return khachHang;
 	}

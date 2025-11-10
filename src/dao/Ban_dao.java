@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import connectDB.ConnectDB;
 import entity.Ban;
+import entity.KhachHang;
 import entity.TrangThaiBan;
 
 public class Ban_dao {
@@ -36,6 +37,7 @@ public class Ban_dao {
 				trangThai = TrangThaiBan.fromString(trangThaiStr);
 				
 				Ban ban=new Ban(ma, ten, soGhe, trangThai);
+				
 				ds.add(ban);
 			}
 		} catch (Exception e) {
@@ -68,6 +70,32 @@ public class Ban_dao {
             return false;
         }
     }
+	 public Ban timTheoMa(String maBan) {
+		 ConnectDB.getInstance();
+		 Connection con=ConnectDB.getConnection();
+	      try {
+	        	String sql = "SELECT * FROM Ban WHERE maBan = ?";
+	        	PreparedStatement stmt = con.prepareStatement(sql);
+	            stmt.setString(1, maBan);
+	            ResultSet rs = stmt.executeQuery();
+	            if (rs.next()) {
+	            	String ma=rs.getString("maBan");
+					String ten=rs.getString("tenBan");
+					int soGhe=rs.getInt("soGhe");
+					String trangThaiStr = rs.getString("trangThai");
+					TrangThaiBan trangThai = null;
+					
+					trangThai = TrangThaiBan.fromString(trangThaiStr);
+					
+					Ban ban= new Ban(ma, ten, soGhe, trangThai);
+					return ban;
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	      return null;
+	       
+	    }
 
 
 }

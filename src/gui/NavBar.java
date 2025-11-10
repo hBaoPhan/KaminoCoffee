@@ -36,6 +36,7 @@ public class NavBar extends JFrame implements MouseListener {
 	private Color textDefaultColor = Color.BLACK;
 	private Font customFont = new Font("Time New Romans", Font.BOLD, 20);
 	private JButton btnDangXuat;
+	private BanPanel pnlBan;
 
 	public NavBar() {
 	    setTitle("Kamino Coffee");
@@ -82,6 +83,7 @@ public class NavBar extends JFrame implements MouseListener {
 	    String[] tabs = { "Trang chủ", "Bàn","Thực đơn",  "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };
 	    JLabel[] labels = new JLabel[tabs.length];
 
+
 	    for (int i = 0; i < tabs.length; i++) {
 	        final String tab = tabs[i];
 	        labels[i] = new JLabel(tab);
@@ -100,6 +102,21 @@ public class NavBar extends JFrame implements MouseListener {
 	    // 1. Thêm khoảng trống giãn nở (Glue) để đẩy nút Đăng xuất xuống dưới
 	    sidebar.add(Box.createVerticalGlue());
 
+		// Thêm các panel vào CardLayout
+		cardLayout = new CardLayout();
+	    
+	    contentPanel = new JPanel(cardLayout);
+		contentPanel.add(new TrangChuPanel(), "Trang chủ");// 
+		contentPanel.add(pnlBan=new BanPanel(), "Bàn");
+		contentPanel.add(new ThucDonPanel(), "Thực đơn");//Đổi chỗ này thành thuộc tính
+		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");//
+		contentPanel.add(new KhachHangPanel(), "Khách hàng");//
+		contentPanel.add(new NhanVienPanel(), "Nhân viên");//
+		contentPanel.add(new ThongKePanel(), "Thống Kê");//
+
+		
+		
+
 	    // 2. Định nghĩa nút Đăng xuất và đặt style
 	    btnDangXuat = new JButton("Đăng xuất");
 	    btnDangXuat.setBackground(Color.RED);
@@ -117,18 +134,10 @@ public class NavBar extends JFrame implements MouseListener {
 
 
 	    // --- CardLayout (CENTER) (GIỮ NGUYÊN) ---
-	    cardLayout = new CardLayout();
-	    
-	    contentPanel = new JPanel(cardLayout);
+	   
 
 	    // Thêm các panel vào CardLayout
-	    contentPanel.add(new TrangChuPanel(), "Trang chủ");
-	    contentPanel.add(new BanPanel(), "Bàn");
-	    contentPanel.add(new ThucDonPanel(), "Thực đơn");
-	    contentPanel.add(new HoaDonPanel(), "Hóa Đơn");
-	    contentPanel.add(new KhachHangPanel(), "Khách hàng");
-	    contentPanel.add(new NhanVienPanel(), "Nhân viên");
-	    contentPanel.add(new ThongKePanel(), "Thống Kê");
+	   
 	    
 	    add(contentPanel, BorderLayout.CENTER);
 	    
@@ -143,11 +152,18 @@ public class NavBar extends JFrame implements MouseListener {
 	    add(pbot, BorderLayout.SOUTH);
 	    */
 	}
+	
+	private void onCardChanged() {
+		pnlBan.loadDataBanPanel();
+		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
+	    
+	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		JLabel clickedLabel = (JLabel) e.getSource();
 		String tabName = clickedLabel.getText();
 		cardLayout.show(contentPanel, tabName);
+		onCardChanged();
 	}
 
 	@Override

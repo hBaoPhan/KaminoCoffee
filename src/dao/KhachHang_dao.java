@@ -49,9 +49,12 @@ public class KhachHang_dao {
         // 🔍 Kiểm tra trùng SDT trước
         KhachHang tonTai = timTheoSDT(kh.getsDT());
         if (tonTai != null) {
-            JOptionPane.showMessageDialog(null,
-                "⚠️ Số điện thoại này đã được sử dụng bởi khách hàng: " + tonTai.getTenKhachHang());
-            return false;
+        	if(!tonTai.getsDT().isEmpty()) {
+        		 JOptionPane.showMessageDialog(null,
+        	                "⚠️ Số điện thoại này đã được sử dụng bởi khách hàng: " + tonTai.getTenKhachHang());
+        	            return false;
+        	}
+           
         }
 
         String sql = "INSERT INTO KhachHang (maKH, tenKH, sDT, diemTichLuy, laKHDK) VALUES (?, ?, ?, ?, ?)";
@@ -85,12 +88,16 @@ public class KhachHang_dao {
     // ✅ Sửa thông tin khách hàng (kiểm tra SDT trùng với người khác)
     public boolean suaKhachHang(KhachHang kh) {
         // 🔍 Kiểm tra trùng SDT với KH khác
-        KhachHang khTrung = timTheoSDT(kh.getsDT());
-        if (khTrung != null && !khTrung.getMaKhachHang().equals(kh.getMaKhachHang())) {
-            JOptionPane.showMessageDialog(null,
-                "⚠️ Số điện thoại này đã được sử dụng bởi khách hàng khác (" + khTrung.getTenKhachHang() + ")");
-            return false;
-        }
+    	KhachHang khTrung = timTheoSDT(kh.getsDT());
+    	if (khTrung != null) {
+    	    if (!khTrung.getsDT().isEmpty()) {
+    	        if (khTrung.getMaKhachHang().equals(kh.getMaKhachHang())) {
+    	            JOptionPane.showMessageDialog(null,
+    	                "⚠️ Số điện thoại này đã được sử dụng bởi khách hàng khác (" + khTrung.getTenKhachHang() + ")");
+    	            return false;
+    	        }
+    	    }
+    	}
 
         String sql = "UPDATE KhachHang SET tenKH = ?, sDT = ?, diemTichLuy = ?, laKHDK = ? WHERE maKH = ?";
 
@@ -100,6 +107,25 @@ public class KhachHang_dao {
             stmt.setInt(3, kh.getDiemTichLuy());
             stmt.setBoolean(4, kh.isLaKHDK());
             stmt.setString(5, kh.getMaKhachHang());
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "⚠️ Lỗi khi sửa khách hàng: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean suaDiemTichLuyKhachHang(KhachHang kh) {
+        // 🔍 Kiểm tra trùng SDT với KH khác
+    	
+
+        String sql = "UPDATE KhachHang SET diemTichLuy = ? WHERE maKH = ?";
+
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            stmt.setInt(1, kh.getDiemTichLuy());
+ 
+            stmt.setString(2, kh.getMaKhachHang());
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {

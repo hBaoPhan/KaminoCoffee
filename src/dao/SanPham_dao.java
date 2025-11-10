@@ -180,5 +180,32 @@ public class SanPham_dao {
 	    }
 	    return null;
 	}
+	public SanPham getSanPhamByMa(String maSP) {
+	    ConnectDB.getInstance();
+	    Connection con = ConnectDB.getConnection();
+	    PreparedStatement stmt = null;
+	    String sql = "SELECT * FROM SanPham WHERE maSP = ?";
+	    try {
+	        stmt = con.prepareStatement(sql);
+	        stmt.setString(1, maSP);
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	            String ma = rs.getString("maSP");
+	            String ten=rs.getString("tenSp");
+	            double gia = rs.getDouble("gia");
+	            LoaiSanPham loai = LoaiSanPham.fromString(rs.getString("loaiSanPham"));
+	            return new SanPham(ma, ten, gia, loai);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return null;
+	}
 
 }

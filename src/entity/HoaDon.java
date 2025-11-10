@@ -25,6 +25,9 @@ public class HoaDon {
 		this.thoiGianRa = thoiGianRa;
 		
 	}
+	public HoaDon(String string) {
+		this.maHoaDon = string;
+	}
 	public Ban getBan() {
 		return ban;
 	}

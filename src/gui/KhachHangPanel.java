@@ -215,7 +215,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             }
 
             // 🔹 Ràng buộc số điện thoại (10 chữ số)
-            if (!sdt.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+            if (!sdt.matches("^0[0-9]{9}$")) {
                 JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại phải gồm đúng 10 chữ số!");
                 return;
             }

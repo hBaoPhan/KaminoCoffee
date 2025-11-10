@@ -94,8 +94,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private JLabel lblThoiGian_DatBan;
 	private DatePicker txtNgay_DatBan;
 	private JButton btnDatBan;
-	private DefaultTableModel modelDatBan;
-	private JTable tableDatBan;
+	private DefaultTableModel modeDonlDatBan;
+	private JTable tableDonDatBan;
 	private Ban_dao banDao;
 
 	private ImageIcon imgBanDangSuDung;
@@ -125,6 +125,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private JPanel pnlCacMon;
 	private ButtonGroup tableGroup;
 	private ChiTietHoaDon_dao chiTietHoaDonDao;
+	private JButton btnHuyDonDatBan;
 
 	public BanPanel() {
 		
@@ -448,27 +449,36 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		JLabel lblDanhSachDonDatBan = new JLabel("Danh Sách Đơn Đặt Bàn");
 		lblDanhSachDonDatBan.setFont(lblFont);
 
-		String headerDatBan[] = { "Mã Đơn đặt bàn", "Tên Khách Hàng", "Mã khách hàng", "Bàn", "Thời gian" };
-		modelDatBan = new DefaultTableModel(headerDatBan, 0);
-		tableDatBan = new JTable(modelDatBan);
-		TableUtils.highlightExpiredBookings(tableDatBan, 4, "HH:mm dd/MM/yyyy");
-		TableColumnModel columnModel = tableDatBan.getColumnModel();
+		String headerDatBan[] = { "Mã Đơn đặt bàn", "Tên Khách Hàng", "Mã khách hàng", "Bàn", "Thời gian","Trạng thái" };
+		modeDonlDatBan = new DefaultTableModel(headerDatBan, 0);
+		tableDonDatBan = new JTable(modeDonlDatBan);
+		TableUtils.highlightExpiredBookings(tableDonDatBan, 4, "HH:mm dd/MM/yyyy");
+		TableColumnModel columnModel = tableDonDatBan.getColumnModel();
 
 		// Đặt kích thước cho cột thứ 0 (cột đầu tiên)
 		
-		columnModel.getColumn(0).setPreferredWidth(100);
-		columnModel.getColumn(1).setPreferredWidth(100);
+		columnModel.getColumn(0).setPreferredWidth(50);
+		columnModel.getColumn(1).setPreferredWidth(130);
 		columnModel.getColumn(3).setPreferredWidth(70);
 		columnModel.getColumn(4).setPreferredWidth(110);
 		columnModel.getColumn(4).setMinWidth(100); // chiều rộng tối thiểu
 		columnModel.getColumn(4).setMaxWidth(200);
-		tableDatBan.setBackground(Color.WHITE);
-		tableDatBan.setOpaque(true);
+		tableDonDatBan.setBackground(Color.WHITE);
+		tableDonDatBan.setOpaque(true);
 		tableMonAn.setOpaque(true);
-		JScrollPane scrPaneDanhSachDonDatBan = new JScrollPane(tableDatBan);
+		JScrollPane scrPaneDanhSachDonDatBan = new JScrollPane(tableDonDatBan);
 
+		
+		Box boxBtnHuyDonDatBan=Box.createHorizontalBox();
+		btnHuyDonDatBan=new JButton("Hủy Đơn");
+		btnHuyDonDatBan.setBackground(Color.decode("#DC3545"));
+		btnHuyDonDatBan.setForeground(Color.WHITE);
+		boxBtnHuyDonDatBan.add(btnHuyDonDatBan);
+		
+		
 		boxArrayDanhSachDonDatBan[0].add(lblDanhSachDonDatBan);
 		boxArrayDanhSachDonDatBan[1].add(scrPaneDanhSachDonDatBan);
+		boxArrayDanhSachDonDatBan[2].add(boxBtnHuyDonDatBan);
 		//////////////////////// CRUD Bàn////////////////////////////////////
 		JPanel pnlQuanLyBan=new JPanel(new BorderLayout());
 		
@@ -513,6 +523,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		tableMonAn.addMouseListener(this);
 		cboFilterDoUong.addActionListener(this);
 
+		btnHuyDonDatBan.addActionListener(this);
+
+
 	}
 	public void loadDataBanPanel() {
 		initIcons();
@@ -520,8 +533,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		capNhatTrangThaiDatBan();
 		themBanVaoPanel(pnlCacBan, banDao.getAllBan());
 		themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());/// Bàn bên đặt bàn
+		////////////////////
+		themSanPhamVaoPanel(pnlCacMon, sanPhamDao.getAllSanPham()); // Danh sách món
 
-		loadSanPhamVaoPanel(pnlCacMon, sanPhamDao.getAllSanPham()); // Danh sách món
 
 		updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan()); // Danh Sách Đơn đặt bàn
 	}
@@ -630,7 +644,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		}
 	}
 
-	public void loadSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
+	public void themSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
 		panel.removeAll();
 		for (SanPham sp : danhSachSanPham) {
 			String tenSP = sp.getTenSanPham();
@@ -669,21 +683,21 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	}
 
 	public void updateTableDonDatBanTuDao(ArrayList<DonDatBan> ds) {
-		modelDatBan.getDataVector().removeAllElements();
+		modeDonlDatBan.getDataVector().removeAllElements();
 		ArrayList<KhachHang> dsKH = khachHangDao.getAllKhachHang();
 
 		for (DonDatBan ddb : ds) {
 			for (KhachHang kh : dsKH) {
 				if (ddb.getKhachHang().getMaKhachHang().equals(kh.getMaKhachHang())) {
-					modelDatBan.addRow(new Object[] { ddb.getMaDonDatBan(), kh.getTenKhachHang(),
+					modeDonlDatBan.addRow(new Object[] { ddb.getMaDonDatBan(), kh.getTenKhachHang(),
 							ddb.getKhachHang().getMaKhachHang(), ddb.getBan().getMaBan(),
-							ddb.getThoiGian().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")) });
+							ddb.getThoiGian().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),ddb.isDaNhan()?"Đã nhận":"Chưa nhận" });
 					break;
 				}
 			}
 
 		}
-		modelDatBan.fireTableDataChanged();
+		modeDonlDatBan.fireTableDataChanged();
 	}
 
 	public void capNhatTrangThaiDatBan() {
@@ -933,6 +947,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	}
 
 
+	@SuppressWarnings("unused")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
@@ -1065,6 +1080,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 								JOptionPane.showMessageDialog(this, "Đặt bàn thành công cho khách hàng khách lẻ");
 								capNhatTrangThaiDatBan();
 								updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
+								themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());/// Bàn bên đặt bàn
 
 							} else {
 								JOptionPane.showMessageDialog(this, "Đặt bàn không thành công! Vui lòng thử lại.");
@@ -1352,6 +1368,41 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 					
 				}
 				
+			
+		}else if(o.equals(btnHuyDonDatBan)) {
+			int row=tableDonDatBan.getSelectedRow();
+			if(row==-1) {
+				JOptionPane.showMessageDialog(this, "Vui lòng chọn Đơn để hủy");
+			}else {
+				String maDDB=modeDonlDatBan.getValueAt(row, 0).toString();
+				DonDatBan donDatBan=null;
+				for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+					if(ddb.getMaDonDatBan().equals(maDDB)) {
+						donDatBan=ddb;
+						break;
+					}
+				}
+				if(JOptionPane.showConfirmDialog(this, "Xác nhận xóa")==JOptionPane.YES_OPTION) {
+						
+						if(donDatBanDao.deleteDonDatBan(maDDB)) {
+							JOptionPane.showMessageDialog(this, "Xóa đơn đặt bàn thành công");
+							if(Duration.between(LocalDateTime.now(), donDatBan.getThoiGian()).toMinutes() < 60 && Duration.between(LocalDateTime.now(), donDatBan.getThoiGian()).toMinutes() > -60) {
+								Ban ban=banDao.timTheoMa(donDatBan.getBan().getMaBan());
+								ban.setTrangThai(TrangThaiBan.Trong);
+								banDao.updateBan(ban);
+							}
+							capNhatTrangThaiDatBan();
+							themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());
+							updateTableDonDatBanTuDao(donDatBanDao.getAllDonDatBan());
+						
+					}else {
+						JOptionPane.showMessageDialog(this, "Xóa đơn đặt bàn không thành công");
+					}
+				}
+				
+			}
+			
+			
 			
 		}
 		if (o.equals(btnTimKiemDoUong) || o.equals(cboFilterDoUong)) {

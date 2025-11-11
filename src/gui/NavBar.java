@@ -129,15 +129,31 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		Image scaledImage = LogoIcon.getImage().getScaledInstance(146, 146, Image.SCALE_SMOOTH);
 		ImageIcon resizedIcon = new ImageIcon(scaledImage);
 		JLabel lblLogo = new JLabel(resizedIcon);
+		lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT); 
+		lblLogo.setBorder(BorderFactory.createEmptyBorder(20,20,0,20));
 		sidebar.add(lblLogo);
-
+		
+		
+		JLabel lblKAMINOCOFFEE=new JLabel("Kamino Coffee");
+		lblKAMINOCOFFEE.setFont(new Font(lblKAMINOCOFFEE.getFont().getFontName(), Font.BOLD, 17));
+		
+		JLabel lblXinChao =new JLabel("Xin chào,");
 		lblTenTaiKhoan = new JLabel(taiKhoan.getNhanVien().getTenNV());
 		lblChucVu = new JLabel(taiKhoan.getNhanVien().getChucVu() == ChucVu.QUAN_LY ? "Quản Lý" : "Nhân Viên");
+		lblChucVu.setForeground(Color.decode("#00A651"));
 		
-		lblTenTaiKhoan.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+		lblKAMINOCOFFEE.setBorder(BorderFactory.createEmptyBorder(10, 10, 7, 10));
+		lblXinChao.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 10));
+		lblTenTaiKhoan.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
 		lblChucVu.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
+		lblKAMINOCOFFEE.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblXinChao.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblTenTaiKhoan.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    lblChucVu.setAlignmentX(Component.CENTER_ALIGNMENT); 
+	    
+	    sidebar.add(lblKAMINOCOFFEE);
 		sidebar.add(Box.createVerticalStrut(10));
+		sidebar.add(lblXinChao);
 		sidebar.add(lblTenTaiKhoan);
 		sidebar.add(lblChucVu);
 		sidebar.add(Box.createVerticalStrut(10));
@@ -156,34 +172,36 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 			final String tab = tabs[i];
 			labels[i] = new JLabel(tab);
 			labels[i].setFont(customFont);
-			labels[i].setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			labels[i].setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 			labels[i].addMouseListener(this);
 			labels[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			labels[i].setAlignmentX(Component.CENTER_ALIGNMENT); // Căn giữa
 			sidebar.add(labels[i]);
 		}
+		
 		cardLayout = new CardLayout();
 	    
 	    contentPanel = new JPanel(cardLayout);
-		contentPanel.add(new TrangChuPanel(), "Trang chủ");// 
+		contentPanel.add(new TrangChuPanel(), "Trang chủ");
 		contentPanel.add(pnlBan=new BanPanel(taiKhoan), "Bàn");
-	
-		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");//
+		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");
 		
 		if(taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY) {
-			contentPanel.add(new ThucDonPanel(), "Thực đơn");//Đổi chỗ này thành thuộc tính
-			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");//
-			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");//
-			contentPanel.add(new ThongKePanel(), "Thống Kê");//
+			contentPanel.add(new ThucDonPanel(), "Thực đơn");//
+			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
+			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");
+			contentPanel.add(new ThongKePanel(), "Thống Kê");
 		}
 
 		
 		
-
+		sidebar.add(Box.createVerticalGlue());
 	    // 2. Định nghĩa nút Đăng xuất và đặt style
 	    btnDangXuat = new JButton("Đăng xuất");
-	    btnDangXuat.setBackground(Color.RED);
+	    btnDangXuat.setBackground(Color.decode("#DC3545"));
 	    btnDangXuat.setForeground(Color.WHITE);
-	    btnDangXuat.setAlignmentX(Component.CENTER_ALIGNMENT); 
+	    btnDangXuat.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    btnDangXuat.setBorder(BorderFactory.createLineBorder(Color.red,5,true));
 	    
 	    // 3. Đặt nút vào Sidebar
 	    // Dùng JPanel để kiểm soát padding và màu nền xung quanh nút
@@ -250,7 +268,7 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-Object o = e.getSource();
+		Object o = e.getSource();
 		
 		if (o.equals(btnDangXuat)) {
 			int xacNhan = JOptionPane.showConfirmDialog(this, 

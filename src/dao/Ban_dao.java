@@ -53,6 +53,27 @@ public class Ban_dao {
 		}
 		return ds;
 	}
+	public boolean themBan(Ban ban) {
+		ConnectDB.getInstance();
+		Connection con=ConnectDB.getConnection();
+		PreparedStatement stmt=null;
+       
+        try {
+        	String sql = "INSERT Ban(maBan,tenBan,soGhe,trangThai) VALUES (?,?,?,?)";
+        	stmt=con.prepareStatement(sql);
+        	stmt.setString(1, ban.getMaBan());
+            stmt.setString(2, ban.getTenBan());
+            stmt.setInt(3, ban.getSoGhe());
+            stmt.setString(4, ban.getTrangThai().getMoTa()); 
+           
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 	public boolean updateBan(Ban ban) {
 		ConnectDB.getInstance();
 		Connection con=ConnectDB.getConnection();

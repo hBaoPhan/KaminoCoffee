@@ -488,8 +488,6 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		pnlCacBan_QLBan=new JPanel(new GridLayout(0,3,5,5));
 		pnlQuanLyBan.add(pnlCacBan_QLBan);
 		
-		
-		
 		// Gắn các panel vào mainPanel
 		pnlGoiMon.add(BoxBan_Left, BorderLayout.WEST);
 		pnlGoiMon.add(BoxThongTin_Center, BorderLayout.CENTER);
@@ -499,11 +497,6 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		pnlDatBan.add(BoxThongTin_DatBan, BorderLayout.CENTER);
 		pnlDatBan.add(DanhSachDonDatBan, BorderLayout.EAST);
 
-		
-		
-		
-		
-		
 		// Thêm tab đầu tiên
 		this.addTab("Gọi Món", pnlGoiMon);
 		this.addTab("Đặt Bàn", pnlDatBan);
@@ -511,8 +504,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		if(taiKhoan.getNhanVien().getChucVu().equals(ChucVu.QUAN_LY)) {
 			this.addTab("Quản Lý Bàn", pnlQuanLyBan);
 		}
-		
-
+	
 		banDao = new Ban_dao();
 		sanPhamDao = new SanPham_dao();
 		donDatBanDao = new DonDatBan_dao();

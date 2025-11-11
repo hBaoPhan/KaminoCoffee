@@ -11,14 +11,11 @@ import entity.NhanVien;
 import entity.TaiKhoan;
 
 public class TaiKhoan_dao {
-	
-	
 	public TaiKhoan timTaiKhoan(String tenDangNhap, String matKhau) {
 		TaiKhoan taiKhoan = null;
 		Connection con = ConnectDB.getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
 		try {
 			if (con == null) {
 				ConnectDB.getInstance().connect();

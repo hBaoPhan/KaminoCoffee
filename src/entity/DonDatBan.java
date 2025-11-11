@@ -25,9 +25,6 @@ public class DonDatBan {
 	public void setDaNhan(boolean daNhan) {
 		this.daNhan = daNhan;
 	}
-
-	
-
 	public KhachHang getKhachHang() {
 		return khachHang;
 	}

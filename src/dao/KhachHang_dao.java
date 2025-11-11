@@ -134,6 +134,28 @@ public class KhachHang_dao {
             return false;
         }
     }
+    public boolean coLienKetVoiHoaDonHoacDonDatBan(String maKH) {
+        Connection con = ConnectDB.getInstance().getConnection();
+        String sql = """
+            SELECT COUNT(*) AS count FROM HoaDon WHERE maKH = ?
+            UNION ALL
+            SELECT COUNT(*) AS count FROM DonDatBan WHERE maKH = ?
+        """;
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, maKH);
+            stmt.setString(2, maKH);
+            ResultSet rs = stmt.executeQuery();
+
+            int tong = 0;
+            while (rs.next()) {
+                tong += rs.getInt("count");
+            }
+            return tong > 0; // true nếu có hóa đơn hoặc đơn đặt bàn
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true; // nếu lỗi thì tạm không cho xóa để tránh mất dữ liệu
+        }
+    }
 
     // ✅ Xóa khách hàng theo mã
     public boolean xoaKhachHang(String maKH) {

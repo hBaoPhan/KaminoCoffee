@@ -5,20 +5,19 @@ public enum ChucVu {
     QUAN_LY("Quản Lý", "QL");
 
     private final String tenHienThi;   // Tên để hiển thị trên UI
-    private final String tenDatabase;  // Tên lưu trong CSDL (không dấu)
+    private final String tenDatabase;  // Tên lưu trong CSDL
 
-    // Constructor
     private ChucVu(String tenHienThi, String tenDatabase) {
         this.tenHienThi = tenHienThi;
         this.tenDatabase = tenDatabase;
     }
 
-    // ✅ Lấy tên hiển thị (dùng cho UI)
+    // Lấy tên hiển thị (dùng cho UI)
     public String getTenHienThi() {
         return tenHienThi;
     }
 
-    // ✅ Chuyển từ chuỗi (từ DB hoặc UI) sang Enum
+    //  Chuyển từ chuỗi (từ DB hoặc UI) sang Enum
     public static ChucVu fromString(String ten) {
         if (ten == null) return NHAN_VIEN;
         ten = ten.trim();
@@ -29,7 +28,7 @@ public enum ChucVu {
                 return cv;
         }
 
-        // ✅ Thêm hỗ trợ cho các giá trị viết tắt
+        //  Thêm hỗ trợ cho các giá trị viết tắt
         switch (ten.toUpperCase()) {
             case "NV":
             case "NHANVIEN":
@@ -44,13 +43,12 @@ public enum ChucVu {
         }
     }
 
-    // ✅ Giá trị lưu vào DB (tên chuẩn không dấu)
     public String toDatabaseValue() {
         return tenDatabase;
     }
 
     @Override
     public String toString() {
-        return tenHienThi; // Khi hiển thị Enum ra UI, tự động dùng tiếng Việt
+        return tenHienThi;
     }
 }

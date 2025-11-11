@@ -303,7 +303,16 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(this, "Xóa khách hàng " + ma + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        // 🔹 Kiểm tra ràng buộc trước khi xóa
+        if (khDAO.coLienKetVoiHoaDonHoacDonDatBan(ma)) {
+            JOptionPane.showMessageDialog(this, 
+                "⚠️ Không thể xóa khách hàng này vì đang có hóa đơn hoặc đơn đặt bàn liên quan!");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Xóa khách hàng " + ma + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        
         if (confirm == JOptionPane.YES_OPTION) {
             if (khDAO.xoaKhachHang(ma)) {
                 JOptionPane.showMessageDialog(this, "🗑 Xóa thành công!");
@@ -314,6 +323,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
             }
         }
     }
+
 
     private void timKhachHang() {
         String keyword = txtTimKiem.getText().trim();

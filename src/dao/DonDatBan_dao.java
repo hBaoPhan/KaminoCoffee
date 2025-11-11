@@ -28,7 +28,6 @@ public class DonDatBan_dao {
 				String ma = rs.getString("maDonDatBan");
 				KhachHang kh = new KhachHang(rs.getString("maKH"));
 				Ban ban = new Ban(rs.getString("maBan"));
-				// read timestamp and convert to LocalDateTime (handle nulls)
 				Timestamp ts = rs.getTimestamp("thoiGian");
 				LocalDateTime thoiGian = (ts != null) ? ts.toLocalDateTime() : null;
 				boolean daNhan=rs.getBoolean("daNhan");

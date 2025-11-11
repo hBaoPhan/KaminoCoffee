@@ -85,7 +85,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private TimePicker txtThoiGianVao;
 	private TimePicker txtThoiGianRa;
 	private JButton btnLuu;
-	private JToggleButton tggleDangSuDung;
+	private JToggleButton tggleNhanBan;
 	private JButton btnThanhToan;
 	private JButton btnTimKiemDoUong;
 	private JComboBox<String> cboFilterDoUong;
@@ -131,7 +131,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private JButton btnHuyDonDatBan;
 	private JPanel pnlCacBan_QLBan;
 
-	public BanPanel() {
+	public BanPanel(TaiKhoan taiKhoan) {
 		// Tạo panel chính cho tab đầu tiên
 		JPanel pnlGoiMon = new JPanel(new BorderLayout());
 		// === Panel trái: Danh sách bàn ===
@@ -239,13 +239,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		tongTienBox.add(lblThanhTien);
 		boxArrayThongTinBan[11].add(tongTienBox);
 
-		tggleDangSuDung = new JToggleButton("Đang sử dụng");
-		tggleDangSuDung.setToolTipText("Chuyển trạng thái bàn cho những bàn được đặt");
-		tggleDangSuDung.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
-		tggleDangSuDung.setForeground(Color.WHITE);
-		tggleDangSuDung.setPreferredSize(new Dimension(410, 40));
-		tggleDangSuDung.setMaximumSize(tggleDangSuDung.getPreferredSize());
-		tggleDangSuDung.setBackground(Color.decode("#e07b39"));
+		tggleNhanBan = new JToggleButton("Nhận bàn");
+		tggleNhanBan.setToolTipText("Chuyển trạng thái bàn cho những bàn được đặt");
+		tggleNhanBan.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
+		tggleNhanBan.setForeground(Color.WHITE);
+		tggleNhanBan.setPreferredSize(new Dimension(410, 40));
+		tggleNhanBan.setMaximumSize(tggleNhanBan.getPreferredSize());
+		tggleNhanBan.setBackground(Color.decode("#e07b39"));
 		btnLuu = new JButton("Tạo / Lưu Hóa Đơn");
 		btnLuu.setToolTipText("Tạo Hóa đơn nếu chưa có, lưu thay đổi hóa đơn nếu đã tồn tại");
 		btnLuu.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
@@ -256,7 +256,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 
 		Box buttonBox = Box.createHorizontalBox();
 
-		buttonBox.add(tggleDangSuDung);
+		buttonBox.add(tggleNhanBan);
 		buttonBox.add(Box.createHorizontalStrut(30));
 		buttonBox.add(btnLuu);
 		boxArrayThongTinBan[12].add(buttonBox);
@@ -475,10 +475,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		this.addTab("Gọi Món", pnlGoiMon);
 		this.addTab("Đặt Bàn", pnlDatBan);
 		
-//		if(taiKhoan.getNhanVien().getChucVu().equals(ChucVu.QUAN_LY)) {
-//			this.addTab("Quản Lý Bàn", pnlQuanLyBan);
-//		}
-//	
+		if(taiKhoan.getNhanVien().getChucVu().equals(ChucVu.QUAN_LY)) {
+			this.addTab("Quản Lý Bàn", pnlQuanLyBan);
+		}
+	
 		banDao = new Ban_dao();
 		sanPhamDao = new SanPham_dao();
 		donDatBanDao = new DonDatBan_dao();
@@ -494,7 +494,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		btnTimKiemDoUong.addActionListener(this);
 		btnThanhToan.addActionListener(this);
 		btnLuu.addActionListener(this);
-		tggleDangSuDung.addActionListener(this);
+		tggleNhanBan.addActionListener(this);
 		tableMonAn.addMouseListener(this);
 		cboFilterDoUong.addActionListener(this);
 		btnHuyDonDatBan.addActionListener(this);
@@ -534,11 +534,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			txtSDT_DatBan.requestFocus();
 			return false;
 		}
-//		if(txtNgay_DatBan.getDate() == null || txtGio_DatBan.getTime() == null) {
-//			JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ đặt bàn!");
-//			txtNgay_DatBan.requestFocus();
-//			return false;
-//		}
+
 		if (Duration.between(LocalDateTime.now(), thoiGianDatBan).toMinutes() < 30) {
 			JOptionPane.showMessageDialog(this, "Thời gian đặt bàn phải sau thời gian hiện tại 30p! Vui lòng chọn lại.");
 			txtGio_DatBan.requestFocus();
@@ -651,28 +647,6 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	    panel.revalidate();
 	    panel.repaint();
 	}
-//	public void themSanPhamVaoPanel(JPanel panel, ArrayList<SanPham> danhSachSanPham) {
-//	
-//		panel.removeAll();
-//		for (SanPham sp : danhSachSanPham) {
-//			String tenSP = sp.getTenSanPham();
-//			ImageIcon icon = loadSanPhamIcon("data/images/" + tenSP);
-//			JButton btn = new JButton(tenSP, icon);
-//			btn.setPreferredSize(new Dimension(100, 100));
-//			btn.setMaximumSize(btn.getPreferredSize());
-//			btn.setBackground(Color.WHITE);
-//			btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-//			btn.setToolTipText(tenSP + " - " + String.format("%.0f", sp.getGia()) + " VND");
-//			btn.setVerticalTextPosition(SwingConstants.TOP);
-//			btn.setHorizontalTextPosition(SwingConstants.CENTER);
-//			btn.setHorizontalAlignment(SwingConstants.CENTER);
-//			btn.addActionListener(this);
-//			panel.add(btn);
-//		}
-//
-//		panel.revalidate();
-//		panel.repaint();
-//	}
 
 	public ImageIcon loadSanPhamIcon(String tenSP) {
 		String[] extensions = { ".png", ".jpg", ".jpeg" };
@@ -715,6 +689,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 //							System.out.println(Duration.between(LocalDateTime.now(),ddb.getThoiGian()).toMinutes());
 							b.setTrangThai(TrangThaiBan.DaDuocDat);
 							banDao.updateBan(b);
+							txtNgay_DatBan.setText("");
+						    txtGio_DatBan.setText("");
+						    txtTenKH_DatBan.setText("");
+						    txtSDT_DatBan.setText("");
 						}
 					}
 				}
@@ -780,8 +758,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		}
 		return danhSachBan;
 	}
-
+	
 	public class TableUtils {
+		@SuppressWarnings("serial")
 		public static void highlightExpiredBookings(JTable table, int timeColumnIndex, String timePattern) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timePattern);
 
@@ -832,14 +811,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	    txtTenKH.setText("");
 	    txtSDT.setText("");
 	    txtTimKiemDoUong.setText("");
-	    txtTenKH_DatBan.setText("");
-	    txtSDT_DatBan.setText("");
 	    txtThoiGianVao.setText("");
 	    txtThoiGianRa.setText("");
-	    tggleDangSuDung.setSelected(false);
+	    tggleNhanBan.setSelected(false);
 	    lblMaHoaDonChoBan.setText("");
-	    txtNgay_DatBan.setText("");
-	    txtGio_DatBan.setText("");
 	    btnLuu.setEnabled(true);
 		btnThanhToan.setEnabled(true);
 		BoxThucDon_Right.setEnabled(true);
@@ -847,7 +822,9 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		txtSDT.setEditable(true);
 		modelMonAn.getDataVector().removeAllElements();
 		lblThanhTien.setText("0");
-		tggleDangSuDung.setEnabled(true);
+		tggleNhanBan.setEnabled(true);
+	    
+
 	}
 	public void themMon(String tenMon, int soLuongMoi, double donGia) {
 	    boolean daTonTai = false;
@@ -957,7 +934,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				}
 				if((ban.getMaBan().equals(btn.getText().substring(0,5))) || (ban.getMaBan().equals(maBanChoBanGioLe))) {
 					if(ban.getTrangThai().equals(TrangThaiBan.Trong)) {
-						tggleDangSuDung.setEnabled(false);					
+	
+						///////////////////////
+						tggleNhanBan.setEnabled(false);
+
 					}else if(ban.getTrangThai().equals(TrangThaiBan.DangDuocSuDung)) {
 						for (HoaDon hd : hoaDonDao.getAllHoaDon()) {
 							if(hd.getBan().getMaBan().equals(ban.getMaBan()) && hd.isTrangThaiThanhToan()==false) {
@@ -966,8 +946,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 										txtTenKH.setText(kh.getTenKhachHang());
 										txtSDT.setText(kh.getsDT());
 										txtThoiGianVao.setText(hd.getThoiGianVao().format(DateTimeFormatter.ofPattern("HH:mm")));
-										tggleDangSuDung.setSelected(true);
-										tggleDangSuDung.setEnabled(false);
+										
+										tggleNhanBan.setEnabled(false);
 										lblMaHoaDonChoBan.setText(hd.getMaHoaDon());
 										loadMonAnChoHoaDon();
 										tinhTongTien();
@@ -987,6 +967,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 										txtTenKH.setText(kh.getTenKhachHang());
 										txtSDT.setText(kh.getsDT());
 										btnLuu.setEnabled(false);
+										tggleNhanBan.setSelected(true);
 										btnThanhToan.setEnabled(false);
 										BoxThucDon_Right.setEnabled(false);
 										txtTenKH.setEditable(false);
@@ -1160,7 +1141,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 					b.setTrangThai(TrangThaiBan.DangDuocSuDung);
 					banDao.updateBan(b);
 					lblMaHoaDonChoBan.setText(maHoaDonNew);
-					tggleDangSuDung.setSelected(true);
+					
 					themBanVaoPanel(pnlCacBan, banDao.getAllBan());
 					
 				}else {
@@ -1314,7 +1295,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			
 			
 		}
-		if(o.equals(tggleDangSuDung)) {
+		if(o.equals(tggleNhanBan)) {
 				btnLuu.setEnabled(true);
 				btnThanhToan.setEnabled(true);
 				BoxThucDon_Right.setEnabled(true);
@@ -1327,7 +1308,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 						if(banDao.updateBan(ban)) {
 							themBanVaoPanel(pnlCacBan, banDao.getAllBan());
 							lblTenBan.setText(ban.getTenBan()+" - "+ban.getMaBan());
-							tggleDangSuDung.setEnabled(false);
+							tggleNhanBan.setEnabled(false);
 							break;
 						}else {
 							JOptionPane.showMessageDialog(this, "NO");

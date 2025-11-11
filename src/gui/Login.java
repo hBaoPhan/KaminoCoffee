@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -16,31 +15,40 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane; 
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import connectDB.ConnectDB;
+import dao.TaiKhoan_dao;
+import entity.TaiKhoan;
 
 public class Login extends JFrame implements ActionListener {
 
 	private JTextField txtUserName;
 	private JPasswordField txtPassword;
 	private JButton btnLogin;
-	private JButton btnDangKyNhanVienMoi;
 	private JLabel lblQuenMatKhau;
-
+	
+	private TaiKhoan_dao taiKhoanDao;
 
 	public Login() {
 		
+		taiKhoanDao = new TaiKhoan_dao();
+		
 		try {
-			ConnectDB.getInstance().connect1();
+			ConnectDB.getInstance().connect();
 			System.out.println("Connected");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, 
+                "Không thể kết nối đến SQL Server.\n"
+                + "Hãy đảm bảo SQL Server đang chạy và thông tin file ConnectDB.java là chính xác.\n"
+                + "Lỗi: " + e.getMessage(), 
+                "Lỗi Kết Nối CSDL", 
+                JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			System.exit(1); 
 		}
 		
 		setBackground(Color.WHITE);
@@ -48,7 +56,6 @@ public class Login extends JFrame implements ActionListener {
 		setSize(475, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		JPanel pnlMain = new JPanel();
 		pnlMain.setBackground(Color.WHITE);
@@ -82,22 +89,16 @@ public class Login extends JFrame implements ActionListener {
 		txtPassword.setBackground(Color.decode("#F7F4EC"));
 
 		btnLogin = new JButton("Đăng nhập");
-		btnLogin.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true)); /////// Màu cam///
+		btnLogin.setBorder(BorderFactory.createLineBorder(Color.decode("#e07b39"), 5, true));
 		btnLogin.setForeground(Color.WHITE);
 		btnLogin.setPreferredSize(new Dimension(400, 30));
 		btnLogin.setMaximumSize(btnLogin.getPreferredSize());
 		btnLogin.setBackground(Color.decode("#e07b39"));
 
-		btnDangKyNhanVienMoi = new JButton("Đăng ký nhân viên mới");
-		btnDangKyNhanVienMoi.setBorder(BorderFactory.createLineBorder(Color.white, 5, true));
-		btnDangKyNhanVienMoi.setPreferredSize(new Dimension(400, 30));
-		btnDangKyNhanVienMoi.setMaximumSize(btnDangKyNhanVienMoi.getPreferredSize());
-		btnDangKyNhanVienMoi.setBackground(Color.WHITE);
-
 		lblQuenMatKhau = new JLabel("Quên mật khẩu?");
 
 		Box box = Box.createVerticalBox();
-		Box box1, box2, box3, box4, box5, box6, box7, box8;
+		Box box1, box2, box3, box4, box5, box6;
 		pnlMain.add(box, BorderLayout.CENTER);
 		box.add(Box.createVerticalStrut(15));
 		box.add(box1 = Box.createHorizontalBox());
@@ -111,8 +112,6 @@ public class Login extends JFrame implements ActionListener {
 		box.add(box5 = Box.createHorizontalBox());
 		box.add(Box.createVerticalStrut(15));
 		box.add(box6 = Box.createHorizontalBox());
-		box.add(Box.createVerticalStrut(15));
-		box.add(box7 = Box.createHorizontalBox());
 
 		box1.setAlignmentX(Component.LEFT_ALIGNMENT);
 		box2.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -120,18 +119,15 @@ public class Login extends JFrame implements ActionListener {
 		box4.setAlignmentX(Component.LEFT_ALIGNMENT);
 		box5.setAlignmentX(Component.LEFT_ALIGNMENT);
 		box6.setAlignmentX(Component.LEFT_ALIGNMENT);
-		box7.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		box1.add(lblUserName);
 		box2.add(txtUserName);
 		box3.add(lblPassword);
 		box4.add(txtPassword);
 		box5.add(btnLogin);
-//		box6.add(btnDangKyNhanVienMoi);
-		box7.add(lblQuenMatKhau);
+		box6.add(lblQuenMatKhau);
 		
 		btnLogin.addActionListener(this);
-
 	}
 
 	public static void main(String[] args) {
@@ -142,10 +138,30 @@ public class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if (o == btnLogin) {
-			new NavBar().setVisible(true);
-			dispose();
+			xuLyDangNhap();
 		}
-		
 	}
 
+	private void xuLyDangNhap() {
+		String tenDangNhap = txtUserName.getText().trim();
+		String matKhau = new String(txtPassword.getPassword());
+		
+		if (tenDangNhap.isEmpty() || matKhau.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		TaiKhoan taiKhoan = taiKhoanDao.timTaiKhoan(tenDangNhap, matKhau);
+		
+		if (taiKhoan != null) {
+			JOptionPane.showMessageDialog(this, "Đăng nhập thành công! Xin chào " + taiKhoan.getNhanVien().getTenNV());
+			
+			new NavBar(taiKhoan).setVisible(true);
+			dispose();
+			
+		} else {
+			JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu!", "Lỗi Đăng Nhập", JOptionPane.ERROR_MESSAGE);
+			txtPassword.requestFocus();
+		}
+	}
 }

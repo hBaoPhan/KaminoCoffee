@@ -154,7 +154,7 @@ public class Login extends JFrame implements ActionListener {
 		TaiKhoan taiKhoan = taiKhoanDao.timTaiKhoan(tenDangNhap, matKhau);
 		
 		if (taiKhoan != null) {
-			JOptionPane.showMessageDialog(this, "Đăng nhập thành công! Xin chào " + taiKhoan.getNhanVien().getTenNV());
+			JOptionPane.showMessageDialog(this, "Đăng nhập thành công!\nXin chào " + taiKhoan.getNhanVien().getTenNV());
 			
 			new NavBar(taiKhoan).setVisible(true);
 			dispose();

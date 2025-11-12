@@ -1,7 +1,4 @@
-﻿-- ========================================================
--- DATABASE: QUANLYQUANCOFFEE
--- ========================================================
-USE [master]
+﻿USE [master]
 GO 
 DROP DATABASE IF EXISTS QUANLYKAMINOCOFFEE
 GO
@@ -10,37 +7,26 @@ GO
 USE QUANLYKAMINOCOFFEE;
 GO
 
--- ========================================================
--- B?NG NHÂN VIÊN
--- ========================================================
 CREATE TABLE NhanVien (
     maNV VARCHAR(20) PRIMARY KEY,
     tenNV NVARCHAR(100) NOT NULL,
-    chucVu NVARCHAR(10) CHECK (chucVu IN (N'NV', N'QL')) NOT NULL, -- Gi? nguyên 'NV', 'QL' t? enum ChucVu
+    chucVu NVARCHAR(10) CHECK (chucVu IN (N'NV', N'QL')) NOT NULL, 
     sDT VARCHAR(15),
     gioiTinh Bit not null
 );
 GO
 
--- ========================================================
--- B?NG TÀI KHO?N (ÐÃ S?A)
--- S?a: B? c?t chucVu và tenNV (đã có ? b?ng NhanVien)
--- S?a: Thêm UNIQUE(maNV) đ? đ?m b?o quan h? 1-1 nhu UML
--- ========================================================
 CREATE TABLE TaiKhoan (
     tenDangNhap VARCHAR(50) PRIMARY KEY,
     matKhau VARCHAR(255) NOT NULL,
-    maNV VARCHAR(20) NOT NULL, -- Ð? là NOT NULL cho quan h? 1-1
+    maNV VARCHAR(20) NOT NULL,
     FOREIGN KEY (maNV) REFERENCES NhanVien(maNV)
-        ON DELETE CASCADE -- N?u xóa NV thì xóa luôn TK
+        ON DELETE CASCADE 
         ON UPDATE CASCADE,
-    UNIQUE(maNV) -- Đ?m b?o m?i nhân viên ch? có 1 tài kho?n (quan h? 1-1)
+    UNIQUE(maNV) 
 );
 GO
 
--- ========================================================
--- B?NG KHÁCH HÀNG
--- ========================================================
 CREATE TABLE KhachHang (
     maKH VARCHAR(20) PRIMARY KEY,
     tenKH NVARCHAR(100),
@@ -50,10 +36,6 @@ CREATE TABLE KhachHang (
 );
 GO
 
--- ========================================================
--- B?NG BÀN (ÐÃ S?A)
--- S?a: Đ?i trangThai t? BIT sang NVARCHAR đ? kh?p v?i enum TrangThaiBan (3 tr?ng thái)
--- ========================================================
 CREATE TABLE Ban (
     maBan VARCHAR(20) PRIMARY KEY,
     tenBan NVARCHAR(100),
@@ -64,31 +46,23 @@ CREATE TABLE Ban (
 );
 GO
 
--- ========================================================
--- B?NG S?N PH?M (ÐÃ S?A)
--- S?a: B? c?t soLuong và thêm c?t loaiSanPham nhu trong UML
--- ========================================================
 CREATE TABLE SanPham (
     maSP VARCHAR(20) PRIMARY KEY,
     tenSP NVARCHAR(100),
     gia FLOAT CHECK (gia >= 0),
-    loaiSanPham NVARCHAR(100) -- Thêm c?t này t? UML
+    loaiSanPham NVARCHAR(100) 
         CHECK (loaiSanPham IN(N'Trà',N'Cafe',N'Bánh',N'Trà Sữa',N'Sinh tố',N'YOGURT',N'Nước uống đóng chai'))
-    -- B? c?t soLuong (không có trong UML)
+   
 );
 GO
 
--- ========================================================
--- B?NG HÓA ÐON (ÐÃ S?A)
--- S?a: Đ?i ngayLap -> thoiGianVao (DATETIME) và thêm thoiGianRa (DATETIME)
--- ========================================================
 CREATE TABLE HoaDon (
     maHD VARCHAR(20) PRIMARY KEY,
     maNV VARCHAR(20),
     maKH VARCHAR(20),
     maBan VARCHAR(20),
-    thoiGianVao DATETIME DEFAULT (GETDATE()), -- S?a t? ngayLap (DATE)
-    thoiGianRa DATETIME NULL, -- Thêm c?t này t? UML
+    thoiGianVao DATETIME DEFAULT (GETDATE()),
+    thoiGianRa DATETIME NULL, 
     trangThaiThanhToan Bit,
     FOREIGN KEY (maNV) REFERENCES NhanVien(maNV)
         ON DELETE SET NULL
@@ -102,9 +76,6 @@ CREATE TABLE HoaDon (
 );
 GO
 
--- ========================================================
--- B?NG CHI TI?T HÓA ÐON
--- ========================================================
 CREATE TABLE ChiTietHoaDon (
     maHD VARCHAR(20),
     maSP VARCHAR(20),
@@ -120,10 +91,6 @@ CREATE TABLE ChiTietHoaDon (
 );
 GO
 
--- ========================================================
--- B?NG ĐON Đ?T BÀN (B?NG M?I)
--- Thêm b?ng này vì có trong UML nhung không có trong SQL
--- ========================================================
 CREATE TABLE DonDatBan (
     maDonDatBan VARCHAR(20) PRIMARY KEY,
     maKH VARCHAR(20),
@@ -139,7 +106,6 @@ CREATE TABLE DonDatBan (
 );
 GO
 
-
 DELETE FROM ChiTietHoaDon;
 DELETE FROM HoaDon;
 DELETE FROM DonDatBan;
@@ -149,7 +115,6 @@ DELETE FROM KhachHang;
 DELETE FROM Ban;
 DELETE FROM SanPham;
 GO
-
 
 INSERT INTO SanPham VALUES 
 ('SP001', N'Cà phê đen', 23000, N'Cafe'),
@@ -170,27 +135,26 @@ INSERT INTO SanPham VALUES
 ('SP0016', N'Bánh chuối', 35000, N'Bánh'),
 ('SP0017', N'Mousse', 35000, N'Bánh');
 INSERT INTO NhanVien (maNV, tenNV, chucVu, sDT, gioiTinh) VALUES
-('NV001', N'Nguyễn Văn A', N'NV', '0901234567', 1),
-('NV002', N'Trần Thị B', N'NV', '0912345678', 0),
-('NV003', N'Lê Văn C', N'QL', '0923456789', 1),
-('NV004', N'Phạm Thị D', N'NV', '0934567890', 0),
-('NV005', N'Hoàng Văn E', N'QL', '0945678901', 1);
+('NV001', N'Phan Hoài Bảo', N'QL', '0335806335', 1),
+('NV002', N'Trần Thiên Bảo', N'QL', '0912345678', 1),
+('NV003', N'Chìu Kim Thi', N'QL', '0923456789', 0),
+('NV004', N'Trần Tấn Tài', N'QL', '0934567890', 1),
+('NV005', N'Hoàng Nhân Viên', N'NV', '0945678901', 1);
 INSERT INTO TaiKhoan (tenDangNhap, matKhau, maNV) VALUES
-('userA', 'passA', 'NV001'),
-('userB', 'passB', 'NV002'),
-('userC', 'passC', 'NV003'),
-('userD', 'passD', 'NV004'),
-('userE', 'passE', 'NV005');
+('baoph', 'adpass', 'NV001'),
+('baotr', 'adpass', 'NV002'),
+('thich', 'adpass', 'NV003'),
+('taitr', 'adpass', 'NV004'),
+('user', 'pass', 'NV005');
 INSERT INTO KhachHang (maKH, tenKH, sDT, diemTichLuy, laKHDK) VALUES
-('KH001', N'Nguyễn Khách 1', '0981111111', 50, 1),
-('KH002', N'Nguyễn Khách 2', '0982222222', 0, 0),
-('KH003', N'Nguyễn Khách 3', '0983333333', 100, 1),
-('KH004', N'Nguyễn Khách 4', '0984444444', 0, 0),
-('KH005', N'Nguyễn Khách 5', '0985555555', 70, 1);
-
+('KH001', N'Nguyễn Thanh Tú', '0981111111', 71, 1),
+('KH002', N'Nguyễn Thành Long', '0982222222', 86, 1),
+('KH003', N'Nguyễn Xuân Trường', '0983333333', 48, 1),
+('KH004', N'Nguyễn Minh Nhật', '0984444444', 59, 0),
+('KH005', N'Nguyên Chồn', '0985555555', 47, 1);
 INSERT INTO Ban VALUES 
 ('BA001','Bàn 1',4,N'Trống'),
-('BA002','Bàn 2',2,N'Đang được sử dụng'),
+('BA002','Bàn 2',2,N'Trống'),
 ('BA003','Bàn 3',6,N'Trống'),
 ('BA004','Bàn 4', 4, N'Trống'),
 ('BA005','Bàn 5', 6, N'Trống'),
@@ -200,23 +164,38 @@ INSERT INTO Ban VALUES
 ('BA009','Bàn 9', 4, N'Trống'),
 ('BA010','Bàn 10', 6, N'Trống');
 INSERT INTO DonDatBan (maDonDatBan, maKH, maBan, thoiGian, daNhan) VALUES
-('DB001', 'KH001', 'BA002', GETDATE(), 1),
-('DB002', 'KH002', 'BA003', GETDATE(), 1),
-('DB003', 'KH003', 'BA004', GETDATE(), 1),
-('DB004', 'KH004', 'BA005', GETDATE(), 1),
-('DB005', 'KH005', 'BA006', GETDATE(), 1);
+('DB001', 'KH001', 'BA002', '2025-11-01 09:00:00',1),
+('DB002', 'KH002', 'BA003', '2025-11-03 13:30:00',1),
+('DB003', 'KH003', 'BA004', '2025-11-05 17:45:00',0),
+('DB004', 'KH004', 'BA005', '2025-11-08 10:15:00',1),
+('DB005', 'KH005', 'BA006', '2025-11-10 15:20:00',0);
+
 INSERT INTO HoaDon (maHD, maNV, maKH, maBan, thoiGianVao, thoiGianRa, trangThaiThanhToan) VALUES
-('HD001', 'NV001', 'KH001', 'BA001', GETDATE(), NULL, 1),
-('HD002', 'NV002', 'KH002', 'BA002', GETDATE(), NULL, 1),
-('HD003', 'NV003', 'KH003', 'BA003', GETDATE(), NULL, 1),
-('HD004', 'NV004', 'KH004', 'BA004', GETDATE(), NULL, 1),
-('HD005', 'NV005', 'KH005', 'BA005', GETDATE(), NULL, 1);
+('HD001', 'NV001', 'KH002', 'BA006', '2025-10-05 09:30:00', '2025-10-05 10:15:00', 1),
+('HD002', 'NV002', 'KH003', 'BA007', '2025-10-10 14:00:00', '2025-10-10 15:00:00', 1),
+('HD003', 'NV003', 'KH004', 'BA008', '2025-10-15 18:20:00', '2025-10-15 19:10:00', 1),
+('HD004', 'NV004', 'KH005', 'BA009', '2025-10-20 11:45:00', '2025-10-20 12:30:00', 1),
+('HD005', 'NV005', 'KH001', 'BA001', '2025-10-25 16:10:00', '2025-10-25 17:00:00', 1),
+('HD006', 'NV001', 'KH001', 'BA001', '2025-11-01 09:30:00', '2025-11-01 10:15:00', 1),
+('HD007', 'NV002', 'KH002', 'BA002', '2025-11-03 14:00:00', '2025-11-03 15:00:00', 1),
+('HD008', 'NV003', 'KH003', 'BA003', '2025-11-05 18:20:00', '2025-11-05 19:10:00', 1),
+('HD009', 'NV004', 'KH004', 'BA004', '2025-11-08 11:45:00', '2025-11-08 12:30:00', 1),
+('HD010', 'NV005', 'KH005', 'BA005', '2025-11-10 16:10:00', '2025-11-10 17:00:00', 1);
 INSERT INTO ChiTietHoaDon (maHD, maSP, soLuong, tongTien) VALUES
-('HD001', 'SP001', 2, 40000),
-('HD002', 'SP002', 1, 25000),
-('HD003', 'SP004', 3, 105000),
-('HD004', 'SP005', 2, 80000),
-('HD005', 'SP007', 5, 50000);
+('HD001', 'SP001', 2, 46000),   
+('HD001', 'SP002', 1, 25000),   
+('HD002', 'SP004', 3, 105000),   
+('HD003', 'SP007', 5, 150000),
+('HD003', 'SP005', 2, 80000),   
+('HD004', 'SP007', 5, 150000),  
+('HD005', 'SP005', 2, 80000),
+('HD006', 'SP001', 2, 46000),  
+('HD007', 'SP002', 1, 25000),   
+('HD008', 'SP003', 2, 70000),   
+('HD009', 'SP004', 3, 105000),  
+('HD010', 'SP005', 1, 40000);   
+  
+
 
 
 

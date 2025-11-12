@@ -91,4 +91,22 @@ public class ThongKe_dao {
         }
         return "Chưa có dữ liệu";
     }
+    public double getDoanhThuHomNay() {
+        String sql = """
+            SELECT IFNULL(SUM(tongTien), 0)
+            FROM ChiTietHoaDon ct
+            JOIN HoaDon hd ON hd.maHD = ct.maHD
+            WHERE DATE(hd.thoiGianVao) = CURDATE()
+        """;
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }

@@ -300,5 +300,17 @@ public class HoaDon_dao {
                  ex.printStackTrace();
              }
         }
-}
+	 }
+	 public int countToday() {
+	        String sql = "SELECT COUNT(*) FROM HoaDon WHERE DATE(thoiGianVao) = CURDATE()";
+	        try (Connection con = ConnectDB.getInstance().getConnection();
+	             PreparedStatement ps = con.prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery()) {
+
+	            if (rs.next()) return rs.getInt(1);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return 0;
+	    }
 }

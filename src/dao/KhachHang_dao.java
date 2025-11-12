@@ -216,4 +216,17 @@ public class KhachHang_dao {
         }
         return null;
     }
+    public int countAll() {
+        String sql = "SELECT COUNT(*) FROM KhachHang";
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }

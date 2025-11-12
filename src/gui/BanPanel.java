@@ -14,6 +14,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.lang.classfile.ClassFile.Option;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -1397,16 +1398,38 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 					}
 				}		
 			}
-			if(banDao.xoaBan(ban)) {
-				JOptionPane.showMessageDialog(this, "Xóa bàn thành công");
-				themBanVaoPanel(pnlCacBan_QLBan, banDao.getAllBan());
-			}else {
-				JOptionPane.showMessageDialog(this, "Xóa bàn không thành công");
-
-			}if(o.equals(btnSuaBan)) {
-				
+			if(JOptionPane.showConfirmDialog(this, "Xác nhận xóa bàn")==JOptionPane.YES_OPTION) {
+				if(banDao.xoaBan(ban)) {
+					JOptionPane.showMessageDialog(this, "Xóa bàn thành công");
+					themBanVaoPanel(pnlCacBan_QLBan, banDao.getAllBan());
+				}else {
+					JOptionPane.showMessageDialog(this, "Xóa bàn không thành công");
+				}
 			}
 			
+		}if(o.equals(btnSuaBan)) {
+			String maBan=txtMaBan.getText().trim();
+			if(maBan.equals("")){
+				JOptionPane.showMessageDialog(this, "Vui lòng chọn bàn để xóa");
+			}
+			String tenBan=txtTenBan.getText().trim();
+			int soGhe=0;
+			try {
+				soGhe=Integer.parseInt(txtSoGhe.getText());
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(this, "Số ghế phải là số");
+			}
+			Ban ban=banDao.timTheoMa(maBan);
+			ban.setSoGhe(soGhe);
+			ban.setTrangThai(ban.getTrangThai());
+			ban.setTenBan(tenBan);
+			if(banDao.updateBan(ban)) {
+				JOptionPane.showMessageDialog(this, "Sửa thành công");
+				themBanVaoPanel(pnlCacBan_QLBan, banDao.getAllBan());
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "Sửa thất bại");
+			}
 		}
 		if(o instanceof JButton ) {
 			if(lblMaHoaDonChoBan.getText().equals("")  && this.getSelectedIndex()==0) {

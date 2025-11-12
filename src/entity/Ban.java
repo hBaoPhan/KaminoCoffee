@@ -23,6 +23,12 @@ public class Ban {
 		this.soGhe = 0;
 		this.trangThai = TrangThaiBan.Trong;
 	}
+	public Ban(String maBan, String tenBan, int soGhe) {
+		this.maBan = maBan;
+		this.tenBan = tenBan;
+		this.soGhe = soGhe;
+	}
+
 	public String getTenBan() {
 		return tenBan;
 	}

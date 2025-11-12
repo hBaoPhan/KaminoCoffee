@@ -218,7 +218,7 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 
 	 
 	    add(contentPanel, BorderLayout.CENTER);
-	    
+	    btnDangXuat.addActionListener(this);
 	
 	}
 	

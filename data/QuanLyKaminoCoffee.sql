@@ -135,11 +135,11 @@ INSERT INTO SanPham VALUES
 ('SP0016', N'Bánh chuối', 35000, N'Bánh'),
 ('SP0017', N'Mousse', 35000, N'Bánh');
 INSERT INTO NhanVien (maNV, tenNV, chucVu, sDT, gioiTinh) VALUES
-('NV001', N'Phan Hoài Bảo', N'QL', '0335806335', 1),
-('NV002', N'Trần Thiên Bảo', N'QL', '0912345678', 1),
-('NV003', N'Chìu Kim Thi', N'QL', '0923456789', 0),
-('NV004', N'Trần Tấn Tài', N'QL', '0934567890', 1),
-('NV005', N'Hoàng Nhân Viên', N'NV', '0945678901', 1);
+('NV001', N'Phan Hoài Bảo', N'QL', '0335806335', 0),
+('NV002', N'Trần Thiên Bảo', N'QL', '0912345678', 0),
+('NV003', N'Chìu Kim Thi', N'QL', '0923456789', 1),
+('NV004', N'Trần Tấn Tài', N'QL', '0934567890', 0),
+('NV005', N'Hoàng Nhân Viên', N'NV', '0945678901', 0);
 INSERT INTO TaiKhoan (tenDangNhap, matKhau, maNV) VALUES
 ('baoph', 'adpass', 'NV001'),
 ('baotr', 'adpass', 'NV002'),

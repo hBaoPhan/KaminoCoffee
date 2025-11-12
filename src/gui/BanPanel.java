@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -515,13 +517,13 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
         boxThongTinBan.add(b4 = Box.createHorizontalBox());
 
         btnThemBan = new JButton("Thêm");
-        btnThemBan.setBackground(Color.decode("#DC3545"));
+        btnThemBan.setBackground(Color.decode("#00A651"));
 		btnThemBan.setForeground(Color.WHITE);
 		btnThemBan.setPreferredSize(new Dimension(90,30));
 		btnThemBan.setMaximumSize(btnThemBan.getPreferredSize());
 		
         btnXoaBan = new JButton("Xóa");
-        btnXoaBan.setBackground(Color.decode("#00A651"));
+        btnXoaBan.setBackground(Color.decode("#DC3545"));
 		btnXoaBan.setForeground(Color.WHITE);
 		btnXoaBan.setPreferredSize(new Dimension(90,30));
 		btnXoaBan.setMaximumSize(btnXoaBan.getPreferredSize());
@@ -1051,25 +1053,55 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		}
 		
 	}
-	public void loadThongTinBan() {
-		String maBan="";
-		try {
-			maBan = lblTenBan_DatBan.getText().substring(9,14);
-			
-		} catch (StringIndexOutOfBoundsException e2) {
-			try {
-				maBan = lblTenBan_DatBan.getText().substring(8,13);
-			} catch (StringIndexOutOfBoundsException e) {
-				
-				maBan = lblTenBan_DatBan.getText().substring(0,5);
-			}
-		}
-		Ban ban=banDao.timTheoMa(maBan);
-		txtTenBan.setText(ban.getTenBan());
-		txtMaBan.setText(ban.getMaBan());
-		txtSoGhe.setText(ban.getSoGhe()+"");
-		
+	public void loadThongTinBan(JRadioButton rad ) {
+		String text=rad.getText();
+	    String maBan = "";
+
+	    // Ưu tiên regex để an toàn
+	    Pattern p = Pattern.compile("(BA\\d+)");
+	    Matcher m = p.matcher(text);
+	    if (m.find()) {
+	        maBan = m.group(1);
+	    } else {
+	        // fallback: lấy phần đầu trước dấu "("
+	        if (text.contains("(")) {
+	            maBan = text.split("\\(")[0].trim();
+	        } else {
+	            maBan = text.trim();
+	        }
+	    }
+
+	    Ban ban = banDao.timTheoMa(maBan);
+	    txtTenBan.setText(ban.getTenBan());
+	    txtMaBan.setText(ban.getMaBan());
+	    txtSoGhe.setText(String.valueOf(ban.getSoGhe()));
 	}
+	public static String extractMaBan(String input) {
+	    if (input == null || input.isEmpty()) {
+	        return "";
+	    }
+
+	    // Ưu tiên regex để tìm đúng mẫu BA + số
+	    Pattern p = Pattern.compile("(BA\\d+)");
+	    Matcher m = p.matcher(input);
+	    if (m.find()) {
+	        return m.group(1); // trả về BA001
+	    }
+
+	    // Nếu không khớp regex, fallback: lấy phần trước dấu "(" hoặc "-"
+	    if (input.contains("(")) {
+	        return input.split("\\(")[0].trim();
+	    }
+	    if (input.contains("-")) {
+	        String[] parts = input.split("-");
+	        return parts[parts.length - 1].trim();
+	    }
+
+	    // Nếu không có gì đặc biệt, trả về chuỗi gốc (trim)
+	    return input.trim();
+	}
+
+
 	@SuppressWarnings("unused")
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -1078,15 +1110,12 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			JRadioButton btn = (JRadioButton) o;	
 			lblTenBan.setText(btn.getText());
 			lblTenBan_DatBan.setText(btn.getText());
-			loadThongTinBan();
+			loadThongTinBan(btn);
 			for (Ban ban : banDao.getAllBan()) {
-				String maBanChoBanGioLe="";
-				try {
-					maBanChoBanGioLe=btn.getText().substring(8,13);
-				} catch (StringIndexOutOfBoundsException e2) {
-					maBanChoBanGioLe=btn.getText().substring(8,12);
-				}
-				if((ban.getMaBan().equals(btn.getText().substring(0,5))) || (ban.getMaBan().equals(maBanChoBanGioLe))) {
+				
+				String maBan=extractMaBan(btn.getText());
+				
+				if((ban.getMaBan().equals(maBan))) {
 					if(ban.getTrangThai().equals(TrangThaiBan.Trong)) {
 	
 						///////////////////////
@@ -1112,10 +1141,10 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 							}
 						}	
 					}else if(ban.getTrangThai().equals(TrangThaiBan.DaDuocDat)){//////////////// Nếu là bàn đã đặt
-						String maBan=lblTenBan.getText().substring(0,5);
+						String maBanDaDuocDat=lblTenBan.getText().substring(0,5);
 						for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
 							long khoangCach = Math.abs(Duration.between(ddb.getThoiGian(),LocalDateTime.now()).toMinutes());
-							if(ddb.getBan().getMaBan().equals(maBan) && (khoangCach < 60 || khoangCach >-60) && ddb.isDaNhan()==false ) {
+							if(ddb.getBan().getMaBan().equals(maBanDaDuocDat) && (khoangCach < 60 || khoangCach >-60) && ddb.isDaNhan()==false ) {
 								for (KhachHang kh : khachHangDao.getAllKhachHang()) {
 									if(ddb.getKhachHang().getMaKhachHang().equals(kh.getMaKhachHang())) {
 										txtTenKH.setText(kh.getTenKhachHang());
@@ -1278,18 +1307,8 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 					return;
 				}
 				}
-				String maBan="";
-				try {
-					maBan = lblTenBan_DatBan.getText().substring(9,14);
-					
-				} catch (StringIndexOutOfBoundsException e2) {
-					try {
-						maBan = lblTenBan_DatBan.getText().substring(8,13);
-					} catch (StringIndexOutOfBoundsException e4) {
-						
-						maBan = lblTenBan_DatBan.getText().substring(0,5);
-					}
-				}
+				String maBan=extractMaBan(lblTenBan.getText());
+				
 				Ban b = null;
 				for (Ban ban : banDao.getAllBan()) {
 					if (ban.getMaBan().equals(maBan)) {
@@ -1362,6 +1381,31 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			themBanVaoPanel(pnlCacBan_QLBan, banDao.getAllBan());
 			
 			
+			
+		}if(o.equals(btnXoaBan)) {
+			String maBan=txtMaBan.getText().trim();
+			Ban ban=banDao.timTheoMa(maBan);
+			if(ban.getTrangThai()==TrangThaiBan.DangDuocSuDung ) {
+				JOptionPane.showMessageDialog(this, "Không thể xóa do bàn đang được sử dụng");
+				return;
+			}
+			for (DonDatBan ddb : donDatBanDao.getAllDonDatBan()) {
+				if(ddb.getBan().getMaBan().equals(maBan)) {
+					if(ddb.getThoiGian().isAfter(LocalDateTime.now())) {
+						JOptionPane.showMessageDialog(this, "Không thể xóa do bàn đã được đặt");
+						return;
+					}
+				}		
+			}
+			if(banDao.xoaBan(ban)) {
+				JOptionPane.showMessageDialog(this, "Xóa bàn thành công");
+				themBanVaoPanel(pnlCacBan_QLBan, banDao.getAllBan());
+			}else {
+				JOptionPane.showMessageDialog(this, "Xóa bàn không thành công");
+
+			}if(o.equals(btnSuaBan)) {
+				
+			}
 			
 		}
 		if(o instanceof JButton ) {

@@ -216,7 +216,7 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	    // --- CardLayout (CENTER) (GIỮ NGUYÊN) ---
 	   
 
-	 
+	    btnDangXuat.addActionListener(this);
 	    add(contentPanel, BorderLayout.CENTER);
 	    
 	

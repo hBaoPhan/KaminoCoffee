@@ -93,6 +93,18 @@ public class DonDatBan_dao {
 	        return false;
 	    }
 	}
+    public int countToday() {
+        String sql = "SELECT COUNT(*) FROM DonDatBan WHERE DATE(ngayDat) = CURDATE()";
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 
 }

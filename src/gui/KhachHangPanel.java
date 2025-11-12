@@ -265,23 +265,28 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
 
             String ma = txtMaKH.getText().trim();
             String ten = txtTenKH.getText().trim();
-            String sdt = txtSDT.getText().trim();
+            String sdtMoi = txtSDT.getText().trim();
             int diem = Integer.parseInt(txtDiem.getText().trim());
             boolean laKHDK = chkLaKHDK.isSelected();
 
-            if (ma.isEmpty() || ten.isEmpty() || sdt.isEmpty()) {
+            if (ma.isEmpty() || ten.isEmpty() || sdtMoi.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "⚠️ Vui lòng nhập đầy đủ thông tin!");
                 return;
             }
 
-            // ✅ Kiểm tra trùng số điện thoại (trừ chính khách hàng đang sửa)
-            KhachHang khTonTai = khDAO.timTheoSDT(sdt);
-            if (khTonTai != null && !khTonTai.getMaKhachHang().equals(ma)) {
-                JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại cho khách hàng khác!");
-                return;
+            // ✅ Lấy số điện thoại cũ từ bảng
+            String sdtCu = tableKhachHang.getValueAt(row, 2).toString().trim();
+
+            // ✅ Chỉ kiểm tra trùng nếu SDT bị thay đổi
+            if (!sdtMoi.equals(sdtCu)) {
+                KhachHang khTonTai = khDAO.timTheoSDT(sdtMoi);
+                if (khTonTai != null && !khTonTai.getMaKhachHang().equals(ma)) {
+                    JOptionPane.showMessageDialog(this, "⚠️ Số điện thoại này đã tồn tại cho khách hàng khác!");
+                    return;
+                }
             }
 
-            KhachHang kh = new KhachHang(ma, ten, sdt, diem, laKHDK);
+            KhachHang kh = new KhachHang(ma, ten, sdtMoi, diem, laKHDK);
             if (khDAO.suaKhachHang(kh)) {
                 JOptionPane.showMessageDialog(this, "✅ Sửa thông tin khách hàng thành công!");
                 taiLaiDanhSach();

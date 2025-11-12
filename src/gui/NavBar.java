@@ -43,6 +43,10 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private KhachHangPanel pnlKhachHang;
 	private NhanVienPanel pnlNhanVien;
 	private Color sidebarColor;
+	private boolean isQuanLy;
+	private TrangChuPanel pnlTrangChu;
+	private ThucDonPanel pnlThucDon;
+	private ThongKePanel pnlThongKe;
 
 //	public NavBar() {
 //	    setTitle("Kamino Coffee");
@@ -180,17 +184,17 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		}
 		
 		cardLayout = new CardLayout();
-	    
+	    isQuanLy=taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY;
 	    contentPanel = new JPanel(cardLayout);
-		contentPanel.add(new TrangChuPanel(), "Trang chủ");
+		contentPanel.add(pnlTrangChu=new TrangChuPanel(), "Trang chủ");
 		contentPanel.add(pnlBan=new BanPanel(taiKhoan), "Bàn");
 		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");
 		
-		if(taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY) {
-			contentPanel.add(new ThucDonPanel(), "Thực đơn");//
+		if(isQuanLy) {
+			contentPanel.add(pnlThucDon=new ThucDonPanel(), "Thực đơn");//
 			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
 			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");
-			contentPanel.add(new ThongKePanel(), "Thống Kê");
+			contentPanel.add(pnlThongKe=new ThongKePanel(), "Thống Kê");
 		}
 
 		
@@ -225,7 +229,11 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private void onCardChanged() {
 		pnlBan.loadDataBanPanel();
 		pnlKhachHang.taiLaiDanhSach();
-		pnlNhanVien.taiLaiDanhSach();
+		if(isQuanLy) {
+			pnlNhanVien.taiLaiDanhSach();
+			pnlThongKe.loadDuLieuThongKe();;
+		}
+		
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
 	    
 	}

@@ -32,11 +32,13 @@ public class KhachHang_dao {
     public ArrayList<KhachHang> getAllKhachHang() {
         ArrayList<KhachHang> ds = new ArrayList<>();
         String sql = "SELECT * FROM KhachHang";
-
-        try (PreparedStatement stmt = con.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        Connection con=ConnectDB.getConnection();
+        PreparedStatement stmt=null;
+        try {
+        	 stmt= con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery(); 
             while (rs.next()) {
-                ds.add(mapResultSetToKhachHang(rs));
+               ds.add(mapResultSetToKhachHang(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,16 +90,7 @@ public class KhachHang_dao {
     // ✅ Sửa thông tin khách hàng (kiểm tra SDT trùng với người khác)
     public boolean suaKhachHang(KhachHang kh) {
         // 🔍 Kiểm tra trùng SDT với KH khác
-    	KhachHang khTrung = timTheoSDT(kh.getsDT());
-    	if (khTrung != null) {
-    	    if (!khTrung.getsDT().isEmpty()) {
-    	        if (khTrung.getMaKhachHang().equals(kh.getMaKhachHang())) {
-    	            JOptionPane.showMessageDialog(null,
-    	                "⚠️ Số điện thoại này đã được sử dụng bởi khách hàng khác (" + khTrung.getTenKhachHang() + ")");
-    	            return false;
-    	        }
-    	    }
-    	}
+ 
 
         String sql = "UPDATE KhachHang SET tenKH = ?, sDT = ?, diemTichLuy = ?, laKHDK = ? WHERE maKH = ?";
 

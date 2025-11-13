@@ -56,7 +56,7 @@ public class HoaDon_dao {
 			try {
 				if (rs != null)
 					rs.close();
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -66,105 +66,107 @@ public class HoaDon_dao {
 	}
 	// Trong lớp HoaDon_dao
 
-		 public ArrayList<Object[]> getAllHoaDonChoPanel() {
-	        ArrayList<Object[]> danhSach = new ArrayList<>();
-	        // ✅ Bỏ ConnectDB.getInstance() thừa
-	        Connection con = ConnectDB.getConnection();
-	        
-	        // ✅ Sửa SQL: ISNULL -> IFNULL (MySQL)
-	        String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
-	                     "       IFNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien, " +
-	                     "       HD.trangThaiThanhToan " + 
-	                     "FROM HoaDon HD " +
-	                     "LEFT JOIN KhachHang KH ON HD.maKH = KH.maKH " + // Dùng LEFT JOIN an toàn
-	                     "JOIN Ban B ON HD.maBan = B.maBan " +
-	                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
-	                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
-	                     "GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, HD.trangThaiThanhToan";
+	public ArrayList<Object[]> getAllHoaDonChoPanel() {
+		ArrayList<Object[]> danhSach = new ArrayList<>();
 
+		String sql = "SELECT\r\n"
+				+ "    HD.maHD,\r\n"
+				+ "    KH.tenKH,\r\n"
+				+ "    B.tenBan,\r\n"
+				+ "    KH.sDT,\r\n"
+				+ "    -- Sửa lỗi: Dùng FORMAT thay vì DATE_FORMAT\r\n"
+				+ "    FORMAT(HD.thoiGianVao, 'dd-MM-yyyy') AS Ngay,\r\n"
+				+ "    KH.laKHDK,\r\n"
+				+ "    ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien,\r\n"
+				+ "    HD.trangThaiThanhToan\r\n"
+				+ "FROM\r\n"
+				+ "    HoaDon AS HD\r\n"
+				+ "LEFT JOIN\r\n"
+				+ "    KhachHang AS KH ON HD.maKH = KH.maKH\r\n"
+				+ "JOIN\r\n"
+				+ "    Ban AS B ON HD.maBan = B.maBan\r\n"
+				+ "LEFT JOIN\r\n"
+				+ "    ChiTietHoaDon AS CT ON HD.maHD = CT.maHD\r\n"
+				+ "LEFT JOIN\r\n"
+				+ "    SanPham AS SP ON CT.maSP = SP.maSP\r\n"
+				+ "GROUP BY\r\n"
+				+ "    HD.maHD,\r\n"
+				+ "    KH.tenKH,\r\n"
+				+ "    B.tenBan,\r\n"
+				+ "    KH.sDT,\r\n"
+				+ "    FORMAT(HD.thoiGianVao, 'dd-MM-yyyy'), -- Sửa lỗi: Phải lặp lại hàm\r\n"
+				+ "    KH.laKHDK,\r\n"
+				+ "    HD.trangThaiThanhToan\r\n"
+				+ "ORDER BY\r\n"
+				+ "    HD.maHD DESC;";
 
-	        try (Statement stmt = con.createStatement(); 
-	             ResultSet rs = stmt.executeQuery(sql)) {
+		Connection con = ConnectDB.getConnection();
 
-	            while (rs.next()) {
-	                
-	                String trangThaiStr;
-	                boolean isPaid = rs.getBoolean("trangThaiThanhToan");
-	                if (isPaid) {
-	                    trangThaiStr = "Đã thanh toán";
-	                } else {
-	                    trangThaiStr = "Chờ thanh toán"; 
-	                }
-	                
-	                String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
+		try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
-	                double tongTienDouble = rs.getDouble("TongTien");
-	                int diemTichLuy = rs.getInt("diemTichLuy");
+			while (rs.next()) {
 
-	                danhSach.add(new Object[]{
-	                    rs.getString("maHD"),
-	                    rs.getString("tenKH"),
-	                    rs.getString("tenBan"),
-	                    rs.getString("sDT"),
-	                    diemTichLuy, // Cột 4: Diem TL (Integer)
-	                    khdkStr, // Cột 5: KHDK (String)
-	                    tongTienDouble, // Cột 6: Tổng tiền (Double)
-	                    trangThaiStr // Cột 7: Trạng thái (String)
-	                });
-	            }
-	        } catch (SQLException e) {
-	            System.err.println("Lỗi truy vấn tất cả hóa đơn cho Panel: " + e.getMessage());
-	        }
-	        return danhSach;
-	    }
-		 
-		public Object[] getChiTietHoaDonDangHoatDongByTenBan(String tenBan) {
-	        // ✅ Bỏ ConnectDB.getInstance() thừa
-	        Connection con = ConnectDB.getConnection();
-	        
-	        // ✅ Sửa SQL: TOP 1 -> LIMIT 1 (MySQL), ISNULL -> IFNULL
-	        String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
-	                     "       IFNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien " + 
-	                     "FROM HoaDon HD " +
-	                     "JOIN KhachHang KH ON HD.maKH = KH.maKH " + 
-	                     "JOIN Ban B ON HD.maBan = B.maBan " +
-	                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
-	                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
-	                     "WHERE B.tenBan = ? AND HD.trangThaiThanhToan = 0 " + // 0: Chờ TT
-	                     "GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK LIMIT 1"; // LIMIT 1
+				String trangThaiStr;
+				boolean isPaid = rs.getBoolean("trangThaiThanhToan");
+				trangThaiStr = isPaid ? "Đã thanh toán" : "Chờ thanh toán";
 
+				String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
 
-	        try (PreparedStatement ps = con.prepareStatement(sql)) {
-	            ps.setString(1, tenBan);
-	            try (ResultSet rs = ps.executeQuery()) {
-	                if (rs.next()) {
-	                    
-	                    String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
-	                    double tongTienDouble = rs.getDouble("TongTien");
+				double tongTienDouble = rs.getDouble("TongTien");
 
-	                    // Trả về Object[] (7 phần tử) khớp với hàm hienThiChiTiet(...)
-	                    return new Object[]{
-	                        rs.getString("maHD"),
-	                        rs.getString("tenKH"),
-	                        rs.getString("tenBan"),
-	                        rs.getString("sDT"),
-	                        rs.getInt("diemTichLuy"), // Integer
-	                        khdkStr, // laKHDK (String)
-	                        tongTienDouble // tongTien (Double)
-	                    };
-	                }
-	            }
-	        } catch (SQLException e) {
-	            System.err.println("Lỗi truy vấn hóa đơn theo Tên Bàn: " + e.getMessage());
-	        }
-	        return null; // Không tìm thấy
-	    }
+				// Thêm vào danh sách (8 cột)
+				danhSach.add(new Object[] { rs.getString("maHD"), rs.getString("tenKH"), rs.getString("tenBan"),
+						rs.getString("sDT"), rs.getString("Ngay"), // Cột 4: Ngày
+						khdkStr, // Cột 5: KHDK
+						tongTienDouble, // Cột 6: Tổng tiền
+						trangThaiStr // Cột 7: Trạng thái
+				});
+			}
+		} catch (SQLException e) {
+			System.err.println("Lỗi truy vấn tất cả hóa đơn cho Panel: " + e.getMessage());
+		}
+		return danhSach;
+	}
+
+	public Object[] getChiTietHoaDonDangHoatDongByTenBan(String tenBan) {
+		// ✅ Bỏ ConnectDB.getInstance() thừa
+		Connection con = ConnectDB.getConnection();
+
+		// ✅ Sửa SQL: TOP 1 -> LIMIT 1 (MySQL), ISNULL -> IFNULL
+		String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, "
+				+ "       ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien " + "FROM HoaDon HD "
+				+ "JOIN KhachHang KH ON HD.maKH = KH.maKH " + "JOIN Ban B ON HD.maBan = B.maBan "
+				+ "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD "
+				+ "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham "
+				+ "WHERE B.tenBan = ? AND HD.trangThaiThanhToan = 0 " + // 0: Chờ TT
+				"GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK LIMIT 1"; // LIMIT 1
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, tenBan);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+
+					String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
+					double tongTienDouble = rs.getDouble("TongTien");
+
+					// Trả về Object[] (7 phần tử) khớp với hàm hienThiChiTiet(...)
+					return new Object[] { rs.getString("maHD"), rs.getString("tenKH"), rs.getString("tenBan"),
+							rs.getString("sDT"), rs.getInt("diemTichLuy"), // Integer
+							khdkStr, // laKHDK (String)
+							tongTienDouble // tongTien (Double)
+					};
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Lỗi truy vấn hóa đơn theo Tên Bàn: " + e.getMessage());
+		}
+		return null; // Không tìm thấy
+	}
 
 	public boolean insertHoaDon(HoaDon hoaDon) {
 		ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
 		PreparedStatement stmt = null;
-		ResultSet rs = null;
 		try {
 			String sql = "INSERT INTO HoaDon (maHD, maNV, maKH, maBan, thoiGianVao, thoiGianRa, trangThaiThanhToan) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -191,7 +193,6 @@ public class HoaDon_dao {
 			return false;
 		}
 	}
-	
 
 	public HoaDon getHoaDonByMa(String maHD) {
 		ConnectDB.getInstance();
@@ -229,10 +230,9 @@ public class HoaDon_dao {
 		ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
 		PreparedStatement stmt = null;
-		ResultSet rs = null;
 		try {
 			String sql = "update HoaDon  "
-					+ "set maNV = ?, maKH = ?, maBan = ?, ThoiGianVao = ?, thoiGianRa = ?, trangThaiThanhToan =?  " 
+					+ "set maNV = ?, maKH = ?, maBan = ?, ThoiGianVao = ?, thoiGianRa = ?, trangThaiThanhToan =?  "
 					+ "WHERE maHD = ? ";
 			stmt = con.prepareStatement(sql);
 			stmt.setString(7, hoaDon.getMaHoaDon());
@@ -257,56 +257,59 @@ public class HoaDon_dao {
 			return false;
 		}
 	}
-	 public boolean xoaHoaDon(String maHoaDon) {
-        Connection con = ConnectDB.getConnection();
-        String sqlDeleteChiTiet = "DELETE FROM ChiTietHoaDon WHERE maHD = ?";
-        String sqlDeleteHoaDon = "DELETE FROM HoaDon WHERE maHD = ?";
 
-        try (PreparedStatement psChiTiet = con.prepareStatement(sqlDeleteChiTiet);
-             PreparedStatement psHoaDon = con.prepareStatement(sqlDeleteHoaDon)) {
-            
-            con.setAutoCommit(false); 
+	public boolean xoaHoaDon(String maHoaDon) {
+		Connection con = ConnectDB.getConnection();
+		String sqlDeleteChiTiet = "DELETE FROM ChiTietHoaDon WHERE maHD = ?";
+		String sqlDeleteHoaDon = "DELETE FROM HoaDon WHERE maHD = ?";
 
-            psChiTiet.setString(1, maHoaDon);
-            psChiTiet.executeUpdate();
+		try (PreparedStatement psChiTiet = con.prepareStatement(sqlDeleteChiTiet);
+				PreparedStatement psHoaDon = con.prepareStatement(sqlDeleteHoaDon)) {
 
-            psHoaDon.setString(1, maHoaDon);
-            int rowsAffected = psHoaDon.executeUpdate();
-            
-            con.commit(); 
-            return rowsAffected > 0;
-            
-        } catch (SQLException e) {
-            System.err.println("Lỗi xóa hóa đơn: " + e.getMessage());
-            try {
-                con.rollback(); 
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            return false;
-        } finally {
-             try {
-                 if (con != null) con.setAutoCommit(true);
-             } catch (SQLException ex) {
-                 ex.printStackTrace();
-             }
-        }
-	 }
-	 public int countToday() {
-	        String sql = "SELECT COUNT(*)"
-	        	+"	FROM HoaDon"
-	        	+	" WHERE CAST(thoiGianVao AS DATE) = CAST(GETDATE() AS DATE);";
-	        ConnectDB.getInstance();
-	        Connection con = ConnectDB.getConnection();
-	        PreparedStatement ps=null;
+			con.setAutoCommit(false);
+
+			psChiTiet.setString(1, maHoaDon);
+			psChiTiet.executeUpdate();
+
+			psHoaDon.setString(1, maHoaDon);
+			int rowsAffected = psHoaDon.executeUpdate();
+
+			con.commit();
+			return rowsAffected > 0;
+
+		} catch (SQLException e) {
+			System.err.println("Lỗi xóa hóa đơn: " + e.getMessage());
 			try {
-	            ps = con.prepareStatement(sql);
-	             ResultSet rs = ps.executeQuery() ;
+				con.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+			return false;
+		} finally {
+			try {
+				if (con != null)
+					con.setAutoCommit(true);
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 
-	            if (rs.next()) return rs.getInt(1);
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	        return 0;
-	    }
+	public int countToday() {
+		String sql = "SELECT COUNT(*)" + "	FROM HoaDon"
+				+ " WHERE CAST(thoiGianVao AS DATE) = CAST(GETDATE() AS DATE);";
+		ConnectDB.getInstance();
+		Connection con = ConnectDB.getConnection();
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+				return rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 }

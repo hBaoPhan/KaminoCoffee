@@ -1245,9 +1245,12 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		if (o.equals(btnLocTheoThoiGian)) {
 			LocalDate date = txtFilterNgayDatBan.getDate();
 			LocalTime time = txtFilterGioDatBan.getTime();
-			if (date == null || time == null || date.isBefore(LocalDate.now()) || (date.isEqual(LocalDate.now()) && time.isBefore(LocalTime.now()))) {
-				JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ để lọc!\nNgày và giờ không được trong quá khứ");
+			if (date == null || time == null) {
 				themBanVaoPanel(pnlCacBan_DatBan, banDao.getAllBan());
+				return;
+			}
+			if(date.isBefore(LocalDate.now()) || (date.isEqual(LocalDate.now()) && time.isBefore(LocalTime.now()))) {
+				JOptionPane.showMessageDialog(this, "Ngày và giờ không được trong quá khứ");
 				return;
 			}
 			LocalDateTime filterDateTime = LocalDateTime.of(date, time);

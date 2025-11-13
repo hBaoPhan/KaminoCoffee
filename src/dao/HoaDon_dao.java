@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -69,36 +70,21 @@ public class HoaDon_dao {
 	public ArrayList<Object[]> getAllHoaDonChoPanel() {
 		ArrayList<Object[]> danhSach = new ArrayList<>();
 
-		String sql = "SELECT\r\n"
-				+ "    HD.maHD,\r\n"
-				+ "    KH.tenKH,\r\n"
-				+ "    B.tenBan,\r\n"
-				+ "    KH.sDT,\r\n"
-				+ "    -- Sửa lỗi: Dùng FORMAT thay vì DATE_FORMAT\r\n"
-				+ "    FORMAT(HD.thoiGianVao, 'dd-MM-yyyy') AS Ngay,\r\n"
-				+ "    KH.laKHDK,\r\n"
-				+ "    ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien,\r\n"
-				+ "    HD.trangThaiThanhToan\r\n"
-				+ "FROM\r\n"
-				+ "    HoaDon AS HD\r\n"
-				+ "LEFT JOIN\r\n"
-				+ "    KhachHang AS KH ON HD.maKH = KH.maKH\r\n"
-				+ "JOIN\r\n"
-				+ "    Ban AS B ON HD.maBan = B.maBan\r\n"
-				+ "LEFT JOIN\r\n"
-				+ "    ChiTietHoaDon AS CT ON HD.maHD = CT.maHD\r\n"
-				+ "LEFT JOIN\r\n"
-				+ "    SanPham AS SP ON CT.maSP = SP.maSP\r\n"
-				+ "GROUP BY\r\n"
-				+ "    HD.maHD,\r\n"
-				+ "    KH.tenKH,\r\n"
-				+ "    B.tenBan,\r\n"
-				+ "    KH.sDT,\r\n"
-				+ "    FORMAT(HD.thoiGianVao, 'dd-MM-yyyy'), -- Sửa lỗi: Phải lặp lại hàm\r\n"
-				+ "    KH.laKHDK,\r\n"
-				+ "    HD.trangThaiThanhToan\r\n"
-				+ "ORDER BY\r\n"
-				+ "    HD.maHD DESC;";
+		String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, "
+	            + " FORMAT(HD.thoiGianVao, 'dd-MM-yyyy') AS Ngay, " // Đổi DATE_FORMAT thành FORMAT
+	            + " (CASE WHEN KH.laKHDK = 1 THEN 'Có' ELSE 'Không' END) AS laKHDK, "
+	            + " ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien, " // Đổi IFNULL thành ISNULL
+	            + " HD.trangThaiThanhToan "
+	            + " FROM HoaDon HD "
+	            + " LEFT JOIN KhachHang KH ON HD.maKH = KH.maKH "
+	            + " JOIN Ban B ON HD.maBan = B.maBan "
+	            + " LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD "
+	            + " LEFT JOIN SanPham SP ON CT.maSP = SP.maSP "
+	            + " GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, "
+	            + "     FORMAT(HD.thoiGianVao, 'dd-MM-yyyy'), " // Bắt buộc lặp lại, không dùng alias 'Ngay'
+	            + "     (CASE WHEN KH.laKHDK = 1 THEN 'Có' ELSE 'Không' END), " // Bắt buộc lặp lại
+	            + "     HD.trangThaiThanhToan "
+	            + " ORDER BY HD.maHD DESC";
 
 		Connection con = ConnectDB.getConnection();
 
@@ -126,42 +112,60 @@ public class HoaDon_dao {
 			System.err.println("Lỗi truy vấn tất cả hóa đơn cho Panel: " + e.getMessage());
 		}
 		return danhSach;
-	}
-
-	public Object[] getChiTietHoaDonDangHoatDongByTenBan(String tenBan) {
-		// ✅ Bỏ ConnectDB.getInstance() thừa
+	}public ArrayList<Object[]> getHoaDonByNgay(LocalDate ngay) {
+        ArrayList<Object[]> dsHoaDon = new ArrayList<>();
+        
+        LocalDateTime startOfDay = ngay.atStartOfDay(); 
+        LocalDateTime startOfNextDay = ngay.plusDays(1).atStartOfDay(); 
+        ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
+		PreparedStatement ps=null;
+		String sql="SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, "
+	            + " FORMAT(HD.thoiGianVao, 'dd-MM-yyyy') AS Ngay, "
+	            + " (CASE WHEN KH.laKHDK = 1 THEN 'Có' ELSE 'Không' END) AS laKHDK, "
+	            + " ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien, "
+	            + " HD.trangThaiThanhToan "
+	            + " FROM HoaDon HD "
+	            + " LEFT JOIN KhachHang KH ON HD.maKH = KH.maKH "
+	            + " JOIN Ban B ON HD.maBan = B.maBan "
+	            + " LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD "
+	            + " LEFT JOIN SanPham SP ON CT.maSP = SP.maSP "
+	            // Điều kiện WHERE (so sánh Date Range) vẫn giữ nguyên
+	            + " WHERE HD.thoiGianVao >= ? AND HD.thoiGianVao < ? " 
+	            + " GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, "
+	            + "     FORMAT(HD.thoiGianVao, 'dd-MM-yyyy'), " // Bắt buộc lặp lại
+	            + "     (CASE WHEN KH.laKHDK = 1 THEN 'Có' ELSE 'Không' END), " // Bắt buộc lặp lại
+	            + "     HD.trangThaiThanhToan "
+	            + " ORDER BY HD.maHD DESC";
+        try {
+             ps= con.prepareStatement(sql) ;
 
-		// ✅ Sửa SQL: TOP 1 -> LIMIT 1 (MySQL), ISNULL -> IFNULL
-		String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, "
-				+ "       ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien " + "FROM HoaDon HD "
-				+ "JOIN KhachHang KH ON HD.maKH = KH.maKH " + "JOIN Ban B ON HD.maBan = B.maBan "
-				+ "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD "
-				+ "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham "
-				+ "WHERE B.tenBan = ? AND HD.trangThaiThanhToan = 0 " + // 0: Chờ TT
-				"GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK LIMIT 1"; // LIMIT 1
+            ps.setTimestamp(1, java.sql.Timestamp.valueOf(startOfDay));
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(startOfNextDay));
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                	boolean isPaid = rs.getBoolean("trangThaiThanhToan");
+    				String trangThaiStr = isPaid ? "Đã thanh toán" : "Chờ thanh toán";
+                    dsHoaDon.add(new Object[]{
+                        rs.getString("maHD"),
+                        rs.getString("tenKH"),
+                        rs.getString("tenBan"),
+                        rs.getString("sDT"),
+                        rs.getString("Ngay"), 
+                        rs.getString("laKHDK"), 
+                        rs.getDouble("TongTien"),
+                       trangThaiStr
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            // Rất quan trọng: Nếu có lỗi SQL, nó sẽ in ra ở đây
+            e.printStackTrace(); 
+        }
+        return dsHoaDon;
+    }
 
-		try (PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, tenBan);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-
-					String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
-					double tongTienDouble = rs.getDouble("TongTien");
-
-					// Trả về Object[] (7 phần tử) khớp với hàm hienThiChiTiet(...)
-					return new Object[] { rs.getString("maHD"), rs.getString("tenKH"), rs.getString("tenBan"),
-							rs.getString("sDT"), rs.getInt("diemTichLuy"), // Integer
-							khdkStr, // laKHDK (String)
-							tongTienDouble // tongTien (Double)
-					};
-				}
-			}
-		} catch (SQLException e) {
-			System.err.println("Lỗi truy vấn hóa đơn theo Tên Bàn: " + e.getMessage());
-		}
-		return null; // Không tìm thấy
-	}
 
 	public boolean insertHoaDon(HoaDon hoaDon) {
 		ConnectDB.getInstance();
@@ -312,4 +316,6 @@ public class HoaDon_dao {
 		}
 		return 0;
 	}
+	
+	
 }

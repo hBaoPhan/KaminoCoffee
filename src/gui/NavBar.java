@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -235,22 +236,26 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if (o.equals(btnDangXuat)) {
-			int xacNhan = JOptionPane.showConfirmDialog(this, 
+			int xacNhan = JOptionPane.showConfirmDialog(null, 
 				"Bạn có chắc chắn muốn đăng xuất?", 
 				"Xác nhận đăng xuất", 
 				JOptionPane.YES_NO_OPTION);
 			
 			if (xacNhan == JOptionPane.YES_OPTION) {
-				this.dispose();
-				SwingUtilities.invokeLater(() -> {
+				
+				
+				EventQueue.invokeLater(() -> {
 			        new Login().setVisible(true);
 			    });
+				this.dispose();
+				
 			}
 		}
 		
 	}
 	public void switchTo(String action) {
 	    CardLayout layout = (CardLayout) contentPanel.getLayout();
+	    onCardChanged();
 	    switch (action) {
 	        case "Đặt bàn mới" -> layout.show(contentPanel, "Bàn");
 	        case "Quản lý hóa đơn" -> layout.show(contentPanel, "Hóa Đơn");

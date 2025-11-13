@@ -15,7 +15,8 @@ public class KhachHang_dao {
     private Connection con;
 
     public KhachHang_dao() {
-        con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+		con = ConnectDB.getConnection();
     }
 
     // 🔹 Hàm dùng chung để chuyển ResultSet -> KhachHang
@@ -211,9 +212,12 @@ public class KhachHang_dao {
     }
     public int countAll() {
         String sql = "SELECT COUNT(*) FROM KhachHang";
-        try (Connection con = ConnectDB.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        ConnectDB.getInstance();
+        Connection con = ConnectDB.getConnection();
+        PreparedStatement ps=null;
+		try {
+              ps= con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {

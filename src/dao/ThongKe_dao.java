@@ -156,5 +156,26 @@ public class ThongKe_dao {
 
 		return map;
 	}
+	public double getDoanhThuHomNay() {
+        String sql = """
+           SELECT ISNULL(SUM(ct.tongTien), 0)
+        	FROM ChiTietHoaDon ct
+        	JOIN HoaDon hd ON hd.maHD = ct.maHD
+        	WHERE CAST(hd.thoiGianVao AS DATE) = CAST(GETDATE() AS DATE);
+
+        """;
+        ConnectDB.getInstance();
+        Connection con = ConnectDB.getConnection();
+        PreparedStatement ps=null;
+		try {
+              ps= con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 }

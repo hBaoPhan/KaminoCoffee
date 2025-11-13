@@ -59,7 +59,7 @@ public class TrangChuPanel extends JPanel {
         lblKhachHangValue = new JLabel("0");
 
         pnlStats.add(createStatCard("Đặt bàn hôm nay", lblDatBanValue, "", new Color(255, 115, 0)));
-        pnlStats.add(createStatCard("Hóa đơn", lblHoaDonValue, "", new Color(0, 120, 215)));
+        pnlStats.add(createStatCard("Hóa đơn hôm nay", lblHoaDonValue, "", new Color(0, 120, 215)));
         pnlStats.add(createStatCard("Doanh thu tạm tính", lblDoanhThuValue, "", new Color(0, 153, 51)));
         pnlStats.add(createStatCard("Khách hàng", lblKhachHangValue, "", new Color(0, 102, 255)));
 
@@ -215,7 +215,7 @@ public class TrangChuPanel extends JPanel {
         return wrap;
     }
 
-    private void loadThongKeData() {
+    public void loadThongKeData() {
         int datBan = donDatBan_dao.countToday();
 		int hoaDon = hoaDon_dao.countToday();
 		double doanhThu = thongKe_dao.getDoanhThuHomNay();
@@ -227,11 +227,4 @@ public class TrangChuPanel extends JPanel {
 		lblKhachHangValue.setText(String.valueOf(khachHang));
     }
 
-    public static void main(String[] args) {
-        JFrame f = new JFrame("Trang chủ");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setSize(1100, 700);
-        f.add(new TrangChuPanel());
-        f.setVisible(true);
-    }
 }

@@ -8,9 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList; // Thêm import cho ArrayList
+import java.util.ArrayList;
+import java.util.Objects; // Import cần thiết
 
-import dao.HoaDon_dao; // Thêm import lớp DAO
+import dao.HoaDon_dao;
 
 public class HoaDonPanel extends JPanel {
 
@@ -108,7 +109,7 @@ public class HoaDonPanel extends JPanel {
         searchBtn.setForeground(Color.WHITE);
         searchBtn.setFocusPainted(false);
         searchBtn.setPreferredSize(new Dimension(150, 35));
-        searchBtn.addActionListener(this::timVaHienThiChiTiet); // <--- XỬ LÝ CHÍNH
+        searchBtn.addActionListener(this::timVaHienThiChiTiet); 
         controlsPanel.add(searchBtn);
         
         deleteBtn = new JButton("Xóa hóa đơn");
@@ -116,7 +117,7 @@ public class HoaDonPanel extends JPanel {
         deleteBtn.setForeground(Color.WHITE);
         deleteBtn.setFocusPainted(false);
         deleteBtn.setPreferredSize(new Dimension(150, 35));
-        deleteBtn.addActionListener(this::xoaHoaDon);
+        deleteBtn.addActionListener(this::xoaHoaDon); // <--- KẾT NỐI HÀM XÓA
         controlsPanel.add(deleteBtn);
         
         topPanel.add(controlsPanel);
@@ -222,7 +223,7 @@ public class HoaDonPanel extends JPanel {
                  }
                  if (column == 6) {
                       // Sử dụng Double để xử lý tiền tệ chính xác hơn
-                     return Double.class; 
+                      return Double.class; 
                  }
                  return String.class;
              }
@@ -287,7 +288,7 @@ public class HoaDonPanel extends JPanel {
     
     // ================== CÁC PHƯƠNG THỨC XỬ LÝ DỮ LIỆU (TÍCH HỢP DAO) ==================
     
-   
+    
     private void timVaHienThiChiTiet(ActionEvent e) {
         String tenBan = searchField.getText().trim();
         lamMoiChiTiet(); // Xóa dữ liệu cũ
@@ -297,19 +298,27 @@ public class HoaDonPanel extends JPanel {
             return;
         }
 
-        // 1. GỌI DAO để lấy chi tiết Hóa đơn đang hoạt động theo Tên Bàn
+        // GỌI DAO để lấy chi tiết Hóa đơn đang hoạt động theo Tên Bàn
         // Object[] chứa: maHD, tenKH, tenBan, sDT, diemTL, laKHDK(String), tongTien(Double)
         Object[] chiTietHD = hoaDonDao.getChiTietHoaDonDangHoatDongByTenBan(tenBan); 
 
         if (chiTietHD != null) {
             
-            String maHD = (String) chiTietHD[0];
-            String tenKH = (String) chiTietHD[1];
-            String tenBanKetQua = (String) chiTietHD[2];
-            String sdt = (String) chiTietHD[3];
-            int diemTL = (Integer) chiTietHD[4];
-            boolean laKHDK = chiTietHD[5].equals("Có"); 
-            double tongTien = (Double) chiTietHD[6]; 
+            // Sử dụng Objects.toString() để đảm bảo an toàn khi lấy dữ liệu
+            String maHD = Objects.toString(chiTietHD[0], "");
+            String tenKH = Objects.toString(chiTietHD[1], "");
+            String tenBanKetQua = Objects.toString(chiTietHD[2], "");
+            String sdt = Objects.toString(chiTietHD[3], "N/A");
+            
+            // Ép kiểu an toàn cho Integer
+            int diemTL = (chiTietHD[4] instanceof Number) ? ((Number) chiTietHD[4]).intValue() : 0;
+            
+            // Lấy giá trị String "Có"/"Không"
+            String laKHDK_Str = Objects.toString(chiTietHD[5], "Không"); 
+            boolean laKHDK = "Có".equals(laKHDK_Str);
+            
+            // Ép kiểu an toàn cho Double
+            double tongTien = (chiTietHD[6] instanceof Number) ? ((Number) chiTietHD[6]).doubleValue() : 0.0;
             
             hienThiChiTiet(maHD, tenKH, tenBanKetQua, sdt, diemTL, laKHDK, tongTien);
             JOptionPane.showMessageDialog(this, "Đã tìm thấy hóa đơn đang hoạt động cho bàn " + tenBanKetQua + ".");
@@ -350,15 +359,28 @@ public class HoaDonPanel extends JPanel {
     private void hienThiChiTietTuBang() {
         int row = invoiceTable.getSelectedRow();
         if (row >= 0) {
-            String maHD = tableModel.getValueAt(row, 0).toString();
-            String tenKH = tableModel.getValueAt(row, 1).toString();
-            String tenBan = tableModel.getValueAt(row, 2).toString();
-            String sdt = tableModel.getValueAt(row, 3).toString();
-            int diem = (Integer) tableModel.getValueAt(row, 4);
-            boolean khdk = tableModel.getValueAt(row, 5).toString().equals("Có");
-            double tongTien = (Double) tableModel.getValueAt(row, 6); 
+            // ✅ SỬA LỖI: Kiểm tra null an toàn cho các cột String
+            String maHD = Objects.toString(tableModel.getValueAt(row, 0), "");
+            String tenKH = Objects.toString(tableModel.getValueAt(row, 1), "");
+            String tenBan = Objects.toString(tableModel.getValueAt(row, 2), "");
+            String sdt = Objects.toString(tableModel.getValueAt(row, 3), "N/A");
             
-            hienThiChiTiet(maHD, tenKH, tenBan, sdt, diem, khdk, tongTien);
+            // ✅ Ép kiểu an toàn cho Integer và Double
+            Object diemObj = tableModel.getValueAt(row, 4);
+            int diem = (diemObj instanceof Number) ? ((Number) diemObj).intValue() : 0;
+            
+            String khdkStr = Objects.toString(tableModel.getValueAt(row, 5), "Không");
+            boolean khdk = "Có".equals(khdkStr);
+            
+            Object tongTienObj = tableModel.getValueAt(row, 6);
+            double tongTien = (tongTienObj instanceof Number) ? ((Number) tongTienObj).doubleValue() : 0.0;
+            
+            // Chỉ hiển thị chi tiết nếu Mã HD hợp lệ (không phải là hàng trống)
+            if (!maHD.isEmpty()) {
+                hienThiChiTiet(maHD, tenKH, tenBan, sdt, diem, khdk, tongTien);
+            } else {
+                 lamMoiChiTiet();
+            }
         }
     }
 
@@ -382,10 +404,7 @@ public class HoaDonPanel extends JPanel {
             double tongTien = 0.0;
             if (row[6] instanceof Number) {
                  tongTien = ((Number) row[6]).doubleValue();
-                 row[6] = tongTien; // Cập nhật lại giá trị đã kiểm tra
-            } else {
-                 row[6] = 0.0; // Đặt về 0 nếu không phải số
-            }
+            } 
             
             // Cột 7: Trạng thái (String)
             String trangThai = (String) row[7];
@@ -407,6 +426,9 @@ public class HoaDonPanel extends JPanel {
         lblPending.setText(String.valueOf(pendingCount));
         lblPaid.setText(String.valueOf(paidCount));
         lblRevenue.setText(String.format("%,.0fđ", tongDoanhThu));
+        
+        // Cần xóa chi tiết sau khi tải lại
+        lamMoiChiTiet(); 
     }
     
     /**
@@ -419,26 +441,22 @@ public class HoaDonPanel extends JPanel {
             return;
         }
         
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa hóa đơn " + maHD + "?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc chắn muốn xóa hóa đơn " + maHD + "?\n(Thao tác này sẽ xóa vĩnh viễn dữ liệu liên quan)", 
+            "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        
         if (confirm == JOptionPane.YES_OPTION) {
-             // TODO: Thêm logic xóa thực tế và tải lại bảng
-             JOptionPane.showMessageDialog(this, "Đã gửi yêu cầu xóa hóa đơn " + maHD + ".");
-             lamMoiChiTiet();
-             taiLaiDanhSach();
+             // GỌI DAO để xóa
+             if (hoaDonDao.xoaHoaDon(maHD)) {
+                 JOptionPane.showMessageDialog(this, "✅ Xóa hóa đơn " + maHD + " thành công!");
+                 lamMoiChiTiet();
+                 taiLaiDanhSach(); // Tải lại bảng sau khi xóa
+             } else {
+                 JOptionPane.showMessageDialog(this, "❌ Xóa hóa đơn thất bại! Vui lòng kiểm tra lại.", "Lỗi xóa", JOptionPane.ERROR_MESSAGE);
+             }
         }
     }
     
     // Phương thức main để test giao diện
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Quản lý Hóa đơn");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 850);
-            
-            HoaDonPanel panel = new HoaDonPanel();
-            frame.add(panel);
-            
-            frame.setVisible(true);
-        });
-    }
+    
 }

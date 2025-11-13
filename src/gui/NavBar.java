@@ -231,7 +231,8 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		pnlKhachHang.taiLaiDanhSach();
 		if(isQuanLy) {
 			pnlNhanVien.taiLaiDanhSach();
-			pnlThongKe.loadDuLieuThongKe();;
+			pnlThongKe.loadDuLieuThongKe();
+			pnlTrangChu.loadThongKeData();
 		}
 		
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây

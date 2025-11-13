@@ -94,10 +94,16 @@ public class DonDatBan_dao {
 	    }
 	}
     public int countToday() {
-        String sql = "SELECT COUNT(*) FROM DonDatBan WHERE DATE(ngayDat) = CURDATE()";
-        try (Connection con = ConnectDB.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        String sql = "SELECT COUNT(*)\r\n"
+        		+ "FROM DonDatBan\r\n"
+        		+ "WHERE CAST(thoiGian AS DATE) = CAST(GETDATE() AS DATE);\r\n"
+        		+ "";
+        ConnectDB.getInstance();
+        Connection con = ConnectDB.getConnection();
+        PreparedStatement stmt=null;
+		try {
+             stmt= con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {

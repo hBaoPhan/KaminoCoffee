@@ -56,8 +56,7 @@ public class HoaDon_dao {
 			try {
 				if (rs != null)
 					rs.close();
-				if (stmt != null)
-					stmt.close();
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -223,13 +222,6 @@ public class HoaDon_dao {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return null;
 	}
@@ -302,10 +294,15 @@ public class HoaDon_dao {
         }
 	 }
 	 public int countToday() {
-	        String sql = "SELECT COUNT(*) FROM HoaDon WHERE DATE(thoiGianVao) = CURDATE()";
-	        try (Connection con = ConnectDB.getInstance().getConnection();
-	             PreparedStatement ps = con.prepareStatement(sql);
-	             ResultSet rs = ps.executeQuery()) {
+	        String sql = "SELECT COUNT(*)"
+	        	+"	FROM HoaDon"
+	        	+	" WHERE CAST(thoiGianVao AS DATE) = CAST(GETDATE() AS DATE);";
+	        ConnectDB.getInstance();
+	        Connection con = ConnectDB.getConnection();
+	        PreparedStatement ps=null;
+			try {
+	            ps = con.prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery() ;
 
 	            if (rs.next()) return rs.getInt(1);
 	        } catch (SQLException e) {

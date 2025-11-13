@@ -29,7 +29,6 @@ public class Login extends JFrame implements ActionListener {
 	private JTextField txtUserName;
 	private JPasswordField txtPassword;
 	private JButton btnLogin;
-	private JLabel lblQuenMatKhau;
 	
 	private TaiKhoan_dao taiKhoanDao;
 
@@ -53,7 +52,7 @@ public class Login extends JFrame implements ActionListener {
 		
 		setBackground(Color.WHITE);
 		setTitle("Login");
-		setSize(475, 600);
+		setSize(475, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 
@@ -95,7 +94,6 @@ public class Login extends JFrame implements ActionListener {
 		btnLogin.setMaximumSize(btnLogin.getPreferredSize());
 		btnLogin.setBackground(Color.decode("#e07b39"));
 
-		lblQuenMatKhau = new JLabel("Quên mật khẩu?");
 
 		Box box = Box.createVerticalBox();
 		Box box1, box2, box3, box4, box5, box6;
@@ -125,9 +123,10 @@ public class Login extends JFrame implements ActionListener {
 		box3.add(lblPassword);
 		box4.add(txtPassword);
 		box5.add(btnLogin);
-		box6.add(lblQuenMatKhau);
 		
 		btnLogin.addActionListener(this);
+		txtUserName.addActionListener(this);
+		txtPassword.addActionListener(this);
 	}
 
 	public static void main(String[] args) {
@@ -137,7 +136,7 @@ public class Login extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		if (o == btnLogin) {
+		if (o == btnLogin|| o == txtUserName || o == txtPassword) {
 			xuLyDangNhap();
 		}
 	}

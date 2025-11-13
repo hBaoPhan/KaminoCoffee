@@ -18,6 +18,10 @@ public class DonDatBan {
 		this.daNhan=daNhan;
 	}
 	
+	public DonDatBan() {
+		super();
+	}
+
 	public boolean isDaNhan() {
 		return daNhan;
 	}
@@ -46,6 +50,11 @@ public class DonDatBan {
 	public String getMaDonDatBan() {
 		return maDonDatBan;
 	}
+	
+	public void setMaDonDatBan(String maDonDatBan) {
+		this.maDonDatBan = maDonDatBan;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(maDonDatBan);

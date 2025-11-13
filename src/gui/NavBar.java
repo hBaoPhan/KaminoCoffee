@@ -45,9 +45,6 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private Color sidebarColor;
 	private HoaDonPanel pnlHoaDon;
 	private TrangChuPanel pnlTrangChu;
-	private ThucDonPanel pnlThucDon;
-	private ThongKePanel pnlThongKe;
-	private boolean isQuanLy;
 
 	public NavBar(TaiKhoan taiKhoan) {
 		setTitle("Kamino Coffee");
@@ -120,15 +117,15 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		cardLayout = new CardLayout();
 	    
 	    contentPanel = new JPanel(cardLayout);
-		contentPanel.add(pnlTrangChu=new TrangChuPanel(), "Trang chủ");
+		contentPanel.add(pnlTrangChu = new TrangChuPanel(taiKhoan), "Trang chủ");
 		contentPanel.add(pnlBan=new BanPanel(taiKhoan), "Bàn");
 		contentPanel.add(pnlHoaDon = new HoaDonPanel(), "Hóa Đơn");
-		isQuanLy=taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY;
-		if(isQuanLy) {
-			contentPanel.add(pnlThucDon=new ThucDonPanel(), "Thực đơn");//
+		
+		if(taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY) {
+			contentPanel.add(new ThucDonPanel(), "Thực đơn");//
 			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
 			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");
-			contentPanel.add(pnlThongKe=new ThongKePanel(), "Thống Kê");
+			contentPanel.add(new ThongKePanel(), "Thống Kê");
 		}
 
 		
@@ -161,18 +158,12 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	}
 	
 	private void onCardChanged() {
-		////////////// Ở ngoài là cho Nhân Viên
 		pnlBan.loadDataBanPanel();
 		pnlKhachHang.taiLaiDanhSach();
+		pnlNhanVien.taiLaiDanhSach();
 		pnlHoaDon.taiLaiDanhSach();
 		pnlTrangChu.loadThongKeData();
-		if(isQuanLy) { //////// Quản lý sẽ có thêm mấy cái này
-			pnlNhanVien.taiLaiDanhSach();
-			pnlThongKe.loadDuLieuThongKe();
-			
-		}
-		
-
+		pnlTrangChu.loadRecentActivityData();
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
 	    
 	}
@@ -230,4 +221,14 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		}
 		
 	}
+	public void switchTo(String action) {
+	    CardLayout layout = (CardLayout) contentPanel.getLayout();
+	    switch (action) {
+	        case "Đặt bàn mới" -> layout.show(contentPanel, "Bàn");
+	        case "Quản lý hóa đơn" -> layout.show(contentPanel, "Hóa Đơn");
+	        case "Quản lý khách hàng" -> layout.show(contentPanel, "Khách hàng");
+	        case "Xem thống kê" -> layout.show(contentPanel, "Thống Kê");
+	    }
+	}
+
 }

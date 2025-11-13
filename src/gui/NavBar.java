@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import entity.ChucVu;
@@ -103,9 +104,9 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 
 		String[] tabs;
 		if (taiKhoan.getNhanVien().getChucVu() == ChucVu.QUAN_LY) {
-			tabs = new String[]{ "Trang chủ", "Bàn",  "Hóa Đơn", "Khách hàng","Thực đơn", "Nhân viên", "Thống Kê" };
+			tabs = new String[]{ "Trang chủ", "Bàn", "Thực đơn", "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };
 		} else {
-			tabs = new String[]{ "Trang chủ", "Bàn",  "Hóa Đơn", "Khách hàng"};
+			tabs = new String[]{ "Trang chủ", "Bàn", "Hóa Đơn", "Khách hàng"};
 		}
 
 		labels = new JLabel[tabs.length];
@@ -233,7 +234,6 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		
 		if (o.equals(btnDangXuat)) {
 			int xacNhan = JOptionPane.showConfirmDialog(this, 
 				"Bạn có chắc chắn muốn đăng xuất?", 
@@ -241,8 +241,10 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 				JOptionPane.YES_NO_OPTION);
 			
 			if (xacNhan == JOptionPane.YES_OPTION) {
-				dispose();
-				new Login().setVisible(true);
+				this.dispose();
+				SwingUtilities.invokeLater(() -> {
+			        new Login().setVisible(true);
+			    });
 			}
 		}
 		

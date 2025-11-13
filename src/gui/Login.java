@@ -38,7 +38,7 @@ public class Login extends JFrame implements ActionListener {
 		taiKhoanDao = new TaiKhoan_dao();
 		
 		try {
-			ConnectDB.getInstance().connect();
+			ConnectDB.getInstance().connect1();
 			System.out.println("Connected");
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, 

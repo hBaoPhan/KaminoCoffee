@@ -114,7 +114,7 @@ public class DonDatBan_dao {
     
     // ✅ Sửa: Hàm countToday()
     public int countToday() {
-        String sql = "SELECT COUNT(*) FROM DonDatBan WHERE DATE(thoiGian) = CURDATE()";
+        String sql = "SELECT COUNT(*) FROM DonDatBan WHERE CAST(thoiGian AS DATE) = CAST(GETDATE() AS DATE);";
         try {
             checkConnection();
             try (PreparedStatement ps = con.prepareStatement(sql);
@@ -131,10 +131,10 @@ public class DonDatBan_dao {
         ArrayList<DonDatBan> dsDDB = new ArrayList<>();
         
 
-//        String sql = "SELECT TOP " + limit + " * FROM DonDatBan ORDER BY thoiGian DESC";
+        String sql = "SELECT TOP " + limit + " * FROM DonDatBan ORDER BY thoiGian DESC";
         
 
-        String sql = "SELECT * FROM DonDatBan ORDER BY thoiGian DESC LIMIT " + limit;
+//        String sql = "SELECT * FROM DonDatBan ORDER BY thoiGian DESC LIMIT " + limit;
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();

@@ -62,6 +62,7 @@ public class ThongKePanel extends JPanel {
         pnlCharts.add(piePanel);
 
         add(pnlCharts, BorderLayout.CENTER);
+        loadDuLieuThongKe();
     }
 
     public void loadDuLieuThongKe() {

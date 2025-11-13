@@ -44,13 +44,14 @@ public class TrangChuPanel extends JPanel {
 	private Font customFont = new Font("Times New Roman", Font.BOLD, 20); 
     private TaiKhoan taiKhoan;
     private DecimalFormat df = new DecimalFormat("#,### đ");
+	private boolean laQuanLy;
 
     /**
      * Constructor chính
      */
     public TrangChuPanel(TaiKhoan taiKhoan) {
         this.taiKhoan = taiKhoan;
-
+        laQuanLy=taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY;
         // ===== Khởi tạo DAO =====
         donDatBan_dao = new DonDatBan_dao();
         hoaDon_dao = new HoaDon_dao();
@@ -83,7 +84,9 @@ public class TrangChuPanel extends JPanel {
 
         pnlStats.add(createStatCard("Đặt bàn hôm nay", lblDatBanValue, "", new Color(255, 115, 0)));
         pnlStats.add(createStatCard("Hóa đơn", lblHoaDonValue, "", new Color(0, 120, 215)));
-        pnlStats.add(createStatCard("Doanh thu tạm tính", lblDoanhThuValue, "", new Color(0, 153, 51)));
+        if(laQuanLy) {
+        	   pnlStats.add(createStatCard("Doanh thu tạm tính", lblDoanhThuValue, "", new Color(0, 153, 51)));
+        }
         pnlStats.add(createStatCard("Khách hàng", lblKhachHangValue, "", new Color(0, 102, 255)));
 
         // ======= 3. Panel trung tâm (SOUTH) =======
@@ -152,8 +155,6 @@ public class TrangChuPanel extends JPanel {
         pnlHeader.add(lblTitle, BorderLayout.NORTH);
         pnlHeader.add(lblDesc, BorderLayout.CENTER);
 
-        boolean laQuanLy = taiKhoan.getNhanVien().getChucVu() == ChucVu.QUAN_LY;
-
         JPanel pnlButtons = new JPanel(new GridLayout(2, 2, 15, 15));
         pnlButtons.setBackground(Color.WHITE);
         pnlButtons.setBorder(new EmptyBorder(20, 0, 0, 0));
@@ -171,12 +172,13 @@ public class TrangChuPanel extends JPanel {
 
         for (int i = 0; i < tabs.length; i++) {
             JLabel label = new JLabel(tabs[i], SwingConstants.CENTER);
-            label.setFont(customFont); 
+            label.setFont(new Font("Segoe UI", Font.BOLD, 22));
             label.setForeground(Color.WHITE);
             label.setOpaque(true);
             label.setBackground(i < colors.length ? colors[i] : Color.GRAY);
             label.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
             label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            
 
             Color base = label.getBackground();
             label.addMouseListener(new MouseAdapter() {

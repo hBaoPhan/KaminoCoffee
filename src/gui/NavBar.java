@@ -22,19 +22,18 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+
 import entity.ChucVu;
 import entity.TaiKhoan;
 
+@SuppressWarnings("serial")
 public class NavBar extends JFrame implements MouseListener, ActionListener {
 
 	private JPanel contentPanel;
 	private CardLayout cardLayout;
-
 	private JLabel lblTenTaiKhoan;
 	private JLabel lblChucVu;
-
-	private Color defaultColor = new Color(230, 230, 230);
-	private Color hoverColor = new Color(200, 200, 255); // màu nền khi hover
 	private Color textHoverColor = Color.decode("#e07b39"); // màu chữ khi hover
 	private Color textDefaultColor = Color.BLACK;
 	private Font customFont = new Font("Time New Romans", Font.BOLD, 20);
@@ -45,6 +44,14 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private Color sidebarColor;
 	private HoaDonPanel pnlHoaDon;
 	private TrangChuPanel pnlTrangChu;
+	private ThongKePanel pnlThongKe;
+	private boolean isQuanLy;
+	private JLabel[] labels;
+	
+	
+	private Border emptyBorder=BorderFactory.createEmptyBorder(5, 10, 5, 10);
+	private Border lineBorder=BorderFactory.createLineBorder(Color.decode("#F7F4EC"),5,true);
+	private Border selectedBorder=BorderFactory.createCompoundBorder(lineBorder, emptyBorder);
 
 	public NavBar(TaiKhoan taiKhoan) {
 		setTitle("Kamino Coffee");
@@ -101,13 +108,13 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 			tabs = new String[]{ "Trang chủ", "Bàn",  "Hóa Đơn", "Khách hàng"};
 		}
 
-		JLabel[] labels = new JLabel[tabs.length];
+		labels = new JLabel[tabs.length];
 
 		for (int i = 0; i < tabs.length; i++) {
 			final String tab = tabs[i];
 			labels[i] = new JLabel(tab);
 			labels[i].setFont(customFont);
-			labels[i].setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+			labels[i].setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 			labels[i].addMouseListener(this);
 			labels[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
 			labels[i].setAlignmentX(Component.CENTER_ALIGNMENT); // Căn giữa
@@ -120,12 +127,13 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		contentPanel.add(pnlTrangChu = new TrangChuPanel(taiKhoan), "Trang chủ");
 		contentPanel.add(pnlBan=new BanPanel(taiKhoan), "Bàn");
 		contentPanel.add(pnlHoaDon = new HoaDonPanel(), "Hóa Đơn");
-		
-		if(taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY) {
+		contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
+		isQuanLy=taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY;
+		if(isQuanLy) {
 			contentPanel.add(new ThucDonPanel(), "Thực đơn");//
-			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
+			
 			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");
-			contentPanel.add(new ThongKePanel(), "Thống Kê");
+			contentPanel.add(pnlThongKe=new ThongKePanel(), "Thống Kê");
 		}
 
 		
@@ -160,10 +168,13 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private void onCardChanged() {
 		pnlBan.loadDataBanPanel();
 		pnlKhachHang.taiLaiDanhSach();
-		pnlNhanVien.taiLaiDanhSach();
 		pnlHoaDon.taiLaiDanhSach();
 		pnlTrangChu.loadThongKeData();
 		pnlTrangChu.loadRecentActivityData();
+		if(isQuanLy) {
+			pnlNhanVien.taiLaiDanhSach();
+			pnlThongKe.loadDuLieuThongKe();
+		}
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
 	    
 	}
@@ -172,6 +183,21 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	public void mouseClicked(MouseEvent e) {
 		JLabel clickedLabel = (JLabel) e.getSource();
 		String tabName = clickedLabel.getText();
+		
+		for (JLabel label : labels) {
+	        if (label == clickedLabel) {
+	            label.setBorder(selectedBorder);
+	            label.setOpaque(true); 
+	            label.setBackground(Color.decode("#F7F4EC")); 
+	            
+	        } else {
+	        	 label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	        	 label.setOpaque(true); 
+	             label.setBackground(Color.WHITE);
+	            
+	        }
+	    }
+		
 		cardLayout.show(contentPanel, tabName);
 		onCardChanged();
 	}

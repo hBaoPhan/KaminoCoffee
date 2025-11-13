@@ -43,78 +43,8 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private KhachHangPanel pnlKhachHang;
 	private NhanVienPanel pnlNhanVien;
 	private Color sidebarColor;
-	private boolean isQuanLy;
-	private TrangChuPanel pnlTrangChu;
-	private ThucDonPanel pnlThucDon;
-	private ThongKePanel pnlThongKe;
+	private HoaDonPanel pnlHoaDon;
 
-//	public NavBar() {
-//	    setTitle("Kamino Coffee");
-//	    setExtendedState(JFrame.MAXIMIZED_BOTH);
-//	    setLocationRelativeTo(null);
-//	    setDefaultCloseOperation(EXIT_ON_CLOSE);
-//
-//	    // Định nghĩa màu nền sidebar (Giả định bạn muốn màu gỗ nhạt đã thảo luận trước)
-//	    Color sidebarColor = new Color(255, 255, 255); 
-//
-//	    // --- SIDEBAR (BorderLayout.WEST) ---
-//	    JPanel sidebar = new JPanel();
-//	    // Sử dụng màu nền phù hợp
-//	    sidebar.setBackground(sidebarColor); 
-//	    sidebar.setOpaque(true);
-//	    sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-//	    sidebar.setAlignmentX(Component.CENTER_ALIGNMENT);
-//	    sidebar.setPreferredSize(new Dimension(150, getHeight()));
-//	    add(sidebar, BorderLayout.WEST);
-//
-//	    // --- LOGO VÀ THÔNG TIN TÀI KHOẢN (GIỮ NGUYÊN) ---
-//	    ImageIcon LogoIcon = new ImageIcon("data/images/logo.png");
-//	    Image scaledImage = LogoIcon.getImage().getScaledInstance(146, 146, Image.SCALE_SMOOTH);
-//	    ImageIcon resizedIcon = new ImageIcon(scaledImage);
-//	    JLabel lblLogo = new JLabel(resizedIcon);
-//	    lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT); 
-//	    sidebar.add(lblLogo);
-//
-//	    lblTenTaiKhoan = new JLabel("Tên tài khoản");
-//	    lblChucVu = new JLabel("Chức vụ");
-//	    lblTenTaiKhoan.setAlignmentX(Component.CENTER_ALIGNMENT);
-//	    lblChucVu.setAlignmentX(Component.CENTER_ALIGNMENT); 
-//	    
-//	    lblTenTaiKhoan.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
-//	    lblChucVu.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-//
-//	    sidebar.add(Box.createVerticalStrut(10));
-//	    sidebar.add(lblTenTaiKhoan);
-//	    sidebar.add(lblChucVu);
-//	    sidebar.add(Box.createVerticalStrut(10));
-//	    
-//
-//	    // --- MENU ITEMS (GIỮ NGUYÊN) ---
-//	    String[] tabs = { "Trang chủ", "Bàn","Thực đơn",  "Hóa Đơn", "Khách hàng", "Nhân viên", "Thống Kê" };
-//	    JLabel[] labels = new JLabel[tabs.length];
-//
-//
-//	    for (int i = 0; i < tabs.length; i++) {
-//	        final String tab = tabs[i];
-//	        labels[i] = new JLabel(tab);
-//	        labels[i].setFont(customFont);
-//	        labels[i].setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//	        labels[i].addMouseListener(this);
-//	        labels[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
-//	        labels[i].setAlignmentX(Component.CENTER_ALIGNMENT); // Căn giữa
-//	        sidebar.add(labels[i]);
-//	    }
-//	    
-//	    // =========================================================
-//	    // --- PHẦN SỬA CHỖ NÚT ĐĂNG XUẤT ---
-//	    // =========================================================
-//	    
-//	    // 1. Thêm khoảng trống giãn nở (Glue) để đẩy nút Đăng xuất xuống dưới
-//	    sidebar.add(Box.createVerticalGlue());
-//
-//		// Thêm các panel vào CardLayout
-//
-//	}
 	public NavBar(TaiKhoan taiKhoan) {
 		setTitle("Kamino Coffee");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -184,17 +114,17 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 		}
 		
 		cardLayout = new CardLayout();
-	    isQuanLy=taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY;
+	    
 	    contentPanel = new JPanel(cardLayout);
-		contentPanel.add(pnlTrangChu=new TrangChuPanel(), "Trang chủ");
+		contentPanel.add(new TrangChuPanel(), "Trang chủ");
 		contentPanel.add(pnlBan=new BanPanel(taiKhoan), "Bàn");
-		contentPanel.add(new HoaDonPanel(), "Hóa Đơn");
+		contentPanel.add(pnlHoaDon = new HoaDonPanel(), "Hóa Đơn");
 		
-		if(isQuanLy) {
-			contentPanel.add(pnlThucDon=new ThucDonPanel(), "Thực đơn");//
+		if(taiKhoan.getNhanVien().getChucVu()==ChucVu.QUAN_LY) {
+			contentPanel.add(new ThucDonPanel(), "Thực đơn");//
 			contentPanel.add(pnlKhachHang=new KhachHangPanel(), "Khách hàng");
 			contentPanel.add(pnlNhanVien=new NhanVienPanel(), "Nhân viên");
-			contentPanel.add(pnlThongKe=new ThongKePanel(), "Thống Kê");
+			contentPanel.add(new ThongKePanel(), "Thống Kê");
 		}
 
 		
@@ -229,11 +159,8 @@ public class NavBar extends JFrame implements MouseListener, ActionListener {
 	private void onCardChanged() {
 		pnlBan.loadDataBanPanel();
 		pnlKhachHang.taiLaiDanhSach();
-		if(isQuanLy) {
-			pnlNhanVien.taiLaiDanhSach();
-			pnlThongKe.loadDuLieuThongKe();;
-		}
-		
+		pnlNhanVien.taiLaiDanhSach();
+		pnlHoaDon.taiLaiDanhSach();
 		////////////////////// sửa tên biến phía trên rồi bỏ hàm qua đây
 	    
 	}

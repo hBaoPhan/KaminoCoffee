@@ -65,102 +65,101 @@ public class HoaDon_dao {
 
 		return ds;
 	}
-	 public ArrayList<Object[]> getAllHoaDonChoPanel() {
-        ArrayList<Object[]> danhSach = new ArrayList<>();
-        ConnectDB.getInstance();
-        Connection con = ConnectDB.getConnection();
-        
-        // SỬA LỖI SQL: Dùng KH.maKH cho JOIN và KH.sDT, KH.diemTichLuy, KH.laKHDK
-        String sql = "SELECT HD.maHD, KH.tenKhachHang, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
-                     "       ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien, " +
-                     "       HD.trangThaiThanhToan " + 
-                     "FROM HoaDon HD " +
-                     "JOIN KhachHang KH ON HD.maKH = KH.maKH " + // <--- ĐÃ SỬA: KH.maKH
-                     "JOIN Ban B ON HD.maBan = B.maBan " +
-                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
-                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
-                     "GROUP BY HD.maHD, KH.tenKhachHang, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, HD.trangThaiThanhToan";
+	// Trong lớp HoaDon_dao
+
+		 public ArrayList<Object[]> getAllHoaDonChoPanel() {
+	        ArrayList<Object[]> danhSach = new ArrayList<>();
+	        // ✅ Bỏ ConnectDB.getInstance() thừa
+	        Connection con = ConnectDB.getConnection();
+	        
+	        // ✅ Sửa SQL: ISNULL -> IFNULL (MySQL)
+	        String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
+	                     "       IFNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien, " +
+	                     "       HD.trangThaiThanhToan " + 
+	                     "FROM HoaDon HD " +
+	                     "LEFT JOIN KhachHang KH ON HD.maKH = KH.maKH " + // Dùng LEFT JOIN an toàn
+	                     "JOIN Ban B ON HD.maBan = B.maBan " +
+	                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
+	                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
+	                     "GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, HD.trangThaiThanhToan";
 
 
-        try (Statement stmt = con.createStatement(); 
-             ResultSet rs = stmt.executeQuery(sql)) {
+	        try (Statement stmt = con.createStatement(); 
+	             ResultSet rs = stmt.executeQuery(sql)) {
 
-            while (rs.next()) {
-                
-                // 1. Ánh xạ trạng thái số (boolean) sang chữ
-                String trangThaiStr;
-                boolean isPaid = rs.getBoolean("trangThaiThanhToan");
-                if (isPaid) {
-                    trangThaiStr = "Đã thanh toán";
-                } else {
-                    trangThaiStr = "Chờ thanh toán"; 
-                }
-                
-                // 2. Ánh xạ KHDK
-                String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
+	            while (rs.next()) {
+	                
+	                String trangThaiStr;
+	                boolean isPaid = rs.getBoolean("trangThaiThanhToan");
+	                if (isPaid) {
+	                    trangThaiStr = "Đã thanh toán";
+	                } else {
+	                    trangThaiStr = "Chờ thanh toán"; 
+	                }
+	                
+	                String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
 
-                // 3. Lấy Tổng tiền (TongTien)
-                double tongTienDouble = rs.getDouble("TongTien");
-                int diemTichLuy = rs.getInt("diemTichLuy");
+	                double tongTienDouble = rs.getDouble("TongTien");
+	                int diemTichLuy = rs.getInt("diemTichLuy");
 
-                // Thêm vào danh sách (Object[] khớp với 8 cột trong JTable của bạn)
-                danhSach.add(new Object[]{
-                    rs.getString("maHD"),
-                    rs.getString("tenKhachHang"),
-                    rs.getString("tenBan"),
-                    rs.getString("sDT"),
-                    diemTichLuy, // Cột 4: Diem TL (Integer)
-                    khdkStr, // Cột 5: KHDK (String)
-                    tongTienDouble, // Cột 6: Tổng tiền (Double)
-                    trangThaiStr // Cột 7: Trạng thái (String)
-                });
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi truy vấn tất cả hóa đơn cho Panel: " + e.getMessage());
-        }
-        return danhSach;
-    }
-	public Object[] getChiTietHoaDonDangHoatDongByTenBan(String tenBan) {
-        ConnectDB.getInstance();
-        Connection con = ConnectDB.getConnection();
-        
-        // SỬA LỖI SQL: Dùng KH.maKH cho JOIN và tên cột chính xác
-        String sql = "SELECT TOP 1 HD.maHD, KH.tenKhachHang, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
-                     "       ISNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien " + 
-                     "FROM HoaDon HD " +
-                     "JOIN KhachHang KH ON HD.maKH = KH.maKH " + // <--- ĐÃ SỬA: KH.maKH
-                     "JOIN Ban B ON HD.maBan = B.maBan " +
-                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
-                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
-                     "WHERE B.tenBan = ? AND HD.trangThaiThanhToan = 0 " + // 0: Chờ TT
-                     "GROUP BY HD.maHD, KH.tenKhachHang, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK";
+	                danhSach.add(new Object[]{
+	                    rs.getString("maHD"),
+	                    rs.getString("tenKH"),
+	                    rs.getString("tenBan"),
+	                    rs.getString("sDT"),
+	                    diemTichLuy, // Cột 4: Diem TL (Integer)
+	                    khdkStr, // Cột 5: KHDK (String)
+	                    tongTienDouble, // Cột 6: Tổng tiền (Double)
+	                    trangThaiStr // Cột 7: Trạng thái (String)
+	                });
+	            }
+	        } catch (SQLException e) {
+	            System.err.println("Lỗi truy vấn tất cả hóa đơn cho Panel: " + e.getMessage());
+	        }
+	        return danhSach;
+	    }
+		 
+		public Object[] getChiTietHoaDonDangHoatDongByTenBan(String tenBan) {
+	        // ✅ Bỏ ConnectDB.getInstance() thừa
+	        Connection con = ConnectDB.getConnection();
+	        
+	        // ✅ Sửa SQL: TOP 1 -> LIMIT 1 (MySQL), ISNULL -> IFNULL
+	        String sql = "SELECT HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK, " +
+	                     "       IFNULL(SUM(CT.soLuong * SP.gia), 0) AS TongTien " + 
+	                     "FROM HoaDon HD " +
+	                     "JOIN KhachHang KH ON HD.maKH = KH.maKH " + 
+	                     "JOIN Ban B ON HD.maBan = B.maBan " +
+	                     "LEFT JOIN ChiTietHoaDon CT ON HD.maHD = CT.maHD " +
+	                     "LEFT JOIN SanPham SP ON CT.maSanPham = SP.maSanPham " +
+	                     "WHERE B.tenBan = ? AND HD.trangThaiThanhToan = 0 " + // 0: Chờ TT
+	                     "GROUP BY HD.maHD, KH.tenKH, B.tenBan, KH.sDT, KH.diemTichLuy, KH.laKHDK LIMIT 1"; // LIMIT 1
 
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, tenBan);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    
-                    String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
-                    double tongTienDouble = rs.getDouble("TongTien");
+	        try (PreparedStatement ps = con.prepareStatement(sql)) {
+	            ps.setString(1, tenBan);
+	            try (ResultSet rs = ps.executeQuery()) {
+	                if (rs.next()) {
+	                    
+	                    String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
+	                    double tongTienDouble = rs.getDouble("TongTien");
 
-                    // Trả về Object[] (7 phần tử) khớp với hàm hienThiChiTiet(...)
-                    return new Object[]{
-                        rs.getString("maHD"),
-                        rs.getString("tenKhachHang"),
-                        rs.getString("tenBan"),
-                        rs.getString("sDT"),
-                        rs.getInt("diemTichLuy"), // Integer
-                        khdkStr, // laKHDK (String)
-                        tongTienDouble // tongTien (Double)
-                    };
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi truy vấn hóa đơn theo Tên Bàn: " + e.getMessage());
-        }
-        return null; // Không tìm thấy
-    }
+	                    // Trả về Object[] (7 phần tử) khớp với hàm hienThiChiTiet(...)
+	                    return new Object[]{
+	                        rs.getString("maHD"),
+	                        rs.getString("tenKH"),
+	                        rs.getString("tenBan"),
+	                        rs.getString("sDT"),
+	                        rs.getInt("diemTichLuy"), // Integer
+	                        khdkStr, // laKHDK (String)
+	                        tongTienDouble // tongTien (Double)
+	                    };
+	                }
+	            }
+	        } catch (SQLException e) {
+	            System.err.println("Lỗi truy vấn hóa đơn theo Tên Bàn: " + e.getMessage());
+	        }
+	        return null; // Không tìm thấy
+	    }
 
 	public boolean insertHoaDon(HoaDon hoaDon) {
 		ConnectDB.getInstance();

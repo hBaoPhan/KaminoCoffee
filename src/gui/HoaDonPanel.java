@@ -5,7 +5,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -25,15 +24,17 @@ public class HoaDonPanel extends JPanel {
     private JButton deleteBtn, searchBtn;
 
     // Chi tiết Hóa đơn/Khách hàng
+    // Ghi chú: txtDiemTL_ChiTiet vẫn được giữ để hiển thị khi tìm kiếm theo Bàn, 
+    // dù nó đã bị xóa khỏi bảng danh sách chính.
     private JTextField txtMaHD, txtTenKH_ChiTiet, txtTenBan_ChiTiet, txtSDT_ChiTiet, txtDiemTL_ChiTiet, txtKHDangKy_ChiTiet, txtTongTien_ChiTiet;
     private JPanel pnlChiTietHD;
     
     // KHAI BÁO DAO
-    private HoaDon_dao hoaDonDao; // <--- KHAI BÁO
+    private HoaDon_dao hoaDonDao; 
 
     public HoaDonPanel() {
         // KHỞI TẠO DAO
-        hoaDonDao = new HoaDon_dao(); // <--- KHỞI TẠO
+        hoaDonDao = new HoaDon_dao(); 
         
         setLayout(new BorderLayout());
 
@@ -44,7 +45,7 @@ public class HoaDonPanel extends JPanel {
         mainPanel.add(createHeaderAndSummaryAndControlsPanel(), BorderLayout.NORTH);
         
         // 2. BẢNG (Danh sách hóa đơn)
-        mainPanel.add(createInvoiceTablePanel(), BorderLayout.CENTER);
+        mainPanel.add(createInvoiceTablePanel(), BorderLayout.CENTER); 
         
         // 3. CHI TIẾT HÓA ĐƠN/KHÁCH HÀNG (Ở dưới cùng)
         pnlChiTietHD = createChiTietHoaDonPanel();
@@ -56,7 +57,7 @@ public class HoaDonPanel extends JPanel {
         taiLaiDanhSach();
     }
 
-    // --- (Giữ nguyên các hàm tạo giao diện) ---
+    // --- CÁC PHƯƠNG THỨC TẠO GIAO DIỆN ---
     private JPanel createHeaderAndSummaryAndControlsPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -117,7 +118,7 @@ public class HoaDonPanel extends JPanel {
         deleteBtn.setForeground(Color.WHITE);
         deleteBtn.setFocusPainted(false);
         deleteBtn.setPreferredSize(new Dimension(150, 35));
-        deleteBtn.addActionListener(this::xoaHoaDon); // <--- KẾT NỐI HÀM XÓA
+        deleteBtn.addActionListener(this::xoaHoaDon); 
         controlsPanel.add(deleteBtn);
         
         topPanel.add(controlsPanel);
@@ -155,7 +156,8 @@ public class HoaDonPanel extends JPanel {
 
         // Hàng 3: Điểm TL và KHD K
         Box box3 = Box.createHorizontalBox();
-        box3.add(createLabeledField("Điểm tích lũy:", txtDiemTL_ChiTiet = new JTextField("0", 15), labelSize, false));
+        // Giữ lại Diem TL ở đây, vì nó được lấy khi tìm kiếm theo bàn
+        box3.add(createLabeledField("Điểm tích lũy:", txtDiemTL_ChiTiet = new JTextField("0", 15), labelSize, false)); 
         box3.add(Box.createHorizontalStrut(20));
         box3.add(createLabeledField("Khách hàng ĐK:", txtKHDangKy_ChiTiet = new JTextField(15), labelSize, false));
         pInput.add(box3);
@@ -208,23 +210,21 @@ public class HoaDonPanel extends JPanel {
     }
 
     private JScrollPane createInvoiceTablePanel() {
-        String[] columnNames = {"Mã HD", "Tên KH", "Tên bàn", "Số điện thoại", "Điểm TL", "KHDK", "Tổng tiền", "Trạng thái"};
+        // ✅ ĐÃ SỬA CẤU TRÚC CỘT: Xóa "Điểm TL", thêm "Ngày"
+        String[] columnNames = {"Mã HD", "Tên KH", "Tên bàn", "Số điện thoại", "Ngày", "KHDK", "Tổng tiền", "Trạng thái"};
         
         tableModel = new DefaultTableModel(columnNames, 0) {
              @Override
              public boolean isCellEditable(int row, int column) {
                  return false;
              }
-             // Cột Điểm TL (index 4) là Integer, Tổng tiền (index 6) là Double
              @Override
              public Class<?> getColumnClass(int column) {
-                 if (column == 4) {
-                     return Integer.class; 
-                 }
-                 if (column == 6) {
-                      // Sử dụng Double để xử lý tiền tệ chính xác hơn
+                 // Cột 6: Tổng tiền (Double)
+                 if (column == 6) { 
                       return Double.class; 
                  }
+                 // Các cột còn lại (bao gồm Ngày) là String
                  return String.class;
              }
         };
@@ -243,21 +243,21 @@ public class HoaDonPanel extends JPanel {
             }
         });
 
+        // Setup Renderer
         CustomTableCellRenderer renderer = new CustomTableCellRenderer();
-        // Áp dụng Renderer căn phải cho cột Điểm TL (index 4)
-        invoiceTable.getColumnModel().getColumn(4).setCellRenderer(renderer); 
-        // Áp dụng Renderer căn phải cho cột Tổng tiền (index 6)
+        // Căn phải cho cột Tổng tiền (Index 6)
         invoiceTable.getColumnModel().getColumn(6).setCellRenderer(renderer); 
 
         DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
         leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
         for (int i = 0; i < columnNames.length; i++) {
-            if (i != 4 && i != 6) {
+            // Căn trái cho tất cả trừ cột Tổng tiền (Index 6)
+            if (i != 6) { 
                 invoiceTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
             }
         }
         
-        JScrollPane scrollPane = new JScrollPane(invoiceTable);
+        JScrollPane scrollPane = new JScrollPane(invoiceTable); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
         scrollPane.setBackground(new Color(247, 242, 236));
         return scrollPane;
@@ -271,8 +271,8 @@ public class HoaDonPanel extends JPanel {
         
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, 
-                                                       boolean isSelected, boolean hasFocus, 
-                                                       int row, int column) {
+                                                      boolean isSelected, boolean hasFocus, 
+                                                      int row, int column) {
             
             JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -291,7 +291,7 @@ public class HoaDonPanel extends JPanel {
     
     private void timVaHienThiChiTiet(ActionEvent e) {
         String tenBan = searchField.getText().trim();
-        lamMoiChiTiet(); // Xóa dữ liệu cũ
+        lamMoiChiTiet(); 
         
         if (tenBan.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên Bàn để tìm kiếm.");
@@ -304,20 +304,19 @@ public class HoaDonPanel extends JPanel {
 
         if (chiTietHD != null) {
             
-            // Sử dụng Objects.toString() để đảm bảo an toàn khi lấy dữ liệu
+            // Lấy và ép kiểu dữ liệu từ Object[] (7 phần tử)
             String maHD = Objects.toString(chiTietHD[0], "");
             String tenKH = Objects.toString(chiTietHD[1], "");
             String tenBanKetQua = Objects.toString(chiTietHD[2], "");
             String sdt = Objects.toString(chiTietHD[3], "N/A");
             
-            // Ép kiểu an toàn cho Integer
+            // Lấy Điểm TL (Index 4)
             int diemTL = (chiTietHD[4] instanceof Number) ? ((Number) chiTietHD[4]).intValue() : 0;
             
-            // Lấy giá trị String "Có"/"Không"
             String laKHDK_Str = Objects.toString(chiTietHD[5], "Không"); 
             boolean laKHDK = "Có".equals(laKHDK_Str);
             
-            // Ép kiểu an toàn cho Double
+            // Lấy Tổng tiền (Index 6)
             double tongTien = (chiTietHD[6] instanceof Number) ? ((Number) chiTietHD[6]).doubleValue() : 0.0;
             
             hienThiChiTiet(maHD, tenKH, tenBanKetQua, sdt, diemTL, laKHDK, tongTien);
@@ -348,65 +347,67 @@ public class HoaDonPanel extends JPanel {
         txtTenKH_ChiTiet.setText("");
         txtTenBan_ChiTiet.setText("");
         txtSDT_ChiTiet.setText("");
-        txtDiemTL_ChiTiet.setText("0");
+        txtDiemTL_ChiTiet.setText("0"); // Giữ lại giá trị mặc định cho Diem TL
         txtKHDangKy_ChiTiet.setText("");
         txtTongTien_ChiTiet.setText("0đ");
     }
     
     /**
      * Xử lý hiển thị chi tiết khi click vào hàng trong bảng.
+     * Cấu trúc bảng hiện tại: [maHD(0), tenKH(1), tenBan(2), sDT(3), Ngay(4), KHDK(5), TongTien(6), TrangThai(7)]
      */
     private void hienThiChiTietTuBang() {
         int row = invoiceTable.getSelectedRow();
         if (row >= 0) {
-            // ✅ SỬA LỖI: Kiểm tra null an toàn cho các cột String
+            
             String maHD = Objects.toString(tableModel.getValueAt(row, 0), "");
             String tenKH = Objects.toString(tableModel.getValueAt(row, 1), "");
             String tenBan = Objects.toString(tableModel.getValueAt(row, 2), "");
             String sdt = Objects.toString(tableModel.getValueAt(row, 3), "N/A");
             
-            // ✅ Ép kiểu an toàn cho Integer và Double
-            Object diemObj = tableModel.getValueAt(row, 4);
-            int diem = (diemObj instanceof Number) ? ((Number) diemObj).intValue() : 0;
+            // ⚠️ Diem TL đã bị xóa khỏi bảng chính, nên không thể lấy từ bảng. Đặt là 0.
+            int diem = 0; 
             
+            // Lấy KHDK ở Index 5
             String khdkStr = Objects.toString(tableModel.getValueAt(row, 5), "Không");
             boolean khdk = "Có".equals(khdkStr);
             
+            // Lấy Tổng tiền ở Index 6
             Object tongTienObj = tableModel.getValueAt(row, 6);
             double tongTien = (tongTienObj instanceof Number) ? ((Number) tongTienObj).doubleValue() : 0.0;
             
-            // Chỉ hiển thị chi tiết nếu Mã HD hợp lệ (không phải là hàng trống)
             if (!maHD.isEmpty()) {
-                hienThiChiTiet(maHD, tenKH, tenBan, sdt, diem, khdk, tongTien);
+                // Vẫn truyền diem = 0 vào hàm hiển thị chi tiết
+                hienThiChiTiet(maHD, tenKH, tenBan, sdt, diem, khdk, tongTien); 
             } else {
-                 lamMoiChiTiet();
+                lamMoiChiTiet();
             }
         }
     }
 
     /**
-     * Phương thức được gọi từ bên ngoài (ví dụ: BanPanel) để tải lại dữ liệu.
+     * Phương thức được gọi từ bên ngoài để tải lại dữ liệu và cập nhật Summary.
+     * DAO trả về 8 cột: [maHD, tenKH, tenBan, sDT, Ngay, laKHDK, TongTien, TrangThai]
      */
     public void taiLaiDanhSach() {
-        // HÀM LOAD DỮ LIỆU LÊN BẢNG
         tableModel.setRowCount(0);
         
-        // GỌI DAO để lấy danh sách Object[] (đã được JOIN)
+        // GỌI DAO
         ArrayList<Object[]> danhSachHoaDon = hoaDonDao.getAllHoaDonChoPanel(); 
         
-        // Khởi tạo các biến tính tổng (cho Summary)
         double tongDoanhThu = 0;
         int pendingCount = 0;
         int paidCount = 0;
 
         for (Object[] row : danhSachHoaDon) {
-            // 1. Xử lý dữ liệu Tổng tiền và Trạng thái (để tính Summary)
+            // 1. Xử lý dữ liệu Tổng tiền và Trạng thái 
+            // Cột 6 (Index 6): Tổng tiền
             double tongTien = 0.0;
             if (row[6] instanceof Number) {
                  tongTien = ((Number) row[6]).doubleValue();
             } 
             
-            // Cột 7: Trạng thái (String)
+            // Cột 7 (Index 7): Trạng thái (String)
             String trangThai = (String) row[7];
             
             // 2. Cập nhật Summary
@@ -417,7 +418,7 @@ public class HoaDonPanel extends JPanel {
                 pendingCount++;
             }
             
-            // 3. Thêm hàng vào bảng
+            // 3. Thêm hàng vào bảng (Cấu trúc mới khớp với DAO)
             tableModel.addRow(row);
         }
         
@@ -427,7 +428,6 @@ public class HoaDonPanel extends JPanel {
         lblPaid.setText(String.valueOf(paidCount));
         lblRevenue.setText(String.format("%,.0fđ", tongDoanhThu));
         
-        // Cần xóa chi tiết sau khi tải lại
         lamMoiChiTiet(); 
     }
     
@@ -457,6 +457,6 @@ public class HoaDonPanel extends JPanel {
         }
     }
     
-    // Phương thức main để test giao diện
+   
     
 }

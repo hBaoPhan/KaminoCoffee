@@ -84,9 +84,7 @@ public class TrangChuPanel extends JPanel {
 
         pnlStats.add(createStatCard("Đặt bàn hôm nay", lblDatBanValue, "", new Color(255, 115, 0)));
         pnlStats.add(createStatCard("Hóa đơn", lblHoaDonValue, "", new Color(0, 120, 215)));
-        if(laQuanLy) {
-        	   pnlStats.add(createStatCard("Doanh thu tạm tính", lblDoanhThuValue, "", new Color(0, 153, 51)));
-        }
+        pnlStats.add(createStatCard("Doanh thu tạm tính", lblDoanhThuValue, "", new Color(0, 153, 51)));
         pnlStats.add(createStatCard("Khách hàng", lblKhachHangValue, "", new Color(0, 102, 255)));
 
         // ======= 3. Panel trung tâm (SOUTH) =======

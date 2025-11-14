@@ -52,7 +52,7 @@ public class Login extends JFrame implements ActionListener {
 		
 		setBackground(Color.WHITE);
 		setTitle("Login");
-		setSize(475, 500);
+		setSize(475, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 

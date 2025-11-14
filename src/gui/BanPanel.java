@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1286,7 +1287,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 					
 				}else {
 				int confirm = JOptionPane.showConfirmDialog(this,
-						"Bạn có muốn đăng ký thành viên cho khách hàng  " + tenKH + " không?", "Xác nhận",
+						"Bạn có muốn đăng ký thành viên cho khách hàng " + tenKH + " không?", "Xác nhận",
 						JOptionPane.YES_NO_OPTION);
 				if (confirm == JOptionPane.YES_OPTION) {
 					if (!checkValidTaoHoaDon()) {
@@ -1335,11 +1336,16 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 				}
 				
 			}if(maHoaDon!="") {
-				String txtMaHoaDon=lblMaHoaDonChoBan.getText();
 				int n=modelMonAn.getRowCount();
+				ArrayList<String> dsMoi=new ArrayList<String>();
+				for (int i = 0; i <n ; i++) {
+					SanPham sp=sanPhamDao.getSanPhamByTen((modelMonAn.getValueAt(i, 0).toString()));
+					dsMoi.add(sp.getTenSanPham());
+				}
+				chiTietHoaDonDao.xoaChiTietHoaDonThua(maHoaDon, dsMoi);
 				int count=0;
 				for (int i = 0; i <n ; i++) {
-					HoaDon hd=new HoaDon(txtMaHoaDon);
+					HoaDon hd=new HoaDon(maHoaDon);
 					SanPham sp=sanPhamDao.getSanPhamByTen((modelMonAn.getValueAt(i, 0).toString()));
 					int soLuong=Integer.parseInt(modelMonAn.getValueAt(i, 1).toString());
 					if(chiTietHoaDonDao.insertChiTietHoaDon(new ChiTietHoaDon(hd, sp, soLuong))) {

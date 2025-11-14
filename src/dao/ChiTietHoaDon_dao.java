@@ -8,6 +8,10 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import connectDB.ConnectDB;
 import entity.Ban;
@@ -56,7 +60,6 @@ public class ChiTietHoaDon_dao {
 		ConnectDB.getInstance();
 		Connection con=ConnectDB.getConnection();
 		PreparedStatement stmt=null;
-		ResultSet rs = null;
         try {
         	String sql="MERGE INTO ChiTietHoaDon AS target "
         			+ "USING (SELECT ? AS maHD, ? AS maSP, ? AS soLuong, ? AS tongTien) AS source " 
@@ -115,5 +118,27 @@ public class ChiTietHoaDon_dao {
 
 	    return ds;
 	}
+	public boolean xoaChiTietHoaDonThua(String maHD, ArrayList<String> danhSachMaSPMoi) {
+	    ConnectDB.getInstance();
+	    Connection con = ConnectDB.getConnection();
+	    PreparedStatement stmt = null;
+	    try {
+	        // Tạo chuỗi dấu ? tương ứng với số lượng maSP
+	        String placeholders = String.join(",", Collections.nCopies(danhSachMaSPMoi.size(), "?"));
+	        String sql = "DELETE FROM ChiTietHoaDon WHERE maHD = ? AND maSP NOT IN (" + placeholders + ")";
+	        stmt = con.prepareStatement(sql);
+	        stmt.setString(1, maHD);
+	        for (int i = 0; i < danhSachMaSPMoi.size(); i++) {
+	            stmt.setString(i + 2, danhSachMaSPMoi.get(i));
+	        }
+	        int rows = stmt.executeUpdate();
+	        return rows >= 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+
 
 }

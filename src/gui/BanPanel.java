@@ -63,6 +63,7 @@ import dao.ChiTietHoaDon_dao;
 import dao.DonDatBan_dao;
 import dao.HoaDon_dao;
 import dao.KhachHang_dao;
+import dao.NhanVien_dao;
 import dao.SanPham_dao;
 import entity.Ban;
 import entity.ChiTietHoaDon;
@@ -139,8 +140,12 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 	private JButton btnXoaBan;
 	private JButton btnSuaBan;
 	private JButton btnLamMoi;
+	private NhanVien NhanVien_dao;
+	private dao.NhanVien_dao nhanVienDao;
+	private TaiKhoan taiKhoan;
 
 	public BanPanel(TaiKhoan taiKhoan) {
+		this.taiKhoan=taiKhoan;
 		// Tạo panel chính cho tab đầu tiên
 		JPanel pnlGoiMon = new JPanel(new BorderLayout());
 		// === Panel trái: Danh sách bàn ===
@@ -607,6 +612,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		hoaDonDao = new HoaDon_dao();
 		khachHangDao = new KhachHang_dao();
 		chiTietHoaDonDao=new ChiTietHoaDon_dao();
+		nhanVienDao=new NhanVien_dao();
 		
 		loadDataBanPanel();
 		
@@ -1275,7 +1281,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			String maHoaDon=lblMaHoaDonChoBan.getText();
 			if(maHoaDon.equals("")) {
 				String maHoaDonNew = generateNextCodeForHoaDon(hoaDonDao.getAllHoaDon().getLast().getMaHoaDon());
-				NhanVien nv = new NhanVien("NV001");/////////////////////////
+				NhanVien nv = nhanVienDao.timNV(taiKhoan.getNhanVien().getMaNV());
 
 				String maKH = generateNextCodeForKhachHang(
 						donDatBanDao.getAllDonDatBan().getLast().getKhachHang().getMaKhachHang());
@@ -1451,7 +1457,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		
 		if(o.equals(btnThanhToan)) {
 			String maHD=lblMaHoaDonChoBan.getText();
-			
+			NhanVien nv = nhanVienDao.timNV(taiKhoan.getNhanVien().getMaNV());
 			if(maHD.equals("")) {
 				JOptionPane.showMessageDialog(this, "Vui lòng tạo hóa đơn");
 				return;
@@ -1473,7 +1479,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			        hoaDon.append("Mã Hóa Đơn: "+maHD+"\n");
 			        hoaDon.append("Khách Hàng: "+kh.getTenKhachHang()+"\n");
 			        hoaDon.append("Bàn: "+lblTenBan.getText().substring(0,5)+"\n");
-			        hoaDon.append("Người In: "+"\n");
+			        hoaDon.append("Người In: "+nv.getTenNV()+"\n");
 			        hoaDon.append("------------ Chi tiết món ----------\n");
 
 			        // Thêm từng dòng sản phẩm
@@ -1506,7 +1512,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 			        hoaDon.append("Mã Hóa Đơn: "+maHD+"\n");
 			        hoaDon.append("Khách Hàng: "+kh.getTenKhachHang()+"\n");
 			        hoaDon.append("Bàn: "+lblTenBan.getText().substring(0,5)+"\n");
-			        hoaDon.append("Người In: "+"\n");
+			        hoaDon.append("Người In: "+nv.getTenNV()+"\n");
 			        hoaDon.append("------------ Chi tiết món ----------\n");
 
 			        // Thêm từng dòng sản phẩm
@@ -1535,7 +1541,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		        hoaDon.append("Mã Hóa Đơn: "+maHD+"\n");
 		        hoaDon.append("Khách Hàng: "+kh.getTenKhachHang()+"\n");
 		        hoaDon.append("Bàn: "+lblTenBan.getText().substring(0,5)+"\n");
-		        hoaDon.append("Người In: "+"\n");
+		        hoaDon.append("Người In: "+nv.getTenNV()+"\n");
 		        hoaDon.append("------------ Chi tiết món ----------\n");
 
 		        // Thêm từng dòng sản phẩm

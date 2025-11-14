@@ -123,13 +123,21 @@ public class ChiTietHoaDon_dao {
 	    Connection con = ConnectDB.getConnection();
 	    PreparedStatement stmt = null;
 	    try {
-	        // Tạo chuỗi dấu ? tương ứng với số lượng maSP
-	        String placeholders = String.join(",", Collections.nCopies(danhSachMaSPMoi.size(), "?"));
-	        String sql = "DELETE FROM ChiTietHoaDon WHERE maHD = ? AND maSP NOT IN (" + placeholders + ")";
-	        stmt = con.prepareStatement(sql);
-	        stmt.setString(1, maHD);
-	        for (int i = 0; i < danhSachMaSPMoi.size(); i++) {
-	            stmt.setString(i + 2, danhSachMaSPMoi.get(i));
+	        String sql;
+	        if (danhSachMaSPMoi == null || danhSachMaSPMoi.isEmpty()) {
+	            // Nếu không có sản phẩm mới nào, xóa toàn bộ chi tiết hóa đơn
+	            sql = "DELETE FROM ChiTietHoaDon WHERE maHD = ?";
+	            stmt = con.prepareStatement(sql);
+	            stmt.setString(1, maHD);
+	        } else {
+	            // Tạo chuỗi ? tương ứng với số lượng maSP
+	            String placeholders = String.join(",", Collections.nCopies(danhSachMaSPMoi.size(), "?"));
+	            sql = "DELETE FROM ChiTietHoaDon WHERE maHD = ? AND maSP NOT IN (" + placeholders + ")";
+	            stmt = con.prepareStatement(sql);
+	            stmt.setString(1, maHD);
+	            for (int i = 0; i < danhSachMaSPMoi.size(); i++) {
+	                stmt.setString(i + 2, danhSachMaSPMoi.get(i));
+	            }
 	        }
 	        int rows = stmt.executeUpdate();
 	        return rows >= 0;
@@ -138,6 +146,7 @@ public class ChiTietHoaDon_dao {
 	        return false;
 	    }
 	}
+
 
 
 

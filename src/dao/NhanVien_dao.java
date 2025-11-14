@@ -13,7 +13,8 @@ public class NhanVien_dao {
     private Connection con;
 
     public NhanVien_dao() {
-        con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+		con = ConnectDB.getConnection();
     }
     // LẤY DANH SÁCH NHÂN VIÊN
     public ArrayList<NhanVien> getDsnv() {
@@ -57,7 +58,7 @@ public class NhanVien_dao {
             stmt.setString(2, nv.getTenNV());
             stmt.setString(3, nv.getsDT());
             stmt.setBoolean(4, nv.isGioiTinh());
-            stmt.setString(5, nv.getChucVu().name());
+            stmt.setString(5, nv.getChucVu().toDatabaseValue());
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {

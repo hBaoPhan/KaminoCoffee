@@ -35,7 +35,7 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         add(topPanel, BorderLayout.NORTH);
 
         JLabel lblTitle = new JLabel("THÔNG TIN KHÁCH HÀNG", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitle.setBackground(Color.decode("#F7F4EC"));
         lblTitle.setBorder(new EmptyBorder(15, 10, 15, 10));
         topPanel.add(lblTitle, BorderLayout.NORTH);
@@ -79,10 +79,11 @@ public class KhachHangPanel extends JPanel implements ActionListener, MouseListe
         // --- Điểm tích lũy ---
         Box box4 = Box.createHorizontalBox();
         JLabel lblDiem = new JLabel("Điểm tích lũy:");
+       
         lblDiem.setPreferredSize(labelSize);
         box4.add(lblDiem);
         box4.add(txtDiem = new JTextField("0", 20));
-//        txtDiem.setEditable(false);
+        txtDiem.setEditable(false);
         pInput.add(box4);
         pInput.add(Box.createVerticalStrut(10));
 

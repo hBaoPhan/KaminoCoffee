@@ -37,7 +37,7 @@ public class NhanVienPanel extends JPanel implements ActionListener, MouseListen
         add(topPanel, BorderLayout.NORTH);
 
         JLabel lblTitle = new JLabel("THÔNG TIN NHÂN VIÊN", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitle.setForeground(new Color(52, 73, 94)); 
         lblTitle.setBorder(new EmptyBorder(15, 10, 15, 10));
         topPanel.add(lblTitle, BorderLayout.NORTH);

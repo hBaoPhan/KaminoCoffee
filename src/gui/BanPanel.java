@@ -229,6 +229,7 @@ public class BanPanel extends JTabbedPane implements ActionListener, ChangeListe
 		String header[] = { "Tên món", "Số lượng", "Đơn giá", "Thành tiền" };
 		modelMonAn = new DefaultTableModel(header, 0);
 		tableMonAn = new JTable(modelMonAn);
+		tableMonAn.setEnabled(false);
 		tableMonAn.setBackground(Color.WHITE);
 		JScrollPane scrDanhSachMon = new JScrollPane(tableMonAn);
 		boxArrayThongTinBan[10].add(scrDanhSachMon);

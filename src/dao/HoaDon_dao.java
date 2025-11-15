@@ -96,7 +96,7 @@ public class HoaDon_dao {
 				boolean isPaid = rs.getBoolean("trangThaiThanhToan");
 				trangThaiStr = isPaid ? "Đã thanh toán" : "Chờ thanh toán";
 
-				String khdkStr = rs.getBoolean("laKHDK") ? "Có" : "Không";
+				String khdkStr = rs.getString("laKHDK");
 
 				double tongTienDouble = rs.getDouble("TongTien");
 

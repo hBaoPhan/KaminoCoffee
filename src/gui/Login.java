@@ -24,6 +24,7 @@ import connectDB.ConnectDB;
 import dao.TaiKhoan_dao;
 import entity.TaiKhoan;
 
+@SuppressWarnings("serial")
 public class Login extends JFrame implements ActionListener {
 
 	private JTextField txtUserName;
